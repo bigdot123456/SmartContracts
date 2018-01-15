@@ -1,19 +1,18 @@
 pragma solidity ^0.4.11;
 
-import "../crowdsale/base/PriceTicker.sol";
+import "../priceticker/PriceTicker.sol";
 
 contract FakePriceTicker is PriceTicker {
 
-    function isPriceAvailable(bytes32 fsym, bytes32 tsym) constant returns (bool) {
+    function isPriceAvailable(bytes32, bytes32) public view returns (bool) {
         return true;
     }
 
-    function price(bytes32 fsym, bytes32 tsym) constant returns (uint, uint) {
-        return (10, 1);
+    function price(bytes32, bytes32) public view returns (uint) {
+        return (10**18);
     }
 
-    function requestPrice(bytes32 fsym, bytes32 tsym) payable returns (bytes32, uint) {
-
-        PriceTickerCallback(msg.sender).receivePrice(sha3(block.number, now), 10, 1);
+    function requestPrice(bytes32, bytes32) public payable returns (bytes32, uint) {
+        //PriceTickerCallback(msg.sender).receivePrice(keccak256(block.number, now), 10, 1);
     }
 }

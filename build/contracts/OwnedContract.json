@@ -16,15 +16,15 @@
       "type": "function"
     }
   ],
-  "bytecode": "0x6060604052341561000f57600080fd5b60c48061001d6000396000f300606060405260043610603e5763ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663ce606ee081146043575b600080fd5b3415604d57600080fd5b6053607c565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f35b60005473ffffffffffffffffffffffffffffffffffffffff16815600a165627a7a72305820b0311a084a362365391c07d54fc30926c8fb29888185c8d4ae519ca242d245220029",
-  "deployedBytecode": "0x606060405260043610603e5763ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663ce606ee081146043575b600080fd5b3415604d57600080fd5b6053607c565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f35b60005473ffffffffffffffffffffffffffffffffffffffff16815600a165627a7a72305820b0311a084a362365391c07d54fc30926c8fb29888185c8d4ae519ca242d245220029",
+  "bytecode": "0x6060604052341561000f57600080fd5b60c48061001d6000396000f300606060405260043610603e5763ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663ce606ee081146043575b600080fd5b3415604d57600080fd5b6053607c565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f35b60005473ffffffffffffffffffffffffffffffffffffffff16815600a165627a7a723058207a228d50e0d57f4eda9ea27a1de55050742dad5cd6f4b75237148744ffc00b1d0029",
+  "deployedBytecode": "0x606060405260043610603e5763ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663ce606ee081146043575b600080fd5b3415604d57600080fd5b6053607c565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390f35b60005473ffffffffffffffffffffffffffffffffffffffff16815600a165627a7a723058207a228d50e0d57f4eda9ea27a1de55050742dad5cd6f4b75237148744ffc00b1d0029",
   "sourceMap": "1573:60:17:-;;;;;;;;;;;;;;;;;",
   "deployedSourceMap": "1573:60:17:-;;;;;;;;;;;;;;;;;;;;;;;1602:28;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::o",
   "source": "pragma solidity ^0.4.11;\n\nimport \"./TokenExtensionRouter.sol\";\nimport \"./PlatformTokenExtensionGatewayManagerEmitter.sol\";\nimport \"./../TokenManagementInterface.sol\";\nimport \"../../core/contracts/ContractsManagerInterface.sol\";\nimport \"../../core/platform/ChronoBankPlatformInterface.sol\";\nimport \"../../core/platform/ChronoBankAssetOwnershipManager.sol\";\nimport \"../../core/platform/ChronoBankAssetProxyInterface.sol\";\nimport \"../../core/common/OwnedInterface.sol\";\nimport \"../../core/contracts/ContractsManagerInterface.sol\";\nimport \"../../core/erc20/ERC20ManagerInterface.sol\";\nimport \"../../core/erc20/ERC20Interface.sol\";\nimport \"./../AssetsManagerInterface.sol\";\nimport \"./../FeeInterface.sol\";\nimport \"../../timeholder/FeatureFeeAdapter.sol\";\nimport \"../../core/lib/StringsLib.sol\";\n\ncontract ChronoBankAsset {\n    function init(ChronoBankAssetProxyInterface _proxy) returns (bool);\n}\n\n\ncontract TokenFactory {\n    function createAsset() returns (address);\n    function createAssetWithFee(address owner) returns (address);\n    function createProxy() returns (address);\n}\n\n\ncontract PlatformFactory {\n    function createPlatform(address _eventsHistory, address _owner) returns (address);\n}\n\n\ncontract FactoryProvider {\n    function getTokenFactory() returns (TokenFactory);\n}\n\n\ncontract CrowdsaleManager {\n    function createCrowdsale(address _creator, bytes32 _symbol, bytes32 _factoryName) returns (address, uint);\n    function deleteCrowdsale(address crowdsale) returns (uint);\n}\n\n\ncontract BaseCrowdsale {\n    function getSymbol() constant returns (bytes32);\n}\n\n\ncontract OwnedContract {\n    address public contractOwner;\n}\n\n/**\n* @title Used as a library by TokenExtensionRouter which provides context and variables (platform, contractsManager)\n* when invoke methods of this contract.\n* Since this contract is designed to be used by delegatecall it doesn't inherit from any contract (except FeatureFeeAdapter)\n* and you should be careful when a need will arise to add more functionality by inheritance, because the contract uses\n* storage scheme from TokenExtensionRouter and it should be preserved.\n\n* It's responsibilities are to:\n* - create assets (with and without fee),\n* - create token crowdsale and remove them.\n\n* Some methods might take a fee by TIME tokens.\n*/\ncontract PlatformTokenExtensionGatewayManager is FeatureFeeAdapter {\n    uint constant UNAUTHORIZED = 0;\n    uint constant OK = 1;\n    uint constant REINITIALIZED = 6;\n    uint constant ERROR_TOKEN_EXTENSION_ASSET_TOKEN_EXISTS = 23001;\n    uint constant ERROR_TOKEN_EXTENSION_ASSET_COULD_NOT_BE_REISSUED = 23002;\n    uint constant ERROR_TOKEN_EXTENSION_ASSET_COULD_NOT_BE_REVOKED = 23003;\n    uint constant ERROR_TOKEN_EXTENSION_ASSET_OWNER_ONLY = 23004;\n\n    /** @dev platform address. It is initialized only by delegatecall context */\n    address internal contractsManager;\n\n    /** @dev platform address. It is initialized only by delegatecall context and 0x0 in other cases */\n    address internal platform;\n\n    /**\n     * Contract owner address\n     */\n    address public contractOwner;\n\n    /**\n     * Contract owner address\n     */\n    address public pendingContractOwner;\n\n    function PlatformTokenExtensionGatewayManager() {\n        contractOwner = msg.sender;\n    }\n\n    /**\n    * @dev Owner check modifier\n    */\n    modifier onlyContractOwner {\n        if (contractOwner == msg.sender) {\n            _;\n        }\n    }\n\n    /**\n    * @dev Guards methods to be called only by platform owner.\n    */\n    modifier onlyPlatformOwner {\n        if (OwnedContract(platform).contractOwner() == msg.sender ||\n            msg.sender == address(this)) {\n            _;\n        }\n    }\n\n    /**\n    * @dev Guards methods to be called only by platform itself.\n    *\n    * DEPRECATED. WILL BE REMOVED IN NEXT RELEASES\n    */\n    modifier onlyPlatform {\n        if (msg.sender == platform ||\n            msg.sender == address(this)) {\n            _;\n        }\n    }\n\n    /**\n    *  @dev Designed to be used by ancestors, inits internal fields.\n    *  Will rollback transaction if something goes wrong during initialization.\n    *  Registers contract as a service in ContractManager with given `_type`.\n    *\n    *  @param _contractsManager is contract manager, must be not 0x0\n    *  @return OK if newly initialized and everything is OK,\n    *  or REINITIALIZED if storage already contains some data. Will crash in any other cases.\n    */\n    function init(address _contractsManager) onlyContractOwner public returns (uint resultCode) {\n        require(_contractsManager != 0x0);\n\n        bool reinitialized = (contractsManager != 0x0);\n        if (contractsManager == 0x0 || contractsManager != _contractsManager) {\n            contractsManager = _contractsManager;\n        }\n\n        assert(OK == ContractsManagerInterface(contractsManager).addContract(this, \"TokenExtensionGateway\"));\n\n        return !reinitialized ? OK : REINITIALIZED;\n    }\n\n    function getEventsHistory() public constant returns (address) {\n        return lookupManager(\"MultiEventsHistory\");\n    }\n\n    /**\n     * @dev Destroy contract and scrub a data\n     * @notice Only owner can call it\n     */\n    function destroy() onlyContractOwner public {\n        ContractsManagerInterface(contractsManager).removeContract(this);\n        selfdestruct(msg.sender);\n    }\n\n    /**\n     * Prepares ownership pass.\n     *\n     * Can only be called by current owner.\n     *\n     * @param _to address of the next owner. 0x0 is not allowed.\n     *\n     * @return success.\n     */\n    function changeContractOwnership(address _to) onlyContractOwner public returns (bool) {\n        if (_to == 0x0) {\n            return false;\n        }\n\n        pendingContractOwner = _to;\n        return true;\n    }\n\n    /**\n     * Finalize ownership pass.\n     *\n     * Can only be called by pending owner.\n     *\n     * @return success.\n     */\n    function claimContractOwnership() public returns (bool) {\n        if (pendingContractOwner != msg.sender) {\n            return false;\n        }\n\n        contractOwner = pendingContractOwner;\n        delete pendingContractOwner;\n\n        return true;\n    }\n\n    /**\n    * @dev Direct ownership pass without change/claim pattern. Can be invoked only by current contract owner\n    *\n    * @param _to the next contract owner\n    *\n    * @return `true` if success, `false` otherwise\n    */\n    function transferContractOwnership(address _to) onlyContractOwner public returns (bool) {\n        if (_to == 0x0) {\n            return false;\n        }\n\n        if (pendingContractOwner != 0x0) {\n            pendingContractOwner = 0x0;\n        }\n\n        contractOwner = _to;\n        return true;\n    }\n\n    /**\n    * @dev Creates asset without fee. Performs asset registration in ERC20Manager.\n    * Allowed to be performed only from delegatecall and only by platform owner.\n    * Might take an additional fee in TIME tokens\n    *\n    * @param _symbol new asset's symbol\n    * @param _name asset's name\n    * @param _description description of an asset\n    * @param _value initial balance to issue\n    * @param _decimals decimals\n    * @param _isMint is reissuable\n    * @param _tokenImageIpfsHash asset image IPFS hash\n    *\n    * @return resultCode result code of an operation\n    */\n    function createAssetWithoutFee(\n        bytes32 _symbol,\n        string _name,\n        string _description,\n        uint _value,\n        uint8 _decimals,\n        bool _isMint,\n        bytes32 _tokenImageIpfsHash)\n    onlyPlatformOwner\n    public\n    returns (uint resultCode)\n    {\n        return _createAssetWithoutFee(_symbol, _name, _description, _value, _decimals, _isMint, _tokenImageIpfsHash, [uint(0)]);\n    }\n\n    function _createAssetWithoutFee(\n        bytes32 _symbol,\n        string _name,\n        string _description,\n        uint _value,\n        uint8 _decimals,\n        bool _isMint,\n        bytes32 _tokenImageIpfsHash,\n        uint[1] memory _result)\n    featured(_result)\n    private\n    returns (uint resultCode)\n    {\n        resultCode = _prepareAndIssueAssetOnPlatform(_symbol, _name, _description, _value, _decimals, _isMint);\n        if (resultCode != OK) {\n            return _emitError(resultCode);\n        }\n\n        address _asset = _createAsset(getTokenFactory());\n        address _token = _bindAssetWithToken(getTokenFactory(), _asset, _symbol, _name, _decimals, _tokenImageIpfsHash);\n\n        _emitAssetCreated(platform, _symbol, _token, msg.sender);\n\n        _result[0] = OK;\n        return OK;\n    }\n\n\n    /**\n    * @dev Creates asset with fee. Performs asset registration in ERC20Manager.\n    * Allowed to be performed only from delegatecall and only by platform owner.\n    * Might take an additional fee in TIME tokens\n    *\n    * @param _symbol new asset's symbol\n    * @param _name asset's name\n    * @param _description description of an asset\n    * @param _value initial balance to issue\n    * @param _decimals decimals\n    * @param _isMint is reissuable\n    * @param _feeAddress fee wallet address\n    * @param _feePercent fee percent value\n    * @param _tokenImageIpfsHash asset image IPFS hash\n    *\n    * @return resultCode result code of an operation\n    */\n    function createAssetWithFee(\n        bytes32 _symbol,\n        string _name,\n        string _description,\n        uint _value,\n        uint8 _decimals,\n        bool _isMint,\n        address _feeAddress,\n        uint32 _feePercent,\n        bytes32 _tokenImageIpfsHash)\n    onlyPlatformOwner\n    public\n    returns (uint resultCode) {\n        return _createAssetWithFee(_symbol, _name, _description, _value, _decimals, _isMint, _feeAddress, _feePercent, _tokenImageIpfsHash, [uint(0)]);\n    }\n\n    function _createAssetWithFee(\n        bytes32 _symbol,\n        string _name,\n        string _description,\n        uint _value,\n        uint8 _decimals,\n        bool _isMint,\n        address _feeAddress,\n        uint32 _feePercent,\n        bytes32 _tokenImageIpfsHash,\n        uint[1] memory _result)\n    featured(_result)\n    private\n    returns (uint resultCode)\n    {\n        require(_feeAddress != 0x0);\n\n        resultCode = _prepareAndIssueAssetOnPlatform(_symbol, _name, _description, _value, _decimals, _isMint);\n        if (resultCode != OK) {\n            return _emitError(resultCode);\n        }\n\n        address _token = _bindAssetWithToken(getTokenFactory(), _deployAssetWithFee(getTokenFactory(), _feeAddress, _feePercent), _symbol, _name, _decimals, _tokenImageIpfsHash);\n        _emitAssetCreated(platform, _symbol, _token, msg.sender);\n\n        _result[0] = OK;\n        return OK;\n    }\n\n\n    /**\n    * @dev Gets token and proxy factory\n    *\n    * @return factory address\n    */\n    function getTokenFactory() constant returns (TokenFactory) {\n        return FactoryProvider(lookupManager(\"AssetsManager\")).getTokenFactory();\n    }\n\n    /**\n    * @dev Creates crowdsale campaign of a token with provided symbol\n    * Might take an additional fee in TIME tokens\n    *\n    * @param _symbol a token symbol\n    *\n    * @return result code of an operation\n    */\n    function createCrowdsaleCampaign(bytes32 _symbol, bytes32 _crowdsaleFactoryName)\n    onlyPlatformOwner\n    public\n    returns (uint)\n    {\n        return _createCrowdsaleCampaign(_symbol, _crowdsaleFactoryName, [uint(0)]);\n    }\n\n    function _createCrowdsaleCampaign(\n        bytes32 _symbol,\n        bytes32 _crowdsaleFactoryName,\n        uint[1] memory _result)\n    featured(_result)\n    private\n    returns (uint)\n    {\n        require(_symbol != 0x0);\n        require(_crowdsaleFactoryName != 0x0);\n\n        ChronoBankAssetOwnershipManager _assetOwnershipManager = ChronoBankAssetOwnershipManager(getAssetOwnershipManager());\n        CrowdsaleManager crowdsaleManager = CrowdsaleManager(lookupManager(\"CrowdsaleManager\"));\n\n        var (_crowdsale, result) = crowdsaleManager.createCrowdsale(msg.sender, _symbol, _crowdsaleFactoryName);\n        if (result != OK) {\n            return _emitError(result);\n        }\n\n        if( OK != _assetOwnershipManager.addAssetPartOwner(_symbol, _crowdsale)) revert();\n\n        _emitCrowdsaleCampaignCreated(platform, _symbol, _crowdsale, msg.sender);\n\n        _result[0] = OK;\n        return OK;\n    }\n\n    /**\n    * @dev Stops token's crowdsale\n    *\n    * @param _crowdsale a crowdsale address\n    *\n    * @return result result code of an operation\n    */\n    function deleteCrowdsaleCampaign(address _crowdsale) onlyPlatformOwner public returns (uint result) {\n        bytes32 _symbol = BaseCrowdsale(_crowdsale).getSymbol();\n        ChronoBankAssetOwnershipManager _assetOwnershipManager = ChronoBankAssetOwnershipManager(getAssetOwnershipManager());\n\n        CrowdsaleManager crowdsaleManager = CrowdsaleManager(lookupManager(\"CrowdsaleManager\"));\n\n        result = crowdsaleManager.deleteCrowdsale(_crowdsale);\n        if (result != OK) {\n            return _emitError(result);\n        }\n\n        if(OK != _assetOwnershipManager.removeAssetPartOwner(_symbol, _crowdsale)) revert();\n\n        _emitCrowdsaleCampaignRemoved(platform, _symbol, _crowdsale, msg.sender);\n        return OK;\n    }\n\n    /**\n    * @dev Gets an interface for managing assets' ownership\n    *\n    * @return interface of assets ownership manager\n    */\n    function getAssetOwnershipManager() public constant returns (address) {\n        return platform;\n    }\n\n    /**\n    * @dev Gets a proxy where possible to reissue assets\n    *\n    * @return interface for reissuing assets\n    */\n    function getReissueAssetProxy() public constant returns (ReissuableAssetProxyInterface) {\n        return ReissuableAssetProxyInterface(platform);\n    }\n\n    /**\n    * @dev Gets a proxy where possible to revoke assets\n    *\n    * @return interface for revoking assets\n    */\n    function getRevokeAssetProxy() public constant returns (RevokableAssetProxyInterface) {\n        return RevokableAssetProxyInterface(platform);\n    }\n\n    /**\n    * @dev Checks symbol for existance in the system and issue new asset. PRIVATE\n    */\n    function _prepareAndIssueAssetOnPlatform(bytes32 _symbol, string _name, string _description, uint _value, uint8 _decimals, bool _isMint) private returns (uint) {\n        ERC20ManagerInterface _erc20Manager = ERC20ManagerInterface(lookupManager(\"ERC20Manager\"));\n        if (_erc20Manager.getTokenAddressBySymbol(_symbol) != 0x0) {\n            return ERROR_TOKEN_EXTENSION_ASSET_TOKEN_EXISTS;\n        }\n\n        return ChronoBankPlatformInterface(platform).issueAsset(_symbol, _value, _name, _description, _decimals, _isMint, msg.sender);\n    }\n\n    /**\n    * @dev Binds asset with proxy and register it in ERC20Manager. PRIVATE\n    */\n    function _bindAssetWithToken(TokenFactory _factory, address _asset, bytes32 _symbol, string _name, uint8 _decimals, bytes32 _ipfsHash) private returns (address token) {\n        token = _factory.createProxy();\n\n        if (OK != ChronoBankPlatformInterface(platform).setProxy(token, _symbol)) revert();\n\n        ChronoBankAssetOwnershipManager _assetOwnershipManager = ChronoBankAssetOwnershipManager(getAssetOwnershipManager());\n        ChronoBankAssetProxyInterface(token).init(platform, StringsLib.bytes32ToString(_symbol), _name);\n        ChronoBankAssetProxyInterface(token).proposeUpgrade(_asset);\n        ChronoBankAsset(_asset).init(ChronoBankAssetProxyInterface(token));\n        if (OK != _assetOwnershipManager.addAssetPartOwner(_symbol, this)) revert();\n        _assetOwnershipManager.changeOwnership(_symbol, msg.sender);\n\n        if(OK != _addToken(token, _symbol, _decimals, _ipfsHash)) revert();\n    }\n\n    /**\n    * @dev Creates asset with fee and setup according values. PRIVATE\n    *\n    * @param _factory token factory\n    * @param _feeAddress fee destination address\n    * @param _fee fee percent value\n    */\n    function _deployAssetWithFee(TokenFactory _factory, address _feeAddress, uint32 _fee) private returns (address _asset) {\n        _asset = _factory.createAssetWithFee(this);\n        FeeInterface(_asset).setupFee(_feeAddress, _fee);\n        OwnedInterface(_asset).transferContractOwnership(msg.sender);\n    }\n\n    /**\n    * @dev Creates asset without fee. PRIVATE\n    *\n    * @param _factory token factory\n    *\n    * @return _asset created asset address\n    */\n    function _createAsset(TokenFactory _factory) private returns (address _asset) {\n        _asset = _factory.createAsset();\n    }\n\n    /**\n    * Adds token to ERC20Manager contract\n    * @dev Make as a separate function because of stack size limits\n    *\n    * @param token token's address\n    * @param symbol asset's symbol\n    * @param decimals number of digits after floating point\n    *\n    * @return errorCode result code of an operation\n    */\n    function _addToken(address token, bytes32 symbol, uint8 decimals, bytes32 _ipfsHash) private returns (uint errorCode) {\n        ERC20ManagerInterface erc20Manager = ERC20ManagerInterface(lookupManager(\"ERC20Manager\"));\n        errorCode = erc20Manager.addToken(token, bytes32(0), symbol, bytes32(0), decimals, _ipfsHash, bytes32(0));\n    }\n\n    /**\n    * @dev Makes search in contractsManager for registered contract by some identifier\n    *\n    * @param _identifier string identifier of a manager\n    *\n    * @return manager address of a manager, 0x0 if nothing was found\n    */\n    function lookupManager(bytes32 _identifier) constant returns (address manager) {\n        manager = ContractsManagerInterface(contractsManager).getContractAddressByType(_identifier);\n        assert(manager != 0x0);\n    }\n\n\n    /**\n    * Events emitting\n    */\n\n    function _emitError(uint _errorCode) internal returns (uint) {\n        PlatformTokenExtensionGatewayManagerEmitter(getEventsHistory()).emitError(_errorCode);\n        return _errorCode;\n    }\n\n    function _emitAssetCreated(address _platform, bytes32 _symbol, address _token, address _by) private {\n        PlatformTokenExtensionGatewayManagerEmitter(getEventsHistory()).emitAssetCreated(_platform, _symbol, _token, _by);\n    }\n\n    function _emitCrowdsaleCampaignCreated(address _platform, bytes32 _symbol, address _campaign, address _by) private {\n        PlatformTokenExtensionGatewayManagerEmitter(getEventsHistory()).emitCrowdsaleCampaignCreated(_platform, _symbol, _campaign, _by);\n    }\n\n    function _emitCrowdsaleCampaignRemoved(address _platform, bytes32 _symbol, address _campaign, address _by) private {\n        PlatformTokenExtensionGatewayManagerEmitter(getEventsHistory()).emitCrowdsaleCampaignRemoved(_platform, _symbol, _campaign, _by);\n    }\n\n    function () public {\n        revert();\n    }\n}\n",
-  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/extensions/PlatformTokenExtensionGatewayManager.sol",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/extensions/PlatformTokenExtensionGatewayManager.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/extensions/PlatformTokenExtensionGatewayManager.sol",
+      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/extensions/PlatformTokenExtensionGatewayManager.sol",
       "exportedSymbols": {
         "BaseCrowdsale": [
           3109
@@ -69,7 +69,7 @@
       {
         "attributes": {
           "SourceUnit": 4369,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/extensions/TokenExtensionRouter.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/extensions/TokenExtensionRouter.sol",
           "file": "./TokenExtensionRouter.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -84,7 +84,7 @@
       {
         "attributes": {
           "SourceUnit": 4318,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/extensions/PlatformTokenExtensionGatewayManagerEmitter.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/extensions/PlatformTokenExtensionGatewayManagerEmitter.sol",
           "file": "./PlatformTokenExtensionGatewayManagerEmitter.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -99,7 +99,7 @@
       {
         "attributes": {
           "SourceUnit": 2995,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/TokenManagementInterface.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/TokenManagementInterface.sol",
           "file": "./../TokenManagementInterface.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -114,7 +114,7 @@
       {
         "attributes": {
           "SourceUnit": 5373,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/contracts/ContractsManagerInterface.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/contracts/ContractsManagerInterface.sol",
           "file": "../../core/contracts/ContractsManagerInterface.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -128,8 +128,8 @@
       },
       {
         "attributes": {
-          "SourceUnit": 11284,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/platform/ChronoBankPlatformInterface.sol",
+          "SourceUnit": 11289,
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/platform/ChronoBankPlatformInterface.sol",
           "file": "../../core/platform/ChronoBankPlatformInterface.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -143,8 +143,8 @@
       },
       {
         "attributes": {
-          "SourceUnit": 7939,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/platform/ChronoBankAssetOwnershipManager.sol",
+          "SourceUnit": 7944,
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/platform/ChronoBankAssetOwnershipManager.sol",
           "file": "../../core/platform/ChronoBankAssetOwnershipManager.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -158,8 +158,8 @@
       },
       {
         "attributes": {
-          "SourceUnit": 8652,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/platform/ChronoBankAssetProxyInterface.sol",
+          "SourceUnit": 8657,
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/platform/ChronoBankAssetProxyInterface.sol",
           "file": "../../core/platform/ChronoBankAssetProxyInterface.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -174,7 +174,7 @@
       {
         "attributes": {
           "SourceUnit": 5075,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/common/OwnedInterface.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/common/OwnedInterface.sol",
           "file": "../../core/common/OwnedInterface.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -189,7 +189,7 @@
       {
         "attributes": {
           "SourceUnit": 5373,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/contracts/ContractsManagerInterface.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/contracts/ContractsManagerInterface.sol",
           "file": "../../core/contracts/ContractsManagerInterface.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -203,8 +203,8 @@
       },
       {
         "attributes": {
-          "SourceUnit": 6791,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/erc20/ERC20ManagerInterface.sol",
+          "SourceUnit": 6796,
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/erc20/ERC20ManagerInterface.sol",
           "file": "../../core/erc20/ERC20ManagerInterface.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -218,8 +218,8 @@
       },
       {
         "attributes": {
-          "SourceUnit": 5444,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/erc20/ERC20Interface.sol",
+          "SourceUnit": 5449,
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/erc20/ERC20Interface.sol",
           "file": "../../core/erc20/ERC20Interface.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -234,7 +234,7 @@
       {
         "attributes": {
           "SourceUnit": 1407,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/AssetsManagerInterface.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/AssetsManagerInterface.sol",
           "file": "./../AssetsManagerInterface.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -249,7 +249,7 @@
       {
         "attributes": {
           "SourceUnit": 1581,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/FeeInterface.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/FeeInterface.sol",
           "file": "./../FeeInterface.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -263,8 +263,8 @@
       },
       {
         "attributes": {
-          "SourceUnit": 28565,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/timeholder/FeatureFeeAdapter.sol",
+          "SourceUnit": 29221,
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/timeholder/FeatureFeeAdapter.sol",
           "file": "../../timeholder/FeatureFeeAdapter.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -278,8 +278,8 @@
       },
       {
         "attributes": {
-          "SourceUnit": 7630,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/lib/StringsLib.sol",
+          "SourceUnit": 7635,
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/lib/StringsLib.sol",
           "file": "../../core/lib/StringsLib.sol",
           "scope": 4195,
           "symbolAliases": [
@@ -344,7 +344,7 @@
                         "attributes": {
                           "contractScope": null,
                           "name": "ChronoBankAssetProxyInterface",
-                          "referencedDeclaration": 8651,
+                          "referencedDeclaration": 8656,
                           "type": "contract ChronoBankAssetProxyInterface"
                         },
                         "id": 3041,
@@ -1293,14 +1293,14 @@
       {
         "attributes": {
           "contractDependencies": [
-            28564
+            29220
           ],
           "contractKind": "contract",
           "documentation": "@title Used as a library by TokenExtensionRouter which provides context and variables (platform, contractsManager)\nwhen invoke methods of this contract.\nSince this contract is designed to be used by delegatecall it doesn't inherit from any contract (except FeatureFeeAdapter)\nand you should be careful when a need will arise to add more functionality by inheritance, because the contract uses\nstorage scheme from TokenExtensionRouter and it should be preserved.\nIt's responsibilities are to:\n- create assets (with and without fee),\n- create token crowdsale and remove them.\nSome methods might take a fee by TIME tokens.",
           "fullyImplemented": true,
           "linearizedBaseContracts": [
             4194,
-            28564
+            29220
           ],
           "name": "PlatformTokenExtensionGatewayManager",
           "scope": 4195
@@ -1317,7 +1317,7 @@
                 "attributes": {
                   "contractScope": null,
                   "name": "FeatureFeeAdapter",
-                  "referencedDeclaration": 28564,
+                  "referencedDeclaration": 29220,
                   "type": "contract FeatureFeeAdapter"
                 },
                 "id": 3113,
@@ -1812,7 +1812,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36515,
+                                  "referencedDeclaration": 36974,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -1916,7 +1916,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36515,
+                                  "referencedDeclaration": 36974,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -2128,7 +2128,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 36515,
+                                      "referencedDeclaration": 36974,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -2179,7 +2179,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 36515,
+                                      "referencedDeclaration": 36974,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -2232,7 +2232,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 36664,
+                                      "referencedDeclaration": 37123,
                                       "type": "contract PlatformTokenExtensionGatewayManager",
                                       "value": "this"
                                     },
@@ -2354,7 +2354,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 36515,
+                                      "referencedDeclaration": 36974,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -2419,7 +2419,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 36515,
+                                      "referencedDeclaration": 36974,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -2472,7 +2472,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 36664,
+                                      "referencedDeclaration": 37123,
                                       "type": "contract PlatformTokenExtensionGatewayManager",
                                       "value": "this"
                                     },
@@ -2657,7 +2657,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 36518,
+                              "referencedDeclaration": 36977,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -3046,7 +3046,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 36506,
+                              "referencedDeclaration": 36965,
                               "type": "function (bool) pure",
                               "value": "assert"
                             },
@@ -3183,7 +3183,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 36664,
+                                      "referencedDeclaration": 37123,
                                       "type": "contract PlatformTokenExtensionGatewayManager",
                                       "value": "this"
                                     },
@@ -3621,7 +3621,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 36664,
+                              "referencedDeclaration": 37123,
                               "type": "contract PlatformTokenExtensionGatewayManager",
                               "value": "this"
                             },
@@ -3667,7 +3667,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 36521,
+                              "referencedDeclaration": 36980,
                               "type": "function (address)",
                               "value": "selfdestruct"
                             },
@@ -3693,7 +3693,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36515,
+                                  "referencedDeclaration": 36974,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -4130,7 +4130,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36515,
+                                  "referencedDeclaration": 36974,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -5541,7 +5541,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 28544,
+                      "referencedDeclaration": 29200,
                       "type": "modifier (uint256[1] memory)",
                       "value": "featured"
                     },
@@ -6308,7 +6308,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36515,
+                                  "referencedDeclaration": 36974,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -7404,7 +7404,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 28544,
+                      "referencedDeclaration": 29200,
                       "type": "modifier (uint256[1] memory)",
                       "value": "featured"
                     },
@@ -7461,7 +7461,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 36518,
+                              "referencedDeclaration": 36977,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -8252,7 +8252,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36515,
+                                  "referencedDeclaration": 36974,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -9079,7 +9079,7 @@
                       "overloadedDeclarations": [
                         null
                       ],
-                      "referencedDeclaration": 28544,
+                      "referencedDeclaration": 29200,
                       "type": "modifier (uint256[1] memory)",
                       "value": "featured"
                     },
@@ -9136,7 +9136,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 36518,
+                              "referencedDeclaration": 36977,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -9233,7 +9233,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 36518,
+                              "referencedDeclaration": 36977,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -9325,7 +9325,7 @@
                             "attributes": {
                               "contractScope": null,
                               "name": "ChronoBankAssetOwnershipManager",
-                              "referencedDeclaration": 7925,
+                              "referencedDeclaration": 7930,
                               "type": "contract ChronoBankAssetOwnershipManager"
                             },
                             "id": 3673,
@@ -9363,7 +9363,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 7925,
+                              "referencedDeclaration": 7930,
                               "type": "type(contract ChronoBankAssetOwnershipManager)",
                               "value": "ChronoBankAssetOwnershipManager"
                             },
@@ -9674,7 +9674,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36515,
+                                  "referencedDeclaration": 36974,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -9919,7 +9919,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "addAssetPartOwner",
-                                  "referencedDeclaration": 7892,
+                                  "referencedDeclaration": 7897,
                                   "type": "function (bytes32,address) external returns (uint256)"
                                 },
                                 "children": [
@@ -10008,7 +10008,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36519,
+                                  "referencedDeclaration": 36978,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -10139,7 +10139,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36515,
+                                  "referencedDeclaration": 36974,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -10542,7 +10542,7 @@
                             "attributes": {
                               "contractScope": null,
                               "name": "ChronoBankAssetOwnershipManager",
-                              "referencedDeclaration": 7925,
+                              "referencedDeclaration": 7930,
                               "type": "contract ChronoBankAssetOwnershipManager"
                             },
                             "id": 3752,
@@ -10580,7 +10580,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 7925,
+                              "referencedDeclaration": 7930,
                               "type": "type(contract ChronoBankAssetOwnershipManager)",
                               "value": "ChronoBankAssetOwnershipManager"
                             },
@@ -11073,7 +11073,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "removeAssetPartOwner",
-                                  "referencedDeclaration": 7883,
+                                  "referencedDeclaration": 7888,
                                   "type": "function (bytes32,address) external returns (uint256)"
                                 },
                                 "children": [
@@ -11162,7 +11162,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36519,
+                                  "referencedDeclaration": 36978,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -11293,7 +11293,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36515,
+                                  "referencedDeclaration": 36974,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -11957,7 +11957,7 @@
                             "attributes": {
                               "contractScope": null,
                               "name": "ERC20ManagerInterface",
-                              "referencedDeclaration": 6790,
+                              "referencedDeclaration": 6795,
                               "type": "contract ERC20ManagerInterface"
                             },
                             "id": 3850,
@@ -11995,7 +11995,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 6790,
+                              "referencedDeclaration": 6795,
                               "type": "type(contract ERC20ManagerInterface)",
                               "value": "ERC20ManagerInterface"
                             },
@@ -12117,7 +12117,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "getTokenAddressBySymbol",
-                                  "referencedDeclaration": 6758,
+                                  "referencedDeclaration": 6763,
                                   "type": "function (bytes32) view external returns (address)"
                                 },
                                 "children": [
@@ -12274,7 +12274,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "issueAsset",
-                              "referencedDeclaration": 11248,
+                              "referencedDeclaration": 11253,
                               "type": "function (bytes32,uint256,string memory,string memory,uint8,bool,address) external returns (uint256)"
                             },
                             "children": [
@@ -12304,7 +12304,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 11283,
+                                      "referencedDeclaration": 11288,
                                       "type": "type(contract ChronoBankPlatformInterface)",
                                       "value": "ChronoBankPlatformInterface"
                                     },
@@ -12438,7 +12438,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36515,
+                                  "referencedDeclaration": 36974,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -12846,7 +12846,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "setProxy",
-                                  "referencedDeclaration": 11110,
+                                  "referencedDeclaration": 11115,
                                   "type": "function (address,bytes32) external returns (uint256)"
                                 },
                                 "children": [
@@ -12876,7 +12876,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 11283,
+                                          "referencedDeclaration": 11288,
                                           "type": "type(contract ChronoBankPlatformInterface)",
                                           "value": "ChronoBankPlatformInterface"
                                         },
@@ -12974,7 +12974,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36519,
+                                  "referencedDeclaration": 36978,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -13020,7 +13020,7 @@
                             "attributes": {
                               "contractScope": null,
                               "name": "ChronoBankAssetOwnershipManager",
-                              "referencedDeclaration": 7925,
+                              "referencedDeclaration": 7930,
                               "type": "contract ChronoBankAssetOwnershipManager"
                             },
                             "id": 3919,
@@ -13058,7 +13058,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 7925,
+                              "referencedDeclaration": 7930,
                               "type": "type(contract ChronoBankAssetOwnershipManager)",
                               "value": "ChronoBankAssetOwnershipManager"
                             },
@@ -13153,7 +13153,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "init",
-                              "referencedDeclaration": 8643,
+                              "referencedDeclaration": 8648,
                               "type": "function (address,string memory,string memory) external"
                             },
                             "children": [
@@ -13183,7 +13183,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 8651,
+                                      "referencedDeclaration": 8656,
                                       "type": "type(contract ChronoBankAssetProxyInterface)",
                                       "value": "ChronoBankAssetProxyInterface"
                                     },
@@ -13257,7 +13257,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "bytes32ToString",
-                                  "referencedDeclaration": 7628,
+                                  "referencedDeclaration": 7633,
                                   "type": "function (bytes32) view returns (string memory)"
                                 },
                                 "children": [
@@ -13267,7 +13267,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 7629,
+                                      "referencedDeclaration": 7634,
                                       "type": "type(library StringsLib)",
                                       "value": "StringsLib"
                                     },
@@ -13353,7 +13353,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "proposeUpgrade",
-                              "referencedDeclaration": 8650,
+                              "referencedDeclaration": 8655,
                               "type": "function (address) external returns (bool)"
                             },
                             "children": [
@@ -13383,7 +13383,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 8651,
+                                      "referencedDeclaration": 8656,
                                       "type": "type(contract ChronoBankAssetProxyInterface)",
                                       "value": "ChronoBankAssetProxyInterface"
                                     },
@@ -13460,7 +13460,7 @@
                             "attributes": {
                               "argumentTypes": [
                                 {
-                                  "typeIdentifier": "t_contract$_ChronoBankAssetProxyInterface_$8651",
+                                  "typeIdentifier": "t_contract$_ChronoBankAssetProxyInterface_$8656",
                                   "typeString": "contract ChronoBankAssetProxyInterface"
                                 }
                               ],
@@ -13557,7 +13557,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 8651,
+                                  "referencedDeclaration": 8656,
                                   "type": "type(contract ChronoBankAssetProxyInterface)",
                                   "value": "ChronoBankAssetProxyInterface"
                                 },
@@ -13660,7 +13660,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "addAssetPartOwner",
-                                  "referencedDeclaration": 7892,
+                                  "referencedDeclaration": 7897,
                                   "type": "function (bytes32,address) external returns (uint256)"
                                 },
                                 "children": [
@@ -13703,7 +13703,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36664,
+                                  "referencedDeclaration": 37123,
                                   "type": "contract PlatformTokenExtensionGatewayManager",
                                   "value": "this"
                                 },
@@ -13749,7 +13749,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36519,
+                                  "referencedDeclaration": 36978,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -13806,7 +13806,7 @@
                               "isPure": false,
                               "lValueRequested": false,
                               "member_name": "changeOwnership",
-                              "referencedDeclaration": 7924,
+                              "referencedDeclaration": 7929,
                               "type": "function (bytes32,address) external returns (uint256)"
                             },
                             "children": [
@@ -13861,7 +13861,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36515,
+                                  "referencedDeclaration": 36974,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -14058,7 +14058,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36519,
+                                  "referencedDeclaration": 36978,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -14313,7 +14313,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36664,
+                                  "referencedDeclaration": 37123,
                                   "type": "contract PlatformTokenExtensionGatewayManager",
                                   "value": "this"
                                 },
@@ -14580,7 +14580,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 36515,
+                                  "referencedDeclaration": 36974,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -14987,7 +14987,7 @@
                             "attributes": {
                               "contractScope": null,
                               "name": "ERC20ManagerInterface",
-                              "referencedDeclaration": 6790,
+                              "referencedDeclaration": 6795,
                               "type": "contract ERC20ManagerInterface"
                             },
                             "id": 4048,
@@ -15025,7 +15025,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 6790,
+                              "referencedDeclaration": 6795,
                               "type": "type(contract ERC20ManagerInterface)",
                               "value": "ERC20ManagerInterface"
                             },
@@ -15178,7 +15178,7 @@
                                   "isPure": false,
                                   "lValueRequested": false,
                                   "member_name": "addToken",
-                                  "referencedDeclaration": 6789,
+                                  "referencedDeclaration": 6794,
                                   "type": "function (address,bytes32,bytes32,bytes32,uint8,bytes32,bytes32) external returns (uint256)"
                                 },
                                 "children": [
@@ -15462,7 +15462,7 @@
               "payable": false,
               "scope": 4194,
               "stateMutability": "view",
-              "superFunction": 28551,
+              "superFunction": 29207,
               "visibility": "public"
             },
             "children": [
@@ -15708,7 +15708,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 36506,
+                              "referencedDeclaration": 36965,
                               "type": "function (bool) pure",
                               "value": "assert"
                             },
@@ -17149,7 +17149,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 36519,
+                              "referencedDeclaration": 36978,
                               "type": "function () pure",
                               "value": "revert"
                             },
@@ -17193,5 +17193,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-15T09:25:14.772Z"
+  "updatedAt": "2018-01-12T11:40:44.607Z"
 }

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.11;
 
 import "../../core/common/Object.sol";
-import "../base/PriceTicker.sol";
+import "../../priceticker/PriceTicker.sol";
 
 /**
 *  @title CryptoCompare Price Ticker
@@ -45,11 +45,11 @@ contract CryptocomparePriceTicker is PriceTicker, Object {
     /**
     *  Implement PriceTicker interface.
     */
-    function price(bytes32 _fsym, bytes32 _tsym) constant returns (uint, uint) {
-        if (isEquivalentSymbol(_fsym, _tsym)) return (1, 0);
+    function price(bytes32 _fsym, bytes32 _tsym) constant returns (uint) {
+        if (isEquivalentSymbol(_fsym, _tsym)) return (1 ** 18);
 
         ExchangePrice memory exchangePrice = exchangePrices[sha3(_fsym, _tsym)];
-        return (exchangePrice.rate, EXCHANGE_RATE_DECIMALS);
+        return (exchangePrice.rate ** EXCHANGE_RATE_DECIMALS);
     }
 
     /**

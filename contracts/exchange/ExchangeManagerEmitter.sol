@@ -3,39 +3,33 @@ pragma solidity ^0.4.11;
 import '../core/event/MultiEventsHistoryAdapter.sol';
 
 contract ExchangeManagerEmitter is MultiEventsHistoryAdapter {
-    event ExchangeRemoved(address indexed self, address indexed user, address exchange);
-    event ExchangeAdded(address indexed self, address indexed user, address exchange, uint count);
-    event ExchangeEdited(address indexed self, address indexed user, address oldExchange, address newExchange);
-    event ExchangeCreated(address indexed self, address indexed user, address exchange, uint count);
-    event ExchangeOwnerAdded(address indexed self, address indexed user, address owner, address exchange);
-    event ExchangeOwnerRemoved(address indexed self, address indexed user, address owner, address exchange);
+    event ExchangeCreated(
+        address indexed self,
+        address indexed user,
+        address exchange,
+        bytes32 symbol);
+    event ExchangeAdded(address indexed self, address indexed user, address exchange, bytes32 symbol);
+    event ExchangeRemoved(address indexed self, address exchange, bytes32 symbol);
     event Error(address indexed self, uint errorCode);
 
-    function emitExchangeRemoved(address user, address exchange) {
-        ExchangeRemoved(_self(), user, exchange);
+    function emitExchangeCreated(
+        address user,
+        address exchange,
+        bytes32 symbol)
+    public
+    {
+        ExchangeCreated(_self(), user, exchange, symbol);
     }
 
-    function emitExchangeAdded(address user, address exchange, uint count) {
-        ExchangeAdded(_self(), user, exchange, count);
+    function emitExchangeRemoved(address exchange, bytes32 symbol) public {
+        ExchangeRemoved(_self(), exchange, symbol);
     }
 
-    function emitExchangeEdited(address user, address oldExchange, address newExchange) {
-        ExchangeEdited(_self(), user, oldExchange, newExchange);
+    function emitExchangeAdded(address user, address exchange, bytes32 symbol) public {
+        ExchangeAdded(_self(), user, exchange, symbol);
     }
 
-    function emitExchangeCreated(address user, address exchange, uint count) {
-        ExchangeCreated(_self(), user, exchange, count);
-    }
-
-    function emitExchangeOwnerAdded(address user, address owner, address exchange) {
-        ExchangeOwnerAdded(_self(), user, owner, exchange);
-    }
-
-    function emitExchangeOwnerRemoved(address user, address owner, address exchange) {
-        ExchangeOwnerRemoved(_self(), user, owner, exchange);
-    }
-
-    function emitError(uint errorCode) {
-        Error(_self(),errorCode);
+    function emitError(uint errorCode) public {
+        Error(_self(), errorCode);
     }
 }

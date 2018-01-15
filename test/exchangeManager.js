@@ -1,181 +1,99 @@
-const FakeCoin = artifacts.require("./FakeCoin.sol")
-const FakeCoin2 = artifacts.require("./FakeCoin2.sol")
+const ContractsManager = artifacts.require("./ContractsManager.sol")
 const Exchange = artifacts.require("./Exchange.sol")
+const ExchangeFactory = artifacts.require("./ExchangeFactory.sol")
 const Setup = require('../setup/setup')
 const Reverter = require('./helpers/reverter')
 const bytes32 = require('./helpers/bytes32')
 const ErrorsEnum = require("../common/errors")
+const eventsHelper = require('./helpers/eventsHelper')
 
 contract('Exchange Manager', function(accounts) {
-    const owner = accounts[0]
-    const owner1 = accounts[1]
-    const owner2 = accounts[2]
-    const owner3 = accounts[3]
-    const owner4 = accounts[4]
-    const owner5 = accounts[5]
-    const nonOwner = accounts[6]
-    const SYMBOL = 'TIME'
-    let coin
-    let coin2
-    let exchange
+  const owner = accounts[0]
+  const owner1 = accounts[1]
+  const owner2 = accounts[2]
+  const owner3 = accounts[3]
+  const owner4 = accounts[4]
+  const owner5 = accounts[5]
+  const nonOwner = accounts[6]
+  const manager = accounts[3]
+  const SYMBOL = 'TIME'
 
+  before('setup', function (done) {
+      Setup.setup(done)
+  })
 
-    before('setup', function (done) {
-        FakeCoin.deployed().then(function(instance) {
-            coin = instance
-            return FakeCoin2.deployed()
-        }).then(function(instance) {
-            coin2 = instance
-            return Exchange.new()
-        }).then(function(instance) {
-            exchange = instance
-            Setup.setup(done)
-        })
-    })
+  it("should has a valid factory", async () => {
+      let factory = await Setup.exchangeManager.getExchangeFactory.call();
+      assert.equal(factory, ExchangeFactory.address);
+  })
 
-    context("CRUD interface test", function () {
+  it("should allow to create a new exchange", async () => {
+    let result = await Setup.exchangeManager.createExchange.call(SYMBOL, 1, 2, false, manager, true);
+    assert.equal(result, ErrorsEnum.OK);
 
-        it("should allow to create new exchange", function () {
-            return Setup.exchangeManager.createExchange.call(SYMBOL, false)
-            .then(function (r) {
-                assert.equal(r, ErrorsEnum.OK);
-                return Setup.exchangeManager.createExchange(SYMBOL, false);
-            });
-        });
+    let createExchangeTx = await Setup.exchangeManager.createExchange(SYMBOL, 1, 2, false, manager, true);
 
-        it("should allow to add exchange contract", function () {
-            return Setup.exchangeManager.addExchange.call(exchange.address, {
-                from: accounts[0],
-                gas: 3000000
-            }).then(function (r) {
-                return Setup.exchangeManager.addExchange(exchange.address, {
-                    from: accounts[0],
-                    gas: 3000000
-                }).then(function () {
-                    assert.equal(r, ErrorsEnum.OK);
-                });
-            });
-        });
+    let events = eventsHelper.extractEvents(createExchangeTx, "ExchangeCreated");
+    assert.equal(events.length, 1);
 
-        it("shouldn't allow to add exchange contract twice", function () {
-            return Setup.exchangeManager.addExchange.call(exchange.address, {
-                from: accounts[0],
-                gas: 3000000
-            }).then(function (r) {
-                return Setup.exchangeManager.addExchange(exchange.address, {
-                    from: accounts[0],
-                    gas: 3000000
-                }).then(function () {
-                    assert.equal(r, ErrorsEnum.EXCHANGE_STOCK_INVALID_PARAMETER);
-                });
-            });
-        });
+    let exchange = events[0].args.exchange;
 
-        it("shouldn't add exchange contract if it is not an exchange contract", function () {
-            return Setup.exchangeManager.addExchange(coin.address, {
-                from: accounts[0],
-                gas: 3000000
-            }).then(assert.fail, () => true)
-        });
+    let exchangeExists = await Setup.exchangeManager.isExchangeExists.call(exchange);
+    assert.isTrue(exchangeExists);
 
-        it("shouldn't allow exchange owner to delete exchange contract to nonOwner", function () {
-            return Setup.exchangeManager.removeExchange.call(exchange.address, {from: accounts[1]}).then(function (r) {
-                assert.equal(r,ErrorsEnum.UNAUTHORIZED);
-            });
-        });
+    let exchanges = await Setup.exchangeManager.getExchangesForOwner.call(owner);
+    assert.equal(exchanges.length, 1);
+    assert.equal(exchanges[0], exchange);
+  });
 
-        it("should allow exchange owner to delete exchange contract to owner", function () {
-            return Setup.exchangeManager.removeExchange.call(exchange.address).then(function (r) {
-                return Setup.exchangeManager.removeExchange(exchange.address).then(function () {
-                    assert.equal(r, ErrorsEnum.OK);
-                });
-            });
-        });
+  it("should cleanup an exchange info after Exchange#kill() execution", async () => {
+    let createExchangeTx = await Setup.exchangeManager.createExchange(SYMBOL, 1, 2, false, 0x0, false);
 
+    let events = eventsHelper.extractEvents(createExchangeTx, "ExchangeCreated");
+    assert.equal(events.length, 1);
+
+    let exchange = events[0].args.exchange;
+
+    let exchangeExists = await Setup.exchangeManager.isExchangeExists.call(exchange);
+    assert.isTrue(exchangeExists);
+
+    let theExchange = await Exchange.at(exchange);
+    let killTx = await theExchange.kill();
+
+    assert.isFalse(await Setup.exchangeManager.isExchangeExists.call(exchange));
+    assert.isFalse(await Setup.multiEventsHistory.isAuthorized(theExchange.address));
+  });
+
+  context("Access rights", function () {
+    it("should allow to set fee by CBE", async() => {
+        await Setup.userManager.addCBE(owner5, 0x0)
+        let isCBE = await Setup.userManager.isAuthorized.call(owner5);
+        assert.isTrue(isCBE);
+
+        let fee = await Setup.exchangeManager.getFee.call();
+        let newFee = fee.toNumber() + 1;
+
+        await Setup.exchangeManager.setFee(newFee, {from: owner5})
+        fee = await Setup.exchangeManager.getFee.call();
+        assert.equal(newFee, fee.toNumber());
     });
 
-    context("Security tests", function () {
+    it("shouldn't allow non-CBE to set fee", async() => {
+        let isCBE = await Setup.userManager.isAuthorized.call(owner4);
+        assert.isFalse(isCBE);
 
-        it("should allow to add exchange contract", function () {
-            return Setup.exchangeManager.addExchange.call(exchange.address, {from: owner1}).then(function (r) {
-                return Setup.exchangeManager.addExchange(exchange.address, {from: owner1}).then(function () {
-                    assert.equal(r, ErrorsEnum.OK);
-                });
-            });
-        });
+        let fee = await Setup.exchangeManager.getFee.call();
+        let newFee = fee.toNumber() + 1;
 
-        it("should show acccount[1] as exchange contract owner", function () {
-            return Setup.exchangeManager.getExchangeOwners.call(exchange.address).then(function (r) {
-                assert.equal(r[0],owner1);
-            });
-        });
-
-        it("shouldn't allow exchange nonOwner to add owner to exchange contract", function () {
-            return Setup.exchangeManager.addExchangeOwner.call(exchange.address,owner).then(function (r) {
-                return Setup.exchangeManager.addExchangeOwner(exchange.address, owner).then(function () {
-                    return Setup.exchangeManager.getExchangeOwners.call(exchange.address).then(function (r2)
-                    {
-                        assert.equal(r, ErrorsEnum.UNAUTHORIZED);
-                        assert.equal(r2.length, 1);
-                    });
-                });
-            });
-        });
-
-        it("should allow exchange owner to add new owner to exchange", function () {
-            return Setup.exchangeManager.addExchangeOwner.call(exchange.address, owner, {from: owner1}).then(function (r) {
-                return Setup.exchangeManager.addExchangeOwner(exchange.address, owner, {from: owner1}).then(function () {
-                    return Setup.exchangeManager.isExchangeOwner.call(exchange.address,owner).then(function (r2) {
-                        assert.equal(r, ErrorsEnum.OK);
-                        assert.equal(r2, true);
-                    });
-                });
-            });
-        });
-
-        it("shouldn't allow exchange nonOwner to delete owner of exchange", function () {
-            return Setup.exchangeManager.isExchangeOwner.call(exchange.address, owner).then(function (r) {
-                return Setup.exchangeManager.removeExchangeOwner.call(exchange.address, owner, {from: owner2}).then(function (r2) {
-                    return Setup.exchangeManager.removeExchangeOwner(exchange.address, owner, {from: owner2}).then(function () {
-                        return Setup.exchangeManager.isExchangeOwner.call(exchange.address, owner).then(function (r3) {
-                            assert.equal(r, true);
-                            assert.equal(r2, ErrorsEnum.UNAUTHORIZED);
-                            assert.equal(r3, true);
-                        });
-                    });
-                });
-            });
-        });
-
-        it("should allow exchange owner to delete owner of exchange", function () {
-            return Setup.exchangeManager.isExchangeOwner.call(exchange.address, owner).then(function (r) {
-                return Setup.exchangeManager.removeExchangeOwner.call(exchange.address, owner, {from: owner1}).then(function (r2) {
-                    return Setup.exchangeManager.removeExchangeOwner(exchange.address, owner, {from: owner1}).then(function () {
-                        return Setup.exchangeManager.isExchangeOwner.call(exchange.address, owner).then(function (r3) {
-                            assert.equal(r, true);
-                            assert.equal(r2, ErrorsEnum.OK);
-                            assert.equal(r3, false);
-                        });
-                    });
-                });
-            });
-        });
-
-        it("shouldn't allow exchange owner to delete himself from exchange owners", function () {
-            return Setup.exchangeManager.isExchangeOwner.call(exchange.address, owner1).then(function (r) {
-                return Setup.exchangeManager.removeExchangeOwner.call(exchange.address, owner1, {from: owner1}).then(function (r2) {
-                    return Setup.exchangeManager.removeExchangeOwner(exchange.address, owner1, {from: owner1}).then(function () {
-                        return Setup.exchangeManager.isExchangeOwner.call(exchange.address, owner1).then(function (r3) {
-                            assert.equal(r, true);
-                            assert.equal(r2, ErrorsEnum.EXCHANGE_STOCK_INVALID_PARAMETER);
-                            assert.equal(r3, true);
-                        });
-                    });
-                });
-            });
-        });
-
+        await Setup.exchangeManager.setFee(newFee, {from: owner4})
+        fee = await Setup.exchangeManager.getFee.call();
+        assert.notEqual(newFee, fee.toNumber());
     });
 
-
+    it("shouldn't allow non-contract owner to change an Exchange Factory", async() => {
+        await Setup.exchangeManager.setExchangeFactory(owner2, {from: owner1});
+        let factory = await Setup.exchangeManager.getExchangeFactory.call();
+        assert.equal(ExchangeFactory.address, factory);
+    });
+  });
 });

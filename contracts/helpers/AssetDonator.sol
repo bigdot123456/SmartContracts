@@ -3,6 +3,7 @@ pragma solidity ^0.4.11;
 import "../core/contracts/ContractsManagerInterface.sol";
 import "../core/erc20/ERC20Manager.sol";
 import "../core/erc20/ERC20Interface.sol";
+import "../core/common/Object.sol";
 
 /**
 *  @title AssetDonator
@@ -11,15 +12,12 @@ import "../core/erc20/ERC20Interface.sol";
 *  in production network.
 *
 */
-contract AssetDonator {
+contract AssetDonator is Object {
     address contractManager;
     mapping (address => bool) public timeDonations;
 
-    function init(address _contractManager) {
-        if (_contractManager == 0x0) {
-            throw;
-        }
-
+    function init(address _contractManager) onlyContractOwner public {
+        require(_contractManager != 0x0);
         contractManager = _contractManager;
     }
 
@@ -29,7 +27,7 @@ contract AssetDonator {
     *
     *  @return success or not
     */
-    function sendTime() returns (bool) {
+    function sendTime() public returns (bool) {
         if (timeDonations[msg.sender]) {
            return false;
         }

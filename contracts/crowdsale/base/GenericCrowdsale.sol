@@ -2,7 +2,7 @@ pragma solidity ^0.4.11;
 
 import "../../core/common/Once.sol";
 import "./BaseCrowdsale.sol";
-import "./PriceTicker.sol";
+import "../../priceticker/PriceTicker.sol";
 
 /**
 *  @title GenericCrowdsale
@@ -18,7 +18,7 @@ import "./PriceTicker.sol";
 *  through multiple Sale Agents. Once a new Sale Agent contract is written,
 *  it can be permitted to sell tokens.
 */
-contract GenericCrowdsale is BaseCrowdsale , PriceTickerCallback, Once {
+contract GenericCrowdsale is BaseCrowdsale , Once {
     /* Data structure to hold information about campaign contributors
     `what is donated` => (`who donated` => `how much is donated`) */
     mapping (bytes32 => mapping(address => uint)) public donations;
@@ -119,8 +119,9 @@ contract GenericCrowdsale is BaseCrowdsale , PriceTickerCallback, Once {
         raised[_currencyCode] = raised[_currencyCode].add(_value);
 
         if (priceTicker.isPriceAvailable(_currencyCode, goal.currencyCode)) {
-            var (price, priceDecimals) = priceTicker.price(_currencyCode, goal.currencyCode);
-            mint(_investor, _value, price, priceDecimals);
+            // TODO
+            /* var (price, priceDecimals) = priceTicker.price(_currencyCode, goal.currencyCode);
+            mint(_investor, _value, price, priceDecimals); */
 
             NewSaleDone(msg.sender, _investor, _value, _currencyCode);
         } else {

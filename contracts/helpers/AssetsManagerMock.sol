@@ -4,14 +4,13 @@ import "../core/contracts/ContractsManagerInterface.sol";
 import "../assets/AssetsManagerInterface.sol";
 
 contract AssetsManagerMock is AssetsManagerInterface {
-
     uint constant OK = 1;
 
     address contractsManager;
     bytes32[] symbols;
     mapping(bytes32 => address) assets;
 
-    function init(address _contractsManager) returns(bool) {
+    function init(address _contractsManager) public returns (bool) {
         if(contractsManager != 0x0) {
             return false;
         }
@@ -26,23 +25,23 @@ contract AssetsManagerMock is AssetsManagerInterface {
     }
 
 
-    function isAssetSymbolExists(bytes32 _symbol) constant returns (bool) {
+    function isAssetSymbolExists(bytes32 _symbol) public view returns (bool) {
         return assets[_symbol] != 0x0;
     }
 
-    function getAssetsSymbols() constant returns (bytes32[]) {
+    function getAssetsSymbols() public view returns (bytes32[]) {
         return symbols;
     }
 
-    function getAssetsSymbolsCount() constant returns (uint) {
+    function getAssetsSymbolsCount() public view returns (uint) {
         return symbols.length;
     }
 
-    function getAssetBySymbol(bytes32 symbol) constant returns (address) {
+    function getAssetBySymbol(bytes32 symbol) public view returns (address) {
         return assets[symbol];
     }
-
-    function addAsset(address asset, bytes32 _symbol, address owner) returns (bool) {
+    
+    function addAsset(address asset, bytes32 _symbol, address) public returns (bool) {
         if (assets[_symbol] == 0x0) {
             symbols.push(_symbol);
             assets[_symbol] = asset;
@@ -51,31 +50,31 @@ contract AssetsManagerMock is AssetsManagerInterface {
         return false;
     }
 
-    function() {
-        revert();
-    }
-
-    function getAssetsForOwner(address platform, address owner) constant returns (bytes32[]) {
+    function getAssetsForOwner(address, address) public view returns (bytes32[]) {
         return symbols;
     }
 
-    function getAssetsForOwnerCount(address platform, address owner) constant returns (uint) {
+    function getAssetsForOwnerCount(address, address) public view returns (uint) {
         return symbols.length;
     }
 
-    function getAssetForOwnerAtIndex(address platform, address owner, uint _index) constant returns (bytes32) {
+    function getAssetForOwnerAtIndex(address, address, uint _index) public view returns (bytes32) {
         return symbols[_index];
     }
 
-    function isAssetOwner(bytes32 _symbol, address _user) constant returns (bool) {
+    function isAssetOwner(bytes32, address) public view returns (bool) {
         return true;
     }
 
-    function getTokenExtension(address _platform) constant returns (address) {
+    function getTokenExtension(address) public view returns (address) {
         revert();
     }
 
-    function requestTokenExtension(address _platform) returns (uint) {
+    function requestTokenExtension(address) public returns (uint) {
+        revert();
+    }
+
+    function() public {
         revert();
     }
 }
