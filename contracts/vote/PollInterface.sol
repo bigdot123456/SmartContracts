@@ -37,8 +37,7 @@ contract PollInterface is OwnedInterface {
 
     /// @notice Initializes a poll. Should not activate poll on this stage.
     function init(
-        bytes32[16] _options,
-        bytes32[4] _ipfsHashes,
+        uint _optionsCount,
         bytes32 _detailsIpfsHash,
         uint _votelimit,
         uint _deadline
@@ -65,30 +64,11 @@ contract PollInterface is OwnedInterface {
         bool _status,
         bool _active,
         uint _creation,
-        bytes32[] _options,
-        bytes32[] _hashes
+        uint _optionsCount
     );
 
     /// @notice Get information about current poll situation for existed options: how much tokens are placed for which options.
     function getVotesBalances() public constant returns (uint8[], uint[]);
-
-
-    /** Methods to update a poll's state before it will be activated */
-
-    /// @notice Updates poll details hash. Should be done when poll isn't active
-    function updatePollDetailsIpfsHash(bytes32 _detailsIpfsHash) public returns (uint);
-
-    /// @notice Adds a new options. Should be done when poll isn't active
-    function addPollOption(bytes32 _option) public returns (uint);
-
-    /// @notice Removes existed option from a poll. Should be done when poll isn't active
-    function removePollOption(bytes32 _option) public returns (uint);
-
-    /// @notice Adds ipfs hash to a list. Should be done when poll isn't active
-    function addPollIpfsHash(bytes32 _hash) public returns (uint);
-
-    /// @notice Removes ipfs hash from a list. Should be done when poll isn't active
-    function removePollIpfsHash(bytes32 _hash) public returns (uint);
 }
 
 

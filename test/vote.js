@@ -61,7 +61,7 @@ contract('Vote', function(accounts) {
         var polls = []
         for (var idx = 0; idx < count; ++idx) {
             var time = await clock.time.call()
-            let tx = await votingManager.createPoll([bytes32('11'),bytes32('22')],[bytes32('11'), bytes32('22')], bytes32('auto-created poll'), 150, time.plus(10000), { from: user })
+            let tx = await votingManager.createPoll(2, bytes32('auto-created poll'), 150, time.plus(10000), { from: user })
             let emitter = await VotingManagerEmitter.at(votingManager.address)
             let event = (await eventsHelper.findEvent([emitter], tx, 'PollCreated'))[0]
             assert.isDefined(event)
@@ -76,14 +76,6 @@ contract('Vote', function(accounts) {
         }
 
         return polls
-    }
-
-    let getOptions = async (poll) => {
-        return (await poll.getDetails.call())[7]
-    }
-
-    let getIpfsHashes = async (poll) => {
-        return (await poll.getDetails.call())[8]
     }
 
     before('setup', async () => {
@@ -159,13 +151,13 @@ contract('Vote', function(accounts) {
                 let currentTime = await clock.time.call()
                 deadline = currentTime.plus(10000)
 
-                let createdPollResult = await votingManager.createPoll.call(['1', '2'], ['1', '2'], vote1Obj.details, voteLimit.minus(1), deadline, {
+                let createdPollResult = await votingManager.createPoll.call(2, vote1Obj.details, voteLimit, deadline, {
                     from: owner,
                     gas: 3000000
                 })
                 assert.equal(createdPollResult, ErrorsEnum.OK)
 
-                let createdPollTx = await votingManager.createPoll(['1', '2'], ['1', '2'], vote1Obj.details, voteLimit.minus(1), deadline, {
+                let createdPollTx = await votingManager.createPoll(2, vote1Obj.details, voteLimit, deadline, {
                     from: owner,
                     gas: 3000000
                 })
@@ -190,7 +182,7 @@ contract('Vote', function(accounts) {
                 let currentTime = await clock.time.call()
 
                 try {
-                    let createdPollResult = await votingManager.createPoll.call(['1', '2'], ['1', '2'], vote1Obj.details, voteLimit.plus(1), currentTime.plus(10000), {
+                    let createdPollResult = await votingManager.createPoll.call(2, vote1Obj.details, voteLimit.plus(1), currentTime.plus(10000), {
                         from: owner,
                         gas: 3000000
                     })
@@ -246,7 +238,7 @@ contract('Vote', function(accounts) {
 
             it("should be able to fetch details for a poll", async () => {
                 let details = await pollEntity.getDetails.call()
-                assert.lengthOf(details, 9)
+                assert.lengthOf(details, 8)
                 assert.equal(details[0], owner)
                 assert.equal(details[1], vote1Obj.details)
                 assert.equal(details[3].toNumber(), deadline.toNumber())
@@ -265,14 +257,14 @@ contract('Vote', function(accounts) {
                 let currentTime = await clock.time.call()
                 deadline = currentTime.plus(10000)
 
-                let createdPollResult = await votingManager.createPoll.call(['3', '4'], ['3', '4'], vote1Obj.details, otherPollVotelimit, deadline, {
+                let createdPollResult = await votingManager.createPoll.call(2, vote1Obj.details, otherPollVotelimit, deadline, {
                     from: owner,
                     gas: 3000000
                 })
 
                 assert.equal(createdPollResult, ErrorsEnum.OK)
 
-                let createdPollTx = await votingManager.createPoll(['3', '4'], ['3', '4'], vote1Obj.details, otherPollVotelimit, deadline, {
+                let createdPollTx = await votingManager.createPoll(2, vote1Obj.details, otherPollVotelimit, deadline, {
                     from: owner,
                     gas: 3000000
                 })
@@ -301,13 +293,6 @@ contract('Vote', function(accounts) {
                 assert.include(polls, otherPollEntity.address)
             })
 
-            it('should participate in only one poll where owner have voted', async () => {
-                let membershipPolls = await votingManager.getMembershipPolls.call(owner)
-                let polls = membershipPolls.removeZeros()
-                assert.lengthOf(polls, 1)
-                assert.include(polls, pollEntity.address)
-            })
-
             it('should be able to have to 2 active polls for owner and vote, option 2', async () => {
                 try {
                     await otherPollEntity.activatePoll()
@@ -322,14 +307,6 @@ contract('Vote', function(accounts) {
                 assert.equal(successVotingResultCode, ErrorsEnum.OK)
 
                 let voteTx = await otherPollEntity.vote(2, { from: owner })
-            })
-
-            it('should have 2 polls where owner is participating', async () => {
-                let membershipPolls = await votingManager.getMembershipPolls.call(owner)
-                let polls = membershipPolls.removeZeros()
-                assert.lengthOf(polls, 2)
-                assert.include(polls, pollEntity.address)
-                assert.include(polls, otherPollEntity.address)
             })
 
             it('should be able to return polls\' details', async () => {
@@ -389,13 +366,6 @@ contract('Vote', function(accounts) {
                 assert.isOk(details[5]) // property: 'active'
             })
 
-            it('should show owner1 as a participant of one poll', async () => {
-                let membershipPolls = await votingManager.getMembershipPolls.call(owner1)
-                let polls = membershipPolls.removeZeros()
-                assert.lengthOf(polls, 1)
-                assert.include(polls, pollEntity.address)
-            })
-
             it('shouldn\'t show otherPoll as finished', async () => {
                 let details = await otherPollEntity.getDetails.call()
                 assert.isOk(details[5]) // property: 'active'
@@ -414,14 +384,6 @@ contract('Vote', function(accounts) {
             it('otherPoll should be shown as finished', async () => {
                 let details = await otherPollEntity.getDetails.call()
                 assert.isNotOk(details[5]) // property: 'active'
-            })
-
-            it('should show owner1 as a participant of two polls', async () => {
-                let membershipPolls = await votingManager.getMembershipPolls.call(owner1)
-                let polls = membershipPolls.removeZeros()
-                assert.lengthOf(polls, 2)
-                assert.include(polls, pollEntity.address)
-                assert.include(polls, otherPollEntity.address)
             })
 
             it('should be able to get balances of votes for poll', async () => {
@@ -550,24 +512,11 @@ contract('Vote', function(accounts) {
                 assert.equal(balances[1], timeTokensToWithdraw45Balance)
             })
 
-            it('owner1 should take part in 2 polls', async () => {
-                let membershipPolls = await votingManager.getMembershipPolls.call(owner1)
-                let polls = membershipPolls.removeZeros()
-                assert.lengthOf(polls, 2)
-            })
-
             it('should be able to withdraw 45 TIME tokens from owner1', async () => {
                 let successWithdrawal = await Setup.timeHolder.withdrawShares.call(45, { from: owner1 })
                 assert.isOk(successWithdrawal)
 
                 await Setup.timeHolder.withdrawShares(45, { from: owner1 })
-            })
-
-            it('owner1 should take part only in one poll', async () => {
-                let membershipPolls = await votingManager.getMembershipPolls.call(owner1)
-                let polls = membershipPolls.removeZeros()
-                assert.lengthOf(polls, 1)
-                assert.include(polls, otherPollEntity.address)
             })
 
             let remainderTimeTokenBalance = totalTimeTokens - timeTokensToWithdraw25Balance
@@ -617,259 +566,6 @@ contract('Vote', function(accounts) {
             })
         })
 
-        context('adding/removing parameters in a poll', function () {
-
-            const additionalOption = '5'
-            let firstPoll
-            let secondPoll
-
-            it('prepare', async () => {
-                firstPoll = multiplePolls[multiplePolls.length - 5]
-                secondPoll = multiplePolls[multiplePolls.length - 4]
-                assert.isDefined(firstPoll)
-                assert.isDefined(secondPoll)
-            })
-
-            it('owner should be an owner of polls', async () => {
-                let firstPollOwner = await firstPoll.owner.call()
-                assert.equal(firstPollOwner, owner)
-
-                let secondPollOwner = await secondPoll.owner.call()
-                assert.equal(secondPollOwner, owner)
-            })
-
-            it('should be able to update options list before activation by a poll owner', async () => {
-                let isActivated = await firstPoll.active.call()
-                assert.isNotOk(isActivated)
-
-                let originalOptions = await getOptions(firstPoll)
-                let originalLength = originalOptions.removeZeros().length
-
-                let successAddOptionResultCode = await firstPoll.addPollOption.call(additionalOption, { from: owner })
-                assert.equal(successAddOptionResultCode, ErrorsEnum.OK)
-
-                let addOptionTx = await firstPoll.addPollOption(additionalOption, { from: owner })
-                console.log('addOptionTx', addOptionTx.tx);
-                let emitter = await PollEmitter.at(firstPoll.address)
-                let event = (await eventsHelper.findEvent([emitter], addOptionTx, "PollDetailsOptionAdded"))[0]
-                assert.isDefined(event)
-                let changedOptions = await getOptions(firstPoll)
-                let changedLength = changedOptions.removeZeros().length
-                assert.isAbove(changedLength, originalLength)
-            })
-
-            it('should be able to remove an option from options list before activation by a poll owner', async () => {
-                let originalOptions = await getOptions(firstPoll)
-                let originalLength = originalOptions.removeZeros().length
-
-                let successRemoveOptionResultCode = await firstPoll.removePollOption.call(additionalOption, { from: owner })
-                assert.equal(successRemoveOptionResultCode, ErrorsEnum.OK)
-
-                let removeOptionTx = await firstPoll.removePollOption(additionalOption, { from: owner })
-                console.log('removeOptionTx', removeOptionTx.tx);
-                let emitter = await PollEmitter.at(firstPoll.address)
-                let event = (await eventsHelper.findEvent([emitter], removeOptionTx, "PollDetailsOptionRemoved"))[0]
-                assert.isDefined(event)
-
-                let changedOptions = await getOptions(firstPoll)
-                let changedLength = changedOptions.removeZeros().length
-                assert.isAbove(originalLength, changedLength)
-            })
-
-            it('a non-owner of a poll shouldn\'t be able to add options', async () => {
-                let nonPollOwner = nonOwner
-
-                let originalOptions = await getOptions(firstPoll)
-                let originalLength = originalOptions.removeZeros().length
-
-                let failedResultCode = await firstPoll.addPollOption.call(additionalOption, { from: nonPollOwner })
-                assert.equal(failedResultCode, ErrorsEnum.UNAUTHORIZED)
-
-                let addOptionTx = await firstPoll.addPollOption(additionalOption, { from: nonPollOwner })
-                let emitter = await PollEmitter.at(firstPoll.address)
-                let event = (await eventsHelper.findEvent([emitter], addOptionTx, "PollDetailsOptionAdded"))[0]
-                assert.isUndefined(event)
-
-                let notChangedOptions = await getOptions(firstPoll)
-                let notChangedLength = notChangedOptions.removeZeros().length
-                assert.equal(notChangedLength, originalLength)
-            })
-
-            it('a non-owner of a poll shouldn\'t be able to remove options', async () => {
-                let nonPollOwner = nonOwner
-
-                let originalOptions = await getOptions(firstPoll)
-                let originalLength = originalOptions.removeZeros().length
-
-                let failedResultCode = await firstPoll.removePollOption.call(additionalOption, { from: nonPollOwner })
-                assert.equal(failedResultCode, ErrorsEnum.UNAUTHORIZED)
-
-                let removeOptionTx = await firstPoll.removePollOption(additionalOption, { from: nonPollOwner })
-                let emitter = await PollEmitter.at(firstPoll.address)
-                let event = (await eventsHelper.findEvent([emitter], removeOptionTx, "PollDetailsOptionRemoved"))[0]
-                assert.isUndefined(event)
-
-                let notChangedOptions = await getOptions(firstPoll)
-                let notChangedLength = notChangedOptions.removeZeros().length
-                assert.equal(notChangedLength, originalLength)
-            })
-
-            it('should allow to update details hash for an inactive poll by an owner', async () => {
-                let updatedDetailsHash = bytes32('updatedhash')
-                let originalDetails = (await firstPoll.getDetails.call())[1]
-
-                let successUpdateResultCode = await firstPoll.updatePollDetailsIpfsHash.call(updatedDetailsHash, { from: owner })
-                assert.equal(successUpdateResultCode, ErrorsEnum.OK)
-
-                let updateDetailsTx = await firstPoll.updatePollDetailsIpfsHash(updatedDetailsHash, { from: owner })
-                let emitter = await PollEmitter.at(firstPoll.address)
-                let event = (await eventsHelper.findEvent([emitter], updateDetailsTx, "PollDetailsHashUpdated"))[0]
-                assert.isDefined(event)
-
-                let newDetails = (await firstPoll.getDetails.call())[1]
-                assert.equal(newDetails, updatedDetailsHash)
-            })
-
-            it('shouldn\'t allow to update details hash for an inactive poll by a non-owner of a poll', async () => {
-                let nonPollOwner = nonOwner
-
-                let updatedDetailsHash = bytes32('updatedhash-333')
-                let originalDetails = (await firstPoll.getDetails.call())[1]
-
-                let failedResultCode = await firstPoll.updatePollDetailsIpfsHash.call(updatedDetailsHash, { from: nonPollOwner })
-                assert.equal(failedResultCode, ErrorsEnum.UNAUTHORIZED)
-
-                let updateDetailsTx = await firstPoll.updatePollDetailsIpfsHash(updatedDetailsHash, { from: nonPollOwner })
-                let emitter = await PollEmitter.at(firstPoll.address)
-                let event = (await eventsHelper.findEvent([emitter], updateDetailsTx, "PollDetailsHashUpdated"))[0]
-                assert.isUndefined(event)
-
-                let newDetails = (await firstPoll.getDetails.call())[1]
-                assert.equal(newDetails, originalDetails)
-            })
-
-            const additionalIpfsHash = bytes32('2222')
-
-            it('should be able to update ifpsHashes list before activation by a poll owner', async () => {
-                let isActivated = await firstPoll.active.call()
-                assert.isNotOk(isActivated)
-
-                let originalIpfsHashes = await getIpfsHashes(firstPoll)
-                let originalLength = originalIpfsHashes.removeZeros().length
-
-                let successAddIpfsHashResultCode = await firstPoll.addPollIpfsHash.call(additionalIpfsHash, { from: owner })
-                assert.equal(successAddIpfsHashResultCode, ErrorsEnum.OK)
-
-                let addIpfsHashTx = await firstPoll.addPollIpfsHash(additionalIpfsHash, { from: owner })
-                console.log('addIpfsHashTx', addIpfsHashTx.tx);
-                let emitter = await PollEmitter.at(firstPoll.address)
-                let event = (await eventsHelper.findEvent([emitter], addIpfsHashTx, "PollDetailsIpfsHashAdded"))[0]
-                assert.isDefined(event)
-
-                let changedIpfsHashes = await getIpfsHashes(firstPoll)
-                let changedLength = changedIpfsHashes.removeZeros().length
-                assert.isAbove(changedLength, originalLength)
-            })
-
-            it('should be able to remove an ifpsHash from ifpsHashes list before activation by a poll owner', async () => {
-                let originalIpfsHashes = await getIpfsHashes(firstPoll)
-                let originalLength = originalIpfsHashes.removeZeros().length
-
-                let successRemoveIpfsHashResultCode = await firstPoll.removePollIpfsHash.call(additionalIpfsHash, { from: owner })
-                assert.equal(successRemoveIpfsHashResultCode, ErrorsEnum.OK)
-
-                let removeIpfsHashTx = await firstPoll.removePollIpfsHash(additionalIpfsHash, { from: owner })
-                console.log('removeIpfsHashTx', removeIpfsHashTx.tx);
-                let emitter = await PollEmitter.at(firstPoll.address)
-                let event = (await eventsHelper.findEvent([emitter], removeIpfsHashTx, "PollDetailsIpfsHashRemoved"))[0]
-                assert.isDefined(event)
-
-                let changedIpfsHashes = await getIpfsHashes(firstPoll)
-                let changedLength = changedIpfsHashes.removeZeros().length
-                assert.isAbove(originalLength, changedLength)
-            })
-
-            it('a non-owner of a poll shouldn\'t be able to add ifpsHash', async () => {
-                let nonPollOwner = nonOwner
-
-                let originalIpfsHashes = await getIpfsHashes(firstPoll)
-                let originalLength = originalIpfsHashes.removeZeros().length
-
-                let failedResultCode = await firstPoll.addPollIpfsHash.call(additionalIpfsHash, { from: nonPollOwner })
-                assert.equal(failedResultCode, ErrorsEnum.UNAUTHORIZED)
-
-                let addIpfsHashTx = await firstPoll.addPollIpfsHash(additionalIpfsHash, { from: nonPollOwner })
-                let emitter = await PollEmitter.at(firstPoll.address)
-                let event = (await eventsHelper.findEvent([emitter], addIpfsHashTx, "PollDetailsIpfsHashAdded"))[0]
-                assert.isUndefined(event)
-
-                let notChangedIpfsHashes = await getIpfsHashes(firstPoll)
-                let notChangedLength = notChangedIpfsHashes.removeZeros().length
-                assert.equal(notChangedLength, originalLength)
-            })
-
-            it('a non-owner of a poll shouldn\'t be able to remove ifpsHash', async () => {
-                let nonPollOwner = nonOwner
-
-                let originalIpfsHashes = await getIpfsHashes(firstPoll)
-                let originalLength = originalIpfsHashes.removeZeros().length
-
-                let failedResultCode = await firstPoll.removePollIpfsHash.call(additionalIpfsHash, { from: nonPollOwner })
-                assert.equal(failedResultCode, ErrorsEnum.UNAUTHORIZED)
-
-                let removeIpfsHashTx = await firstPoll.removePollIpfsHash(additionalIpfsHash, { from: nonPollOwner })
-                let emitter = await PollEmitter.at(firstPoll.address)
-                let event = (await eventsHelper.findEvent([emitter], removeIpfsHashTx, "PollDetailsIpfsHashRemoved"))[0]
-                assert.isUndefined(event)
-
-                let notChangedIpfsHashes = await getIpfsHashes(firstPoll)
-                let notChangedLength = notChangedIpfsHashes.removeZeros().length
-                assert.equal(notChangedLength, originalLength)
-            })
-
-            it('should not allow to change any property in a poll when it was activated', async () => {
-                let poll = pollEntity
-                let isActivated = await poll.active.call()
-                assert.isOk(isActivated)
-
-                try {
-                    let addOptionTx = await poll.addPollOption(additionalOption, { from: owner })
-                    assert.isTrue(false)
-                } catch (e) {
-                    assert.isTrue(true)
-                }
-
-                try {
-                    let removeOptionTx = await poll.removePollOption(additionalOption, { from: owner })
-                    assert.isTrue(false)
-                } catch (e) {
-                    assert.isTrue(true)
-                }
-
-                try {
-                    let updateDetailsTx = await poll.updatePollDetailsIpfsHash(updatedDetailsHash, { from: owner })
-                    assert.isTrue(false)
-                } catch (e) {
-                    assert.isTrue(true)
-                }
-
-                try {
-                    let addIpfsHashTx = await poll.addPollIpfsHash(additionalIpfsHash, { from: owner })
-                    assert.isTrue(false)
-                } catch (e) {
-                    assert.isTrue(true)
-                }
-
-                try {
-                    let removeIpfsHashTx = await poll.removePollIpfsHash(additionalIpfsHash, { from: owner })
-                    assert.isTrue(false)
-                } catch (e) {
-                    assert.isTrue(true)
-                }
-            })
-        })
-
         it('revert', reverter.revert)
     })
-
 })

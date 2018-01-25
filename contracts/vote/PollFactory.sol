@@ -16,15 +16,14 @@ contract PollFactory {
     function createPoll(
         address _contractsManager,
         address _backend,
-        bytes32[16] _options,
-        bytes32[4] _ipfsHashes,
+        uint _optionsCount,
         bytes32 _detailsIpfsHash,
         uint _votelimit,
         uint _deadline
     ) public returns (address)
     {
         address _poll = address(new PollRouter(_contractsManager, _backend));
-        if (OK != PollInterface(_poll).init(_options, _ipfsHashes, _detailsIpfsHash, _votelimit, _deadline)) {
+        if (OK != PollInterface(_poll).init(_optionsCount, _detailsIpfsHash, _votelimit, _deadline)) {
             revert();
         }
 

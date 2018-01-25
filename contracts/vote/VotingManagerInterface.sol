@@ -18,9 +18,6 @@ contract VotingManagerInterface {
     /// @notice Gets a number of active polls. Could be restricted to some upper bounds.
     function getActivePollsCount() public view returns (uint);
 
-    /// @notice Gets a list of polls where provided user is participating (means, voted and had non-empty balance).
-    function getMembershipPolls(address _user) public view returns (address[]);
-
     /// @notice Gets detailed info for a list of provided polls.
     function getPollsDetails(address[] _polls) public view returns (
         address[] _owner,
@@ -35,10 +32,12 @@ contract VotingManagerInterface {
 
     /** Actions */
 
+    /// @notice Updates percents of total shares that should be locked (put) in a poll to say that poll is legally completed
+    function setVotesPercent(uint _percent) public returns (uint _resultCode);
+
     /// @notice Creates a new poll and register it in a manager.
     function createPoll(
-        bytes32[16] _options,
-        bytes32[4] _ipfsHashes,
+        uint _optionsCount,
         bytes32 _detailsIpfsHash,
         uint _votelimit,
         uint _deadline

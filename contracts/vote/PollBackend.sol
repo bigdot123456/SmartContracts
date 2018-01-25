@@ -3,7 +3,6 @@ pragma solidity ^0.4.11;
 import "../core/common/Owned.sol";
 import "../core/contracts/ContractsManagerInterface.sol";
 import "../core/lib/SafeMath.sol";
-import "../core/lib/ArrayLib.sol";
 import "../core/user/UserManagerInterface.sol";
 import "../timeholder/TimeHolderInterface.sol";
 import "../pending/MultiSigSupporter.sol";
@@ -23,7 +22,6 @@ contract PollBackend is Owned, MultiSigSupporter {
     /** Constants */
 
     uint8 constant OPTIONS_POLLS_MAX = 16;
-    uint8 constant IPFS_HASH_POLLS_MAX = 5;
 
     /** Error codes */
 
@@ -46,8 +44,7 @@ contract PollBackend is Owned, MultiSigSupporter {
     uint internal creation;
     bool public active;
     bool internal status;
-    bytes32[] internal options;
-    bytes32[] internal ipfsHashes;
+    uint internal optionsCount;
 
     mapping(address => uint8) public memberOptions;
     mapping(address => uint) public memberVotes;
@@ -116,7 +113,7 @@ contract PollBackend is Owned, MultiSigSupporter {
         return VotingManagerInterface(lookupManager("VotingManager")).getVoteLimit();
     }
 
-    /// @notice Gets full details of a poll including a list of options and ipfsHashes.
+    /// @notice Gets full details of a poll including a number of options
     /// @dev delegatecall only
     /// @return {
     ///   "_owner": "owner",
@@ -126,8 +123,7 @@ contract PollBackend is Owned, MultiSigSupporter {
     ///   "_status": 'is valid' status,
     ///   "_active": "is activated",
     ///   "_creation": "creation time",
-    ///   "_options": "list of options",
-    ///   "_hashes": "list of ipfs hashes"
+    ///   "_optionsCount": "list of options"
     /// }
     function getDetails() public view returns (
         address _owner,
@@ -137,8 +133,7 @@ contract PollBackend is Owned, MultiSigSupporter {
         bool _status,
         bool _active,
         uint _creation,
-        bytes32[] _options,
-        bytes32[] _hashes
+        uint _optionsCount
     ) {
         _owner = contractOwner;
         _detailsIpfsHash = detailsIpfsHash;
@@ -147,21 +142,20 @@ contract PollBackend is Owned, MultiSigSupporter {
         _status = status;
         _active = active;
         _creation = creation;
-        _options = options;
-        _hashes = ipfsHashes;
+        _optionsCount = optionsCount;
     }
 
     /// @notice Gets intermediate retults of a poll by providing options and their balances.
     /// @dev delegatecall only
     /// @return {
-    ///   "_options": "poll's options",
+    ///   "_options": "poll's options indices",
     ///   "_balances": "associated balances for options"
     /// }
     function getVotesBalances() public view returns (uint8[] _options, uint[] _balances) {
-        _options = new uint8[](options.length);
+        _options = new uint8[](optionsCount);
         _balances = new uint[](_options.length);
 
-        for (uint8 _idx = 0; _idx < _balances.length; ++_idx) {
+        for (uint8 _idx = 0; _idx < _options.length; ++_idx) {
             _options[_idx] = _idx + 1;
             _balances[_idx] = optionsBalance[_options[_idx]];
         }
@@ -171,42 +165,25 @@ contract PollBackend is Owned, MultiSigSupporter {
     ///
     /// @dev Could be invoked only once. delegatecall only
     ///
-    /// @param _options list of options to pick on active stage
-    /// @param _ipfsHashes list of ipfs hashes
+    /// @param _optionsCount number of options in a poll
     /// @param _detailsIpfsHash ipfs hash for poll's details info
     /// @param _votelimit votelimit. Should be less than votelimit that is defined on a backend
     /// @param _deadline time to end voting
     ///
     /// @return result code of an operation
-    function init(bytes32[16] _options, bytes32[4] _ipfsHashes, bytes32 _detailsIpfsHash, uint _votelimit, uint _deadline) onlyContractOwner public returns (uint) {
+    function init(uint _optionsCount, bytes32 _detailsIpfsHash, uint _votelimit, uint _deadline) onlyContractOwner public returns (uint) {
+        require(_optionsCount >= 2 && _optionsCount <= OPTIONS_POLLS_MAX);
         require(_detailsIpfsHash != bytes32(0));
-        require(_votelimit < getVoteLimit());
+        require(_votelimit <= getVoteLimit());
         require(_deadline > now);
 
+        optionsCount = _optionsCount;
         detailsIpfsHash = _detailsIpfsHash;
         votelimit = _votelimit;
         deadline = _deadline;
         creation = now;
         active = false;
         status = true;
-
-        options = new bytes32[](OPTIONS_POLLS_MAX);
-        ipfsHashes = new bytes32[](IPFS_HASH_POLLS_MAX);
-
-        uint8 i;
-        uint8 pointer = 0;
-        for (i = 0; i < _options.length; i++) {
-            if (_options[i] != bytes32(0)) {
-                options[pointer++] = _options[i];
-            }
-        }
-
-        pointer = 0;
-        for (i = 0; i < _ipfsHashes.length; i++) {
-            if (_ipfsHashes[i] != bytes32(0)) {
-                ipfsHashes[pointer++] = _ipfsHashes[i];
-            }
-        }
 
         return OK;
     }
@@ -220,7 +197,7 @@ contract PollBackend is Owned, MultiSigSupporter {
     /// @return _resultCode result code of an operation. Returns ERROR_POLL_BACKEND_NO_SHARES if
     /// a balance in TimeHolder for the user is equal to zero.
     function vote(uint8 _choice) public returns (uint _resultCode) {
-        require(_choice > 0 && _choice <= ArrayLib.nonEmptyLengthOfArray(options));
+        require(_choice > 0 && _choice <= optionsCount);
         require(memberOptions[msg.sender] == 0);
         require(status == true);
         require(active);
@@ -253,7 +230,6 @@ contract PollBackend is Owned, MultiSigSupporter {
     /// @return _resultCode result code of an operation.
     function activatePoll() public returns (uint _resultCode) {
         require(status == true);
-        require(ArrayLib.nonEmptyLengthOfArray(options) >= 2);
 
         _resultCode = multisig();
         if (_resultCode != OK) {
@@ -292,118 +268,6 @@ contract PollBackend is Owned, MultiSigSupporter {
 
         return _killPoll();
     }
-
-    /// @notice Changes details hash with a new version. Should be called before poll will be activated
-    /// Emits PollDetailsHashUpdated event
-    ///
-    /// @dev delegatecall only. poll owner only
-    ///
-    /// @param _detailsIpfsHash updated ipfs hash value
-    /// @return result code of an operation.
-    function updatePollDetailsIpfsHash(bytes32 _detailsIpfsHash) onlyContractOwner public returns (uint) {
-        require(_detailsIpfsHash != bytes32(0));
-        assert((!active) && (status == true));
-
-        detailsIpfsHash = _detailsIpfsHash;
-
-        getEventsHistory().emitPollDetailsHashUpdated(_detailsIpfsHash);
-        return OK;
-    }
-
-    /// @notice Adds an option to a poll. Should be called before poll will be activated.
-    /// Number of options couldn't be more than OPTIONS_POLLS_MAX value.
-    /// Emits PollDetailsOptionAdded event.
-    ///
-    /// @dev delegatecall only. poll owner only
-    ///
-    /// @param _option a new option
-    ///
-    /// @return result code of an operation. Returns ERROR_POLL_BACKEND_INVALID_PARAMETER if
-    /// provided option was already added to this poll.
-    function addPollOption(bytes32 _option) onlyContractOwner public returns (uint) {
-        require(_option != bytes32(0));
-        uint _count = ArrayLib.nonEmptyLengthOfArray(options);
-        require(_count < OPTIONS_POLLS_MAX);
-        assert((!active) && (status == true));
-
-        if (ArrayLib.arrayIncludes(options, _option)) {
-            return _emitError(ERROR_POLL_BACKEND_INVALID_PARAMETER);
-        }
-
-        ArrayLib.addToArray(options, _option);
-        getEventsHistory().emitPollDetailsOptionAdded(_option, _count + 1);
-        return OK;
-    }
-
-    /// @notice Removes an option to a poll. Should be called before poll will be activated
-    /// Emits PollDetailsOptionRemoved event.
-    ///
-    /// @dev delegatecall only. poll owner only
-    ///
-    /// @param _option an existed option
-    ///
-    /// @return result code of an operation. Returns ERROR_POLL_BACKEND_INVALID_PARAMETER if
-    /// provided option was already removed and doesn't exist anymore.
-    function removePollOption(bytes32 _option) onlyContractOwner public returns (uint) {
-        require(_option != bytes32(0));
-        assert((!active) && (status == true));
-
-        if (!ArrayLib.arrayIncludes(options, _option)) {
-            return _emitError(ERROR_POLL_BACKEND_INVALID_PARAMETER);
-        }
-
-        ArrayLib.removeFirstFromArray(options, _option);
-        getEventsHistory().emitPollDetailsOptionRemoved(_option, ArrayLib.nonEmptyLengthOfArray(options));
-        return OK;
-    }
-
-    /// @notice Adds an ipfs hash to a poll. Should be called before poll will be activated.
-    /// Number of options couldn't be more than IPFS_HASH_POLLS_MAX value.
-    /// Emits PollDetailsIpfsHashAdded event.
-    ///
-    /// @dev delegatecall only. poll owner only
-    ///
-    /// @param _hash a new ipfs hash
-    ///
-    /// @return result code of an operation. Returns ERROR_POLL_BACKEND_INVALID_PARAMETER if
-    /// provided hash was already added to this poll.
-    function addPollIpfsHash(bytes32 _hash) onlyContractOwner public returns (uint) {
-        require(_hash != bytes32(0));
-        uint _count = ArrayLib.nonEmptyLengthOfArray(ipfsHashes);
-        require(_count < IPFS_HASH_POLLS_MAX);
-        assert((!active) && (status == true));
-
-        if (ArrayLib.arrayIncludes(ipfsHashes, _hash)) {
-            return _emitError(ERROR_POLL_BACKEND_INVALID_PARAMETER);
-        }
-
-        ArrayLib.addToArray(ipfsHashes, _hash);
-        getEventsHistory().emitPollDetailsIpfsHashAdded(_hash, _count + 1);
-        return OK;
-    }
-
-    /// @notice Removes an option to a poll. Should be called before poll will be activated
-    /// Emits PollDetailsIpfsHashRemoved event.
-    ///
-    /// @dev delegatecall only. poll owner only
-    ///
-    /// @param _hash an existed ipfs hash
-    ///
-    /// @return result code of an operation. Returns ERROR_POLL_BACKEND_INVALID_PARAMETER if
-    /// provided hash was already removed and doesn't exist anymore.
-    function removePollIpfsHash(bytes32 _hash) onlyContractOwner public returns (uint) {
-        require(_hash != bytes32(0));
-        assert((!active) && (status == true));
-
-        if (!ArrayLib.arrayIncludes(ipfsHashes, _hash)) {
-            return _emitError(ERROR_POLL_BACKEND_INVALID_PARAMETER);
-        }
-
-        ArrayLib.removeFirstFromArray(ipfsHashes, _hash);
-        getEventsHistory().emitPollDetailsIpfsHashRemoved(_hash, ArrayLib.nonEmptyLengthOfArray(ipfsHashes));
-        return OK;
-    }
-
 
     /** ListenerInterface interface */
 

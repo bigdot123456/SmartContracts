@@ -162,37 +162,18 @@ contract VotingManager is BaseManager, VotingManagerEmitter, ListenerInterface, 
         }
     }
 
-    /// @notice Gets a list of polls where provided user is participating (did a vote)
-    /// @param _user user who voted
-    /// @return _polls a list of polls
-    function getMembershipPolls(address _user) public view returns (address[] _polls) {
-        uint _count = store.count(pollsStorage);
-        _polls = new address[](_count);
-
-        uint _pointer;
-        address _poll;
-        for (uint _idx = 0; _idx < _count; ++_idx) {
-            _poll = store.get(pollsStorage, _idx);
-            if (PollInterface(_poll).hasMember(_user)) {
-                _polls[_pointer++] = _poll;
-            }
-        }
-    }
-
-    /// @notice Creates a brand new poll with provided description and properties. Those properties, like _options, _ipfsHashes, could be
-    /// updated any time until poll hasn't started.
+    /// @notice Creates a brand new poll with provided description and properties.
     /// Emits PollCreated event in case of success.
     ///
-    /// @param _options list of options for a poll
-    /// @param _ipfsHashes ipfs hashes
+    /// @param _optionsCount number of options provided for a poll
     /// @param _detailsIpfsHash ipfs hash of poll's description and other details
     /// @param _votelimit limit when poll would be treated as completed
     /// @param _deadline time after which poll isn't active anymore
     ///
     /// @return OK if all went all right, error code otherwise
-    function createPoll(bytes32[16] _options, bytes32[4] _ipfsHashes, bytes32 _detailsIpfsHash, uint _votelimit, uint _deadline) public returns (uint) {
+    function createPoll(uint _optionsCount, bytes32 _detailsIpfsHash, uint _votelimit, uint _deadline) public returns (uint) {
         PollFactory _pollsFactory = PollFactory(store.get(pollsFactoryStorage));
-        address _poll = _pollsFactory.createPoll(contractsManager, store.get(pollBackendStorage), _options, _ipfsHashes, _detailsIpfsHash, _votelimit, _deadline);
+        address _poll = _pollsFactory.createPoll(contractsManager, store.get(pollBackendStorage), _optionsCount, _detailsIpfsHash, _votelimit, _deadline);
 
         if (!MultiEventsHistory(getEventsHistory()).authorize(_poll)) {
             revert();
@@ -249,11 +230,11 @@ contract VotingManager is BaseManager, VotingManagerEmitter, ListenerInterface, 
         store.set(activeCountStorage, _activeCount - 1);
     }
 
-    /// @notice Gets descriptions for a list of polls (except options and ipfsHashes: platform limitation)
+    /// @notice Gets descriptions for a list of polls
     /// @param _polls a list of polls
     /// @return {
     ///   "_owner": "poll owners",
-    ///   "_detailsIpfsHash": p"oll ipfs hashes",
+    ///   "_detailsIpfsHash": poll ipfs hashes",
     ///   "_votelimit": "poll vote limits",
     ///   "_deadline": "poll deadlines",
     ///   "_status": "poll statuses",
@@ -278,7 +259,7 @@ contract VotingManager is BaseManager, VotingManagerEmitter, ListenerInterface, 
         _creation = new uint[](_polls.length);
 
         for (uint _idx = 0; _idx < _polls.length; ++_idx) {
-            (_owner[_idx], _detailsIpfsHash[_idx], _votelimit[_idx], _deadline[_idx], _status[_idx], _active[_idx], _creation[_idx],,) =
+            (_owner[_idx], _detailsIpfsHash[_idx], _votelimit[_idx], _deadline[_idx], _status[_idx], _active[_idx], _creation[_idx],) =
             PollInterface(_polls[_idx]).getDetails();
         }
     }
