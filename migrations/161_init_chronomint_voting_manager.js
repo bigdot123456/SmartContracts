@@ -1,4 +1,5 @@
 const VotingManager = artifacts.require("./VotingManager.sol")
+const ERC20Manager = artifacts.require("./ERC20Manager.sol")
 const StorageManager = artifacts.require("./StorageManager.sol")
 const ContractsManager = artifacts.require('./ContractsManager.sol')
 const MultiEventsHistory = artifacts.require("./MultiEventsHistory.sol")
@@ -17,14 +18,16 @@ module.exports = async (deployer, network) => {
         let _history = await MultiEventsHistory.deployed()
         await _history.authorize(VotingManager.address)
 
+        let erc20Manager = await ERC20Manager.deployed();
+        let timeAddress = await erc20Manager.getTokenAddressBySymbol("TIME");
+
         let _timeholder = await TimeHolder.deployed()
-        await _timeholder.addListener(VotingManager.address)
+        await _timeholder.addListener(timeAddress, VotingManager.address)
 
         if (network === "development") {
             await _votingManager.setVotesPercent(1000);
             console.log("Set votes percent in dev network:", await _votingManager.getVotesPercent());
         }
-
 
         console.log("[MIGRATION] [" + parseInt(require("path").basename(__filename)) + "] Voting Manager init: #done")
     })

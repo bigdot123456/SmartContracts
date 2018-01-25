@@ -5,6 +5,7 @@ const ContractsManager = artifacts.require("./ContractsManager.sol");
 const MultiEventsHistory = artifacts.require("./MultiEventsHistory.sol");
 const ERC20Manager = artifacts.require("./ERC20Manager.sol");
 const TimeHolderWallet = artifacts.require('./TimeHolderWallet.sol')
+const ChronoBankAssetProxy = artifacts.require('./ChronoBankAssetProxy.sol')
 
 module.exports = function(deployer, network, accounts) {
     // Wallet deployment
@@ -19,12 +20,8 @@ module.exports = function(deployer, network, accounts) {
     .then(() => deployer.deploy(TimeHolder,Storage.address,'Deposits'))
     .then(() => StorageManager.deployed())
     .then((_storageManager) => _storageManager.giveAccess(TimeHolder.address, 'Deposits'))
-    .then(() => ERC20Manager.deployed())
-    .then(_erc20Manager => _erc20Manager.getTokenAddressBySymbol("TIME"))
-    .then(_timeAddress => timeAddress = _timeAddress)
     .then(() => TimeHolder.deployed())
-    .then(_timeHolder => timeHolder = _timeHolder)
-    .then(() => timeHolder.init(ContractsManager.address, timeAddress, timeHolderWallet.address, accounts[0]))
+    .then(_timeHolder => _timeHolder.init(ContractsManager.address, ChronoBankAssetProxy.address, timeHolderWallet.address, accounts[0]))
     .then(() => MultiEventsHistory.deployed())
     .then(_history => _history.authorize(TimeHolder.address))
     .then(() => {
@@ -32,5 +29,6 @@ module.exports = function(deployer, network, accounts) {
             return timeHolder.setLimit(100000000);
         }
     })
+    .then(() => TimeHolder.deployed())
     .then(() => console.log("[MIGRATION] [29] TimeHolder: #done"))
 }

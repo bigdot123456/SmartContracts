@@ -1,6 +1,10 @@
 pragma solidity ^0.4.11;
 
-contract ListenerInterface {
-    function deposit(address _address, uint _amount, uint _total) returns (uint);
-    function withdrawn(address _address, uint _amount, uint _total) returns (uint);
+/**
+* @title Declares contract interface to observe changes in TimeHolder.
+* @notice version 2
+*/
+contract HolderListenerInterface {
+    function tokenDeposit(address token, address who, uint amount, uint total) public;
+    function tokenWithdrawn(address token, address who, uint amount, uint total) public;
 }

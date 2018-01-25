@@ -52,7 +52,7 @@ contract("FeatureFeeManager", function(accounts) {
 
         .then(() => assetDonator.sendTime({from: timeHolder1}))
         .then(() => TIME.approve(timeHolderWallet, 10000, {from: timeHolder1}))
-        .then(() => timeHolder.deposit(10000, {from : timeHolder1}))
+        .then(() => timeHolder.deposit(TIME.address, 10000, {from : timeHolder1}))
         .then(() => Setup.setup(done))
     })
 
@@ -104,7 +104,7 @@ contract("FeatureFeeManager", function(accounts) {
         let sig = Setup.exchangeManager.contract.createExchange.getData("",0,0, false, 0x0, false).slice(0, 10);
         await featureFeeManager.setFeatureFee(Setup.exchangeManager.address, sig, CreateExchangeFeatureRequiredBalance, CreateExchangeFeatureFee);
 
-        let holderBalance = await timeHolder.depositBalance.call(timeHolder1);
+        let holderBalance = await timeHolder.getDepositBalance.call(TIME.address, timeHolder1);
         assert.isTrue(holderBalance >= CreateExchangeFeatureRequiredBalance);
         assert.isTrue(holderBalance >= CreateExchangeFeatureFee);
 
@@ -118,7 +118,7 @@ contract("FeatureFeeManager", function(accounts) {
         let events = eventsHelper.extractEvents(createExchangeTx, "ExchangeCreated");
         assert.equal(events.length, 1);
 
-        assert.equal(web3.toBigNumber(holderBalance).sub(CreateExchangeFeatureFee).cmp(await timeHolder.depositBalance.call(timeHolder1)), 0);
+        assert.equal(web3.toBigNumber(holderBalance).sub(CreateExchangeFeatureFee).cmp(await timeHolder.getDepositBalance.call(TIME.address, timeHolder1)), 0);
         assert.equal(web3.toBigNumber(feeWalletBalance).add(CreateExchangeFeatureFee).cmp(await TIME.balanceOf(feeHolderWallet)), 0);
     })
 
@@ -129,7 +129,7 @@ contract("FeatureFeeManager", function(accounts) {
         let sig = Setup.exchangeManager.contract.createExchange.getData("",0,0, false, 0x0, false).slice(0, 10);
         await featureFeeManager.setFeatureFee(Setup.exchangeManager.address, sig, CreateExchangeFeatureRequiredBalance, CreateExchangeFeatureFee);
 
-        let holderBalance = await timeHolder.depositBalance.call(timeHolder4);
+        let holderBalance = await timeHolder.getDepositBalance.call(TIME.address, timeHolder4);
         assert.isTrue(holderBalance < CreateExchangeFeatureRequiredBalance);
         assert.isTrue(holderBalance < CreateExchangeFeatureFee);
 
@@ -140,7 +140,7 @@ contract("FeatureFeeManager", function(accounts) {
 
         let createExchangeTx = await Setup.exchangeManager.createExchange("TIME", 1, 2, false, owner, true, {from: timeHolder4});
 
-        assert.equal(web3.toBigNumber(holderBalance).cmp(await timeHolder.depositBalance.call(timeHolder4)), 0);
+        assert.equal(web3.toBigNumber(holderBalance).cmp(await timeHolder.getDepositBalance.call(TIME.address, timeHolder4)), 0);
         assert.equal(web3.toBigNumber(feeWalletBalance).cmp(await TIME.balanceOf(feeHolderWallet)), 0);
     })
 

@@ -14,6 +14,7 @@ const VotingManager = artifacts.require("./VotingManager.sol")
 const PollInterface = artifacts.require("./PollInterface.sol")
 const VotingManagerEmitter = artifacts.require("./VotingManagerEmitter.sol")
 const PollEmitter = artifacts.require("./PollEmitter.sol")
+const ERC20Manager = artifacts.require("./ERC20Manager.sol")
 
 const reverter = new Reverter(web3)
 const timeMachine = new TimeMachine(web3)
@@ -39,9 +40,9 @@ contract('Vote', function(accounts) {
     const owner1 = accounts[2];
     const nonOwner = accounts[7];
     const SYMBOL = 'TIME'
-
     const totalTimeTokens = 100000000
     const timeTokensBalance = 50
+
     let timeTokensToWithdraw75Balance = 75
     let timeTokensToWithdraw45Balance = 45
     let timeTokensToWithdraw20Balance = 20
@@ -50,6 +51,7 @@ contract('Vote', function(accounts) {
 
     let votingManager
     let clock
+    let timeAddress
 
     let proxyForSymbol = async (symbol) => {
         let tokenAddress = await Setup.erc20Manager.getTokenAddressBySymbol.call(symbol)
@@ -82,6 +84,8 @@ contract('Vote', function(accounts) {
         eventor = await PendingManager.at(MultiEventsHistory.address)
         votingManager = await VotingManager.deployed()
         clock = await Clock.deployed()
+        let erc20Manager = await ERC20Manager.deployed();
+        timeAddress = await erc20Manager.getTokenAddressBySymbol(SYMBOL);
         await Setup.setupPromise()
     });
 
@@ -111,20 +115,20 @@ contract('Vote', function(accounts) {
         })
 
         it("should be able to deposit 50 TIME from owner", async () => {
-            let isDepositSuccess = await Setup.timeHolder.deposit.call(timeTokensBalance, { from: owner })
+            let isDepositSuccess = await Setup.timeHolder.deposit.call(timeAddress,timeTokensBalance, { from: owner })
             assert.isOk(isDepositSuccess)
 
-            await Setup.timeHolder.deposit(timeTokensBalance, { from: owner })
+            await Setup.timeHolder.deposit(timeAddress,timeTokensBalance, { from: owner })
 
             let depositBalance = await Setup.timeHolder.depositBalance.call(owner, { from: owner })
             assert.equal(depositBalance, timeTokensBalance);
         })
 
         it("should be able to withdraw 25 TIME from owner", async () => {
-            let isWithdrawSuccess = await Setup.timeHolder.withdrawShares.call(timeTokensToWithdraw25Balance, { from: owner })
+            let isWithdrawSuccess = await Setup.timeHolder.withdrawShares.call(timeAddress,timeTokensToWithdraw25Balance, { from: owner })
             assert.isOk(isWithdrawSuccess)
 
-            await Setup.timeHolder.withdrawShares(timeTokensToWithdraw25Balance, { from: owner })
+            await Setup.timeHolder.withdrawShares(timeAddress,timeTokensToWithdraw25Balance, { from: owner })
 
             let depositBalance = await Setup.timeHolder.depositBalance.call(owner, { from: owner })
             assert.equal(depositBalance, timeTokensToWithdraw25Balance);
@@ -145,9 +149,9 @@ contract('Vote', function(accounts) {
         context("single voter (owner)", function () {
 
             it("should be able to create poll", async () => {
+                console.log(await Setup.timeHolder.depositBalance.call(owner, { from: owner }));
                 voteLimit = await votingManager.getVoteLimit.call()
                 assert.notEqual(voteLimit.toNumber(), 0)
-
                 let currentTime = await clock.time.call()
                 deadline = currentTime.plus(10000)
 
@@ -343,10 +347,10 @@ contract('Vote', function(accounts) {
             })
 
             it('should be able to deposit 50 TIME tokens from owner1', async () => {
-                let successDeposit = await Setup.timeHolder.deposit.call(timeTokensBalance, { from: owner1 })
+                let successDeposit = await Setup.timeHolder.deposit.call(timeAddress,timeTokensBalance, { from: owner1 })
                 assert.isOk(successDeposit)
 
-                await Setup.timeHolder.deposit(timeTokensBalance, { from: owner1 })
+                await Setup.timeHolder.deposit(timeAddress,timeTokensBalance, { from: owner1 })
             })
 
             it('should show 50 TIME tokens owner1 balance', async () => {
@@ -487,15 +491,13 @@ contract('Vote', function(accounts) {
         context('manipulate balances', function () {
 
             it('should be able to withdraw 5 TIME tokens from owner1', async () => {
-                let successWithdrawal = await Setup.timeHolder.withdrawShares.call(5, { from: owner1 })
-                assert.isOk(successWithdrawal)
+                let successWithdrawal = await Setup.timeHolder.withdrawShares.call(timeAddress, 5, { from: owner1 })
+                assert.equal(successWithdrawal, ErrorsEnum.OK)
 
-                try {
-                    await Setup.timeHolder.withdrawShares(5, { from: owner1 })
-                    assert.isTrue(true)
-                } catch (e) {
-                    assert.isTrue(false)
-                }
+                await Setup.timeHolder.withdrawShares(timeAddress, 5, { from: owner1 })
+
+                let totalShares = await Setup.timeHolder.getDepositBalance.call(timeAddress, owner1)
+                assert.equal(totalShares, timeTokensToWithdraw45Balance)
             })
 
             it('should be able to show updated vote balances for poll', async () => {
@@ -508,10 +510,10 @@ contract('Vote', function(accounts) {
             })
 
             it('should be able to withdraw 45 TIME tokens from owner1', async () => {
-                let successWithdrawal = await Setup.timeHolder.withdrawShares.call(45, { from: owner1 })
-                assert.isOk(successWithdrawal)
+                let successWithdrawal = await Setup.timeHolder.withdrawShares.call(timeAddress, timeTokensToWithdraw45Balance, { from: owner1 })
+                assert.equal(successWithdrawal, ErrorsEnum.OK)
 
-                await Setup.timeHolder.withdrawShares(45, { from: owner1 })
+                await Setup.timeHolder.withdrawShares(timeAddress, timeTokensToWithdraw45Balance, { from: owner1 })
             })
 
             let remainderTimeTokenBalance = totalTimeTokens - timeTokensToWithdraw25Balance
@@ -527,10 +529,10 @@ contract('Vote', function(accounts) {
             })
 
             it('should be able to deposit reminded TIME tokens from owner', async () => {
-                let successDeposit = await Setup.timeHolder.deposit.call(remainderTimeTokenBalance, { from: owner })
+                let successDeposit = await Setup.timeHolder.deposit.call(timeAddress,remainderTimeTokenBalance, { from: owner })
                 assert.isOk(successDeposit)
 
-                await Setup.timeHolder.deposit(remainderTimeTokenBalance, { from: owner })
+                await Setup.timeHolder.deposit(timeAddress,remainderTimeTokenBalance, { from: owner })
             })
 
             it('should show 0 TIME tokens for owner1 and all TIME tokens for owner', async () => {

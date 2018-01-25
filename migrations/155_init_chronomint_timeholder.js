@@ -10,17 +10,17 @@ const TimeHolderWallet = artifacts.require('./TimeHolderWallet.sol')
 
 module.exports = async (deployer, network, accounts) => {
     deployer.then(async () => {
-        let _storageManager = await StorageManager.deployed()
-        await _storageManager.giveAccess(TimeHolder.address, "Deposits")
+        let storageManager = await StorageManager.deployed()
+        await storageManager.giveAccess(TimeHolder.address, "Deposits")
 
         let erc20Manager = await ERC20Manager.deployed();
         let timeAddress = await erc20Manager.getTokenAddressBySymbol("TIME");
 
-        let _timeHolder = await TimeHolder.deployed()
-        await _timeHolder.init(ContractsManager.address, timeAddress, TimeHolderWallet.address, accounts[0])
+        let timeHolder = await TimeHolder.deployed()
+        await timeHolder.init(ContractsManager.address, timeAddress, TimeHolderWallet.address, accounts[0])
 
-        let _history = await MultiEventsHistory.deployed()
-        await _history.authorize(TimeHolder.address)
+        let history = await MultiEventsHistory.deployed()
+        await history.authorize(TimeHolder.address)
 
         console.log("[MIGRATION] [" + parseInt(require("path").basename(__filename)) + "] TimeHolder init: #done")
     })

@@ -284,8 +284,8 @@ contract PollBackend is Owned, MultiSigSupporter {
     /// @param _amount a value of change
     /// @param _total total amount of tokens on _address's balance
     ///
-    /// @return result code of an operation
-    function deposit(address _address, uint _amount, uint _total) onlyVotingManager public returns (uint) {
+    /// @return result code of an operation    
+    function tokenDeposit(address token, address _address, uint _amount, uint _total) onlyVotingManager public returns (uint) {
         if (!hasMember(_address)) return UNAUTHORIZED;
 
         if (status && active) {
@@ -314,7 +314,7 @@ contract PollBackend is Owned, MultiSigSupporter {
     /// @param _total total amount of tokens on _address's balance
     ///
     /// @return result code of an operation
-    function withdrawn(address _address, uint _amount, uint _total) onlyVotingManager public returns (uint) {
+    function tokenWithdrawn(address token, address _address, uint _amount, uint _total) onlyVotingManager public returns (uint) {
         if (!hasMember(_address)) return UNAUTHORIZED;
 
         if (status && active) {

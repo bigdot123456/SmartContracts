@@ -1,6 +1,7 @@
 pragma solidity ^0.4.11;
 
 import "../core/common/BaseManager.sol";
+import "../core/erc20/ERC20Interface.sol";
 import "../core/common/OwnedInterface.sol";
 import "../core/common/ListenerInterface.sol";
 import "../core/event/MultiEventsHistory.sol";
@@ -16,7 +17,7 @@ import "./VotingManagerEmitter.sol";
 /// - tracking a number of currently active polls,
 /// - getting paginated lists of all created polls,
 /// - implements ListenerInterface to support and use TimeHolder's functionality
-contract VotingManager is BaseManager, VotingManagerEmitter, ListenerInterface, PollListenerInterface {
+contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInterface, PollListenerInterface {
 
     /** Constants */
 
@@ -45,7 +46,6 @@ contract VotingManager is BaseManager, VotingManagerEmitter, ListenerInterface, 
 
     /** @dev backend address used for polls */
     StorageInterface.Address pollBackendStorage;
-
 
     /** Modifiers */
 
@@ -98,8 +98,7 @@ contract VotingManager is BaseManager, VotingManagerEmitter, ListenerInterface, 
     /// @notice Gets votes limit (or number of tokens to be voted to treat a poll as completed)
     /// @return a number of tokens
     function getVoteLimit() public view returns (uint) {
-        address timeHolder = lookupManager("TimeHolder");
-        return TimeHolderInterface(timeHolder).totalSupply() / 10000 * store.get(sharesPercentStorage); // @see sharesPercentStorage description
+        return ERC20Interface(voteShares()).totalSupply() / 10000 * store.get(sharesPercentStorage); // @see sharesPercentStorage description
     }
 
     /// @notice Sets votes percent. Multisignature required.
@@ -265,15 +264,33 @@ contract VotingManager is BaseManager, VotingManagerEmitter, ListenerInterface, 
     }
 
     /** ListenerInterface interface */
+    function tokenDeposit(address _token, address _who, uint _amount, uint _total)
+    public
+    onlyTimeHolder
+    {
+        address _voteShares = voteShares();
+        if (_token != _voteShares) {
+            return;
+        }
 
-    function deposit(address _address, uint _amount, uint _total) onlyTimeHolder public returns (uint) {
-        _forEachPollMembership(_address, _amount, _total, _deposit);
-        return OK;
+        _forEachPollMembership(_voteShares, _who, _amount, _total, _deposit);
     }
 
-    function withdrawn(address _address, uint _amount, uint _total) onlyTimeHolder public returns (uint) {
-        _forEachPollMembership(_address, _amount, _total, _withdrawn);
-        return OK;
+    function tokenWithdrawn(address _token, address _who, uint _amount, uint _total)
+    public
+    onlyTimeHolder
+    {
+        address _voteShares = voteShares();
+        if (_token != _voteShares) {
+            return;
+        }
+
+        _forEachPollMembership(_voteShares, _who, _amount, _total, _withdrawn);
+    }
+
+    function voteShares() public view returns (address) {
+        TimeHolderInterface timeHolder = TimeHolderInterface(lookupManager("TimeHolder"));
+        return timeHolder.getDefaultShares();
     }
 
     /// @dev Don't allow to receive any Ether
@@ -281,24 +298,23 @@ contract VotingManager is BaseManager, VotingManagerEmitter, ListenerInterface, 
         revert();
     }
 
-
     /** PRIVATE section */
 
-    function _deposit(address _entity, address _address, uint _amount, uint _total) private {
-        ListenerInterface(_entity).deposit(_address, _amount, _total);
+    function _deposit(address _entity, address _token, address _address, uint _amount, uint _total) private {
+        HolderListenerInterface(_entity).tokenDeposit(_token, _address, _amount, _total);
     }
 
-    function _withdrawn(address _entity, address _address, uint _amount, uint _total) private {
-        ListenerInterface(_entity).withdrawn(_address, _amount, _total);
+    function _withdrawn(address _entity, address _token, address _address, uint _amount, uint _total) private {
+        HolderListenerInterface(_entity).tokenWithdrawn(_token, _address, _amount, _total);
     }
 
-    function _forEachPollMembership(address _address, uint _amount, uint _total, function (address, address, uint, uint) _action) private {
+    function _forEachPollMembership(address _token, address _address, uint _amount, uint _total, function (address, address, address, uint, uint) _action) private {
         uint _count = store.count(pollsStorage);
         address _poll;
         for (uint _idx = 0; _idx < _count; ++_idx) {
             _poll = store.get(pollsStorage, _idx);
             if (PollInterface(_poll).hasMember(_address)) {
-                _action(_poll, _address, _amount, _total);
+                _action(_poll, _token, _address, _amount, _total);
             }
         }
     }
