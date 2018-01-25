@@ -61,8 +61,9 @@ contract PollBackend is Owned, MultiSigSupporter {
 
     /// @dev Guards invocations only for authorized (CBE) accounts
     modifier onlyAuthorized {
-        require(isAuthorized(msg.sender));
-        _;
+        if (isAuthorized(msg.sender)) {
+            _;
+        }        
     }
 
     ///  @notice Initializes internal fields. Contracts owner only.
@@ -263,10 +264,12 @@ contract PollBackend is Owned, MultiSigSupporter {
     /// @dev delegatecall only. Authorized contracts only.
     ///
     /// @return _resultCode result code of an operation.
-    function killPoll() onlyAuthorized public returns (uint) {
+    function killPoll() public onlyAuthorized {
         require(!active || status == false);
 
-        return _killPoll();
+        getPollListener().onRemovePoll();
+
+        selfdestruct(contractOwner);
     }
 
     /** ListenerInterface interface */
@@ -362,13 +365,6 @@ contract PollBackend is Owned, MultiSigSupporter {
 
         getPollListener().onEndPoll();
         getEventsHistory().emitPollEnded();
-        return OK;
-    }
-
-    function _killPoll() private returns (uint _resultCode) {
-        getPollListener().onRemovePoll();
-
-        selfdestruct(contractOwner);
         return OK;
     }
 

@@ -421,7 +421,7 @@ contract('Vote', function(accounts) {
 
             it('should allow to delete inactive poll for CBE user', async () => {
                 let pollToRemove = multiplePolls.pop()
-                let result = await pollToRemove.killPoll.call({ from: admin })
+                //let result = await pollToRemove.killPoll.call({ from: admin })
                 let killTx = await pollToRemove.killPoll({ from: admin })
                 console.log('killTx', killTx.tx);
                 let emitter = await VotingManagerEmitter.at(votingManager.address)
@@ -438,12 +438,7 @@ contract('Vote', function(accounts) {
             it('shouldn\'t allow to delete inactive poll for non-CBE user', async () => {
                 let pollTryToRemove = multiplePolls[multiplePolls.length - 1]
 
-                try {
-                  let failedResultCode = await pollTryToRemove.killPoll.call({ from: owner })
-                  assert.isTrue(false);
-                } catch (e) {
-                    utils.ensureException(e);
-                }
+                await pollTryToRemove.killPoll.call({ from: owner })
 
                 let activePollsCount = await votingManager.getActivePollsCount.call()
                 assert.equal(activePollsCount, maximumPollsCount)
@@ -457,14 +452,14 @@ contract('Vote', function(accounts) {
                 assert.isOk(isActive)
 
                 try {
-                    let failedResultCode = await pollEntity.killPoll.call({ from: admin })
+                    await pollEntity.killPoll.call({ from: admin })
                     assert.isTrue(false)
                 } catch (e) {
                     assert.isTrue(true)
                 }
 
                 try {
-                    let failedResultCode = await pollEntity.killPoll.call({ from: owner })
+                    await pollEntity.killPoll.call({ from: owner })
                     assert.isTrue(false)
                 } catch (e) {
                     assert.isTrue(true)

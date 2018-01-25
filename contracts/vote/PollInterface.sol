@@ -53,7 +53,7 @@ contract PollInterface is OwnedInterface {
     function endPoll() public returns (uint);
 
     /// @notice Eliminates poll, should be allowed to perform before activation or after poll will end.
-    function killPoll() public returns (uint);
+    function killPoll() public;
 
     /// @notice Get full poll details
     function getDetails() public constant returns (
