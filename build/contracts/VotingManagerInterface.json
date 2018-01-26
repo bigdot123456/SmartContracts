@@ -1,0 +1,1136 @@
+{
+  "contractName": "VotingManagerInterface",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_percent",
+          "type": "uint256"
+        }
+      ],
+      "name": "setVotesPercent",
+      "outputs": [
+        {
+          "name": "_resultCode",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_optionsCount",
+          "type": "uint256"
+        },
+        {
+          "name": "_detailsIpfsHash",
+          "type": "bytes32"
+        },
+        {
+          "name": "_votelimit",
+          "type": "uint256"
+        },
+        {
+          "name": "_deadline",
+          "type": "uint256"
+        }
+      ],
+      "name": "createPoll",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_startIndex",
+          "type": "uint256"
+        },
+        {
+          "name": "_pageSize",
+          "type": "uint32"
+        }
+      ],
+      "name": "getPollsPaginated",
+      "outputs": [
+        {
+          "name": "_votings",
+          "type": "address[]"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getVoteLimit",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getActivePollsCount",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "getPollsCount",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_polls",
+          "type": "address[]"
+        }
+      ],
+      "name": "getPollsDetails",
+      "outputs": [
+        {
+          "name": "_owner",
+          "type": "address[]"
+        },
+        {
+          "name": "_detailsIpfsHash",
+          "type": "bytes32[]"
+        },
+        {
+          "name": "_votelimit",
+          "type": "uint256[]"
+        },
+        {
+          "name": "_deadline",
+          "type": "uint256[]"
+        },
+        {
+          "name": "_status",
+          "type": "bool[]"
+        },
+        {
+          "name": "_active",
+          "type": "bool[]"
+        },
+        {
+          "name": "_creation",
+          "type": "uint256[]"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.4.11;\n\n\n/// @title Defines public interface for voting managers.\ncontract VotingManagerInterface {\n\n    /** Getters */\n\n    /// @notice Gets vote limit that was setup for a manager\n    function getVoteLimit() public view returns (uint);\n\n    /// @notice Gets a number of polls registered in a manager\n    function getPollsCount() public view returns (uint);\n\n    /// @notice Requests paginated results for a list of polls.\n    function getPollsPaginated(uint _startIndex, uint32 _pageSize) public view returns (address[] _votings);\n\n    /// @notice Gets a number of active polls. Could be restricted to some upper bounds.\n    function getActivePollsCount() public view returns (uint);\n\n    /// @notice Gets detailed info for a list of provided polls.\n    function getPollsDetails(address[] _polls) public view returns (\n        address[] _owner,\n        bytes32[] _detailsIpfsHash,\n        uint[] _votelimit,\n        uint[] _deadline,\n        bool[] _status,\n        bool[] _active,\n        uint[] _creation\n    );\n\n\n    /** Actions */\n\n    /// @notice Updates percents of total shares that should be locked (put) in a poll to say that poll is legally completed\n    function setVotesPercent(uint _percent) public returns (uint _resultCode);\n\n    /// @notice Creates a new poll and register it in a manager.\n    function createPoll(\n        uint _optionsCount,\n        bytes32 _detailsIpfsHash,\n        uint _votelimit,\n        uint _deadline\n    ) public returns (uint);\n}\n",
+  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/vote/VotingManagerInterface.sol",
+  "ast": {
+    "attributes": {
+      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/vote/VotingManagerInterface.sol",
+      "exportedSymbols": {
+        "VotingManagerInterface": [
+          34068
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.4",
+            ".11"
+          ]
+        },
+        "id": 33995,
+        "name": "PragmaDirective",
+        "src": "0:24:116"
+      },
+      {
+        "attributes": {
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "contract",
+          "documentation": "@title Defines public interface for voting managers.",
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            34068
+          ],
+          "name": "VotingManagerInterface",
+          "scope": 34069
+        },
+        "children": [
+          {
+            "attributes": {
+              "body": null,
+              "constant": true,
+              "implemented": false,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "getVoteLimit",
+              "payable": false,
+              "scope": 34068,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 33996,
+                "name": "ParameterList",
+                "src": "225:2:116"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 34000,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 33997,
+                        "name": "ElementaryTypeName",
+                        "src": "249:4:116"
+                      }
+                    ],
+                    "id": 33998,
+                    "name": "VariableDeclaration",
+                    "src": "249:4:116"
+                  }
+                ],
+                "id": 33999,
+                "name": "ParameterList",
+                "src": "248:6:116"
+              }
+            ],
+            "id": 34000,
+            "name": "FunctionDefinition",
+            "src": "204:51:116"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "constant": true,
+              "implemented": false,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "getPollsCount",
+              "payable": false,
+              "scope": 34068,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 34001,
+                "name": "ParameterList",
+                "src": "346:2:116"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 34005,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 34002,
+                        "name": "ElementaryTypeName",
+                        "src": "370:4:116"
+                      }
+                    ],
+                    "id": 34003,
+                    "name": "VariableDeclaration",
+                    "src": "370:4:116"
+                  }
+                ],
+                "id": 34004,
+                "name": "ParameterList",
+                "src": "369:6:116"
+              }
+            ],
+            "id": 34005,
+            "name": "FunctionDefinition",
+            "src": "324:52:116"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "constant": true,
+              "implemented": false,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "getPollsPaginated",
+              "payable": false,
+              "scope": 34068,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_startIndex",
+                      "scope": 34015,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 34006,
+                        "name": "ElementaryTypeName",
+                        "src": "473:4:116"
+                      }
+                    ],
+                    "id": 34007,
+                    "name": "VariableDeclaration",
+                    "src": "473:16:116"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_pageSize",
+                      "scope": 34015,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint32",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint32",
+                          "type": "uint32"
+                        },
+                        "id": 34008,
+                        "name": "ElementaryTypeName",
+                        "src": "491:6:116"
+                      }
+                    ],
+                    "id": 34009,
+                    "name": "VariableDeclaration",
+                    "src": "491:16:116"
+                  }
+                ],
+                "id": 34010,
+                "name": "ParameterList",
+                "src": "472:36:116"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_votings",
+                      "scope": 34015,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "address[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "address",
+                              "type": "address"
+                            },
+                            "id": 34011,
+                            "name": "ElementaryTypeName",
+                            "src": "530:7:116"
+                          }
+                        ],
+                        "id": 34012,
+                        "name": "ArrayTypeName",
+                        "src": "530:9:116"
+                      }
+                    ],
+                    "id": 34013,
+                    "name": "VariableDeclaration",
+                    "src": "530:18:116"
+                  }
+                ],
+                "id": 34014,
+                "name": "ParameterList",
+                "src": "529:20:116"
+              }
+            ],
+            "id": 34015,
+            "name": "FunctionDefinition",
+            "src": "446:104:116"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "constant": true,
+              "implemented": false,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "getActivePollsCount",
+              "payable": false,
+              "scope": 34068,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 34016,
+                "name": "ParameterList",
+                "src": "673:2:116"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 34020,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 34017,
+                        "name": "ElementaryTypeName",
+                        "src": "697:4:116"
+                      }
+                    ],
+                    "id": 34018,
+                    "name": "VariableDeclaration",
+                    "src": "697:4:116"
+                  }
+                ],
+                "id": 34019,
+                "name": "ParameterList",
+                "src": "696:6:116"
+              }
+            ],
+            "id": 34020,
+            "name": "FunctionDefinition",
+            "src": "645:58:116"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "constant": true,
+              "implemented": false,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "getPollsDetails",
+              "payable": false,
+              "scope": 34068,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_polls",
+                      "scope": 34047,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "address[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "address",
+                              "type": "address"
+                            },
+                            "id": 34021,
+                            "name": "ElementaryTypeName",
+                            "src": "799:7:116"
+                          }
+                        ],
+                        "id": 34022,
+                        "name": "ArrayTypeName",
+                        "src": "799:9:116"
+                      }
+                    ],
+                    "id": 34023,
+                    "name": "VariableDeclaration",
+                    "src": "799:16:116"
+                  }
+                ],
+                "id": 34024,
+                "name": "ParameterList",
+                "src": "798:18:116"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_owner",
+                      "scope": 34047,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "address[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "address",
+                              "type": "address"
+                            },
+                            "id": 34025,
+                            "name": "ElementaryTypeName",
+                            "src": "847:7:116"
+                          }
+                        ],
+                        "id": 34026,
+                        "name": "ArrayTypeName",
+                        "src": "847:9:116"
+                      }
+                    ],
+                    "id": 34027,
+                    "name": "VariableDeclaration",
+                    "src": "847:16:116"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_detailsIpfsHash",
+                      "scope": 34047,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bytes32[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "bytes32[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "bytes32",
+                              "type": "bytes32"
+                            },
+                            "id": 34028,
+                            "name": "ElementaryTypeName",
+                            "src": "873:7:116"
+                          }
+                        ],
+                        "id": 34029,
+                        "name": "ArrayTypeName",
+                        "src": "873:9:116"
+                      }
+                    ],
+                    "id": 34030,
+                    "name": "VariableDeclaration",
+                    "src": "873:26:116"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_votelimit",
+                      "scope": 34047,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "uint256[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 34031,
+                            "name": "ElementaryTypeName",
+                            "src": "909:4:116"
+                          }
+                        ],
+                        "id": 34032,
+                        "name": "ArrayTypeName",
+                        "src": "909:6:116"
+                      }
+                    ],
+                    "id": 34033,
+                    "name": "VariableDeclaration",
+                    "src": "909:17:116"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_deadline",
+                      "scope": 34047,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "uint256[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 34034,
+                            "name": "ElementaryTypeName",
+                            "src": "936:4:116"
+                          }
+                        ],
+                        "id": 34035,
+                        "name": "ArrayTypeName",
+                        "src": "936:6:116"
+                      }
+                    ],
+                    "id": 34036,
+                    "name": "VariableDeclaration",
+                    "src": "936:16:116"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_status",
+                      "scope": 34047,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "bool[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "bool",
+                              "type": "bool"
+                            },
+                            "id": 34037,
+                            "name": "ElementaryTypeName",
+                            "src": "962:4:116"
+                          }
+                        ],
+                        "id": 34038,
+                        "name": "ArrayTypeName",
+                        "src": "962:6:116"
+                      }
+                    ],
+                    "id": 34039,
+                    "name": "VariableDeclaration",
+                    "src": "962:14:116"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_active",
+                      "scope": 34047,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bool[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "bool[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "bool",
+                              "type": "bool"
+                            },
+                            "id": 34040,
+                            "name": "ElementaryTypeName",
+                            "src": "986:4:116"
+                          }
+                        ],
+                        "id": 34041,
+                        "name": "ArrayTypeName",
+                        "src": "986:6:116"
+                      }
+                    ],
+                    "id": 34042,
+                    "name": "VariableDeclaration",
+                    "src": "986:14:116"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_creation",
+                      "scope": 34047,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256[] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "length": null,
+                          "type": "uint256[] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 34043,
+                            "name": "ElementaryTypeName",
+                            "src": "1010:4:116"
+                          }
+                        ],
+                        "id": 34044,
+                        "name": "ArrayTypeName",
+                        "src": "1010:6:116"
+                      }
+                    ],
+                    "id": 34045,
+                    "name": "VariableDeclaration",
+                    "src": "1010:16:116"
+                  }
+                ],
+                "id": 34046,
+                "name": "ParameterList",
+                "src": "837:195:116"
+              }
+            ],
+            "id": 34047,
+            "name": "FunctionDefinition",
+            "src": "774:259:116"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "constant": false,
+              "implemented": false,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "setVotesPercent",
+              "payable": false,
+              "scope": 34068,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_percent",
+                      "scope": 34054,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 34048,
+                        "name": "ElementaryTypeName",
+                        "src": "1210:4:116"
+                      }
+                    ],
+                    "id": 34049,
+                    "name": "VariableDeclaration",
+                    "src": "1210:13:116"
+                  }
+                ],
+                "id": 34050,
+                "name": "ParameterList",
+                "src": "1209:15:116"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_resultCode",
+                      "scope": 34054,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 34051,
+                        "name": "ElementaryTypeName",
+                        "src": "1241:4:116"
+                      }
+                    ],
+                    "id": 34052,
+                    "name": "VariableDeclaration",
+                    "src": "1241:16:116"
+                  }
+                ],
+                "id": 34053,
+                "name": "ParameterList",
+                "src": "1240:18:116"
+              }
+            ],
+            "id": 34054,
+            "name": "FunctionDefinition",
+            "src": "1185:74:116"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "constant": false,
+              "implemented": false,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "createPoll",
+              "payable": false,
+              "scope": 34068,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_optionsCount",
+                      "scope": 34067,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 34055,
+                        "name": "ElementaryTypeName",
+                        "src": "1359:4:116"
+                      }
+                    ],
+                    "id": 34056,
+                    "name": "VariableDeclaration",
+                    "src": "1359:18:116"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_detailsIpfsHash",
+                      "scope": 34067,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bytes32",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bytes32",
+                          "type": "bytes32"
+                        },
+                        "id": 34057,
+                        "name": "ElementaryTypeName",
+                        "src": "1387:7:116"
+                      }
+                    ],
+                    "id": 34058,
+                    "name": "VariableDeclaration",
+                    "src": "1387:24:116"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_votelimit",
+                      "scope": 34067,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 34059,
+                        "name": "ElementaryTypeName",
+                        "src": "1421:4:116"
+                      }
+                    ],
+                    "id": 34060,
+                    "name": "VariableDeclaration",
+                    "src": "1421:15:116"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_deadline",
+                      "scope": 34067,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 34061,
+                        "name": "ElementaryTypeName",
+                        "src": "1446:4:116"
+                      }
+                    ],
+                    "id": 34062,
+                    "name": "VariableDeclaration",
+                    "src": "1446:14:116"
+                  }
+                ],
+                "id": 34063,
+                "name": "ParameterList",
+                "src": "1349:117:116"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 34067,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 34064,
+                        "name": "ElementaryTypeName",
+                        "src": "1483:4:116"
+                      }
+                    ],
+                    "id": 34065,
+                    "name": "VariableDeclaration",
+                    "src": "1483:4:116"
+                  }
+                ],
+                "id": 34066,
+                "name": "ParameterList",
+                "src": "1482:6:116"
+              }
+            ],
+            "id": 34067,
+            "name": "FunctionDefinition",
+            "src": "1330:159:116"
+          }
+        ],
+        "id": 34068,
+        "name": "ContractDefinition",
+        "src": "84:1407:116"
+      }
+    ],
+    "id": 34069,
+    "name": "SourceUnit",
+    "src": "0:1492:116"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "1.0.1",
+  "updatedAt": "2018-01-26T09:34:40.007Z"
+}
