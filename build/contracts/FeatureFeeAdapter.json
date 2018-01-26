@@ -1,0 +1,1188 @@
+{
+  "contractName": "FeatureFeeAdapter",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_identifier",
+          "type": "bytes32"
+        }
+      ],
+      "name": "lookupManager",
+      "outputs": [
+        {
+          "name": "manager",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.4.11;\n\nimport \"./FeatureFeeManager.sol\";\n\ncontract FeatureFeeAdapter {\n    uint constant OK = 1;\n    uint constant FEATURE_IS_UNAVAILABE = 22000;\n\n    modifier featured(uint[1] memory _result) {\n        if (!lookupFeatureFeeManager().isExecutionAllowed(msg.sender, address(this), msg.sig)) {\n            assembly {\n                mstore(0, 22000) //FEATURE_IS_UNAVAILABE\n                return(0, 32)\n            }\n        }\n\n        _;\n\n        if (_result[0] == OK\n                && lookupFeatureFeeManager().takeExecutionFee(msg.sender, address(this), msg.sig) != OK) {\n            revert();\n        }\n    }\n\n    /**\n    *  Abstract function\n    */\n    function lookupManager(bytes32 _identifier) constant returns (address manager);\n\n    function lookupFeatureFeeManager() private returns (FeatureFeeManager) {\n        return FeatureFeeManager(lookupManager(\"FeatureFeeManager\"));\n    }\n}\n",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/timeholder/FeatureFeeAdapter.sol",
+  "ast": {
+    "attributes": {
+      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/timeholder/FeatureFeeAdapter.sol",
+      "exportedSymbols": {
+        "FeatureFeeAdapter": [
+          29220
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.4",
+            ".11"
+          ]
+        },
+        "id": 29146,
+        "name": "PragmaDirective",
+        "src": "0:24:98"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 29505,
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/timeholder/FeatureFeeManager.sol",
+          "file": "./FeatureFeeManager.sol",
+          "scope": 29221,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 29147,
+        "name": "ImportDirective",
+        "src": "26:33:98"
+      },
+      {
+        "attributes": {
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "contract",
+          "documentation": null,
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            29220
+          ],
+          "name": "FeatureFeeAdapter",
+          "scope": 29221
+        },
+        "children": [
+          {
+            "attributes": {
+              "constant": true,
+              "name": "OK",
+              "scope": 29220,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint256",
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "uint",
+                  "type": "uint256"
+                },
+                "id": 29148,
+                "name": "ElementaryTypeName",
+                "src": "94:4:98"
+              },
+              {
+                "attributes": {
+                  "argumentTypes": null,
+                  "hexvalue": "31",
+                  "isConstant": false,
+                  "isLValue": false,
+                  "isPure": true,
+                  "lValueRequested": false,
+                  "subdenomination": null,
+                  "token": "number",
+                  "type": "int_const 1",
+                  "value": "1"
+                },
+                "id": 29149,
+                "name": "Literal",
+                "src": "113:1:98"
+              }
+            ],
+            "id": 29150,
+            "name": "VariableDeclaration",
+            "src": "94:20:98"
+          },
+          {
+            "attributes": {
+              "constant": true,
+              "name": "FEATURE_IS_UNAVAILABE",
+              "scope": 29220,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint256",
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "uint",
+                  "type": "uint256"
+                },
+                "id": 29151,
+                "name": "ElementaryTypeName",
+                "src": "120:4:98"
+              },
+              {
+                "attributes": {
+                  "argumentTypes": null,
+                  "hexvalue": "3232303030",
+                  "isConstant": false,
+                  "isLValue": false,
+                  "isPure": true,
+                  "lValueRequested": false,
+                  "subdenomination": null,
+                  "token": "number",
+                  "type": "int_const 22000",
+                  "value": "22000"
+                },
+                "id": 29152,
+                "name": "Literal",
+                "src": "158:5:98"
+              }
+            ],
+            "id": 29153,
+            "name": "VariableDeclaration",
+            "src": "120:43:98"
+          },
+          {
+            "attributes": {
+              "name": "featured",
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_result",
+                      "scope": 29200,
+                      "stateVariable": false,
+                      "storageLocation": "memory",
+                      "type": "uint256[1] memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "type": "uint256[1] storage pointer"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 29154,
+                            "name": "ElementaryTypeName",
+                            "src": "188:4:98"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "hexvalue": "31",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "subdenomination": null,
+                              "token": "number",
+                              "type": "int_const 1",
+                              "value": "1"
+                            },
+                            "id": 29155,
+                            "name": "Literal",
+                            "src": "193:1:98"
+                          }
+                        ],
+                        "id": 29156,
+                        "name": "ArrayTypeName",
+                        "src": "188:7:98"
+                      }
+                    ],
+                    "id": 29157,
+                    "name": "VariableDeclaration",
+                    "src": "188:22:98"
+                  }
+                ],
+                "id": 29158,
+                "name": "ParameterList",
+                "src": "187:24:98"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "falseBody": null
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "!",
+                          "prefix": true,
+                          "type": "bool"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "bool",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_address",
+                                      "typeString": "address"
+                                    },
+                                    {
+                                      "typeIdentifier": "t_bytes4",
+                                      "typeString": "bytes4"
+                                    }
+                                  ],
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "isExecutionAllowed",
+                                  "referencedDeclaration": 29442,
+                                  "type": "function (address,address,bytes4) external returns (bool)"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "arguments": [
+                                        null
+                                      ],
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": false,
+                                      "isStructConstructorCall": false,
+                                      "lValueRequested": false,
+                                      "names": [
+                                        null
+                                      ],
+                                      "type": "contract FeatureFeeManager",
+                                      "type_conversion": false
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": [
+                                            null
+                                          ],
+                                          "overloadedDeclarations": [
+                                            null
+                                          ],
+                                          "referencedDeclaration": 29219,
+                                          "type": "function () returns (contract FeatureFeeManager)",
+                                          "value": "lookupFeatureFeeManager"
+                                        },
+                                        "id": 29159,
+                                        "name": "Identifier",
+                                        "src": "227:23:98"
+                                      }
+                                    ],
+                                    "id": 29160,
+                                    "name": "FunctionCall",
+                                    "src": "227:25:98"
+                                  }
+                                ],
+                                "id": 29161,
+                                "name": "MemberAccess",
+                                "src": "227:44:98"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "sender",
+                                  "referencedDeclaration": null,
+                                  "type": "address"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 36974,
+                                      "type": "msg",
+                                      "value": "msg"
+                                    },
+                                    "id": 29162,
+                                    "name": "Identifier",
+                                    "src": "272:3:98"
+                                  }
+                                ],
+                                "id": 29163,
+                                "name": "MemberAccess",
+                                "src": "272:10:98"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "isStructConstructorCall": false,
+                                  "lValueRequested": false,
+                                  "names": [
+                                    null
+                                  ],
+                                  "type": "address",
+                                  "type_conversion": true
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": [
+                                        {
+                                          "typeIdentifier": "t_contract$_FeatureFeeAdapter_$29220",
+                                          "typeString": "contract FeatureFeeAdapter"
+                                        }
+                                      ],
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": true,
+                                      "lValueRequested": false,
+                                      "type": "type(address)",
+                                      "value": "address"
+                                    },
+                                    "id": 29164,
+                                    "name": "ElementaryTypeNameExpression",
+                                    "src": "284:7:98"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 37091,
+                                      "type": "contract FeatureFeeAdapter",
+                                      "value": "this"
+                                    },
+                                    "id": 29165,
+                                    "name": "Identifier",
+                                    "src": "292:4:98"
+                                  }
+                                ],
+                                "id": 29166,
+                                "name": "FunctionCall",
+                                "src": "284:13:98"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "member_name": "sig",
+                                  "referencedDeclaration": null,
+                                  "type": "bytes4"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 36974,
+                                      "type": "msg",
+                                      "value": "msg"
+                                    },
+                                    "id": 29167,
+                                    "name": "Identifier",
+                                    "src": "299:3:98"
+                                  }
+                                ],
+                                "id": 29168,
+                                "name": "MemberAccess",
+                                "src": "299:7:98"
+                              }
+                            ],
+                            "id": 29169,
+                            "name": "FunctionCall",
+                            "src": "227:80:98"
+                          }
+                        ],
+                        "id": 29170,
+                        "name": "UnaryOperation",
+                        "src": "226:81:98"
+                      },
+                      {
+                        "children": [
+                          {
+                            "attributes": {
+                              "externalReferences": [
+                                null
+                              ],
+                              "operations": "{\n    mstore(0, 22000)\n    return(0, 32)\n}"
+                            },
+                            "children": [],
+                            "id": 29171,
+                            "name": "InlineAssembly",
+                            "src": "323:121:98"
+                          }
+                        ],
+                        "id": 29172,
+                        "name": "Block",
+                        "src": "309:135:98"
+                      }
+                    ],
+                    "id": 29173,
+                    "name": "IfStatement",
+                    "src": "222:222:98"
+                  },
+                  {
+                    "id": 29174,
+                    "name": "PlaceholderStatement",
+                    "src": "454:1:98"
+                  },
+                  {
+                    "attributes": {
+                      "falseBody": null
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "commonType": {
+                            "typeIdentifier": "t_bool",
+                            "typeString": "bool"
+                          },
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "&&",
+                          "type": "bool"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "commonType": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              },
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "operator": "==",
+                              "type": "bool"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": true,
+                                  "isPure": false,
+                                  "lValueRequested": false,
+                                  "type": "uint256"
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 29157,
+                                      "type": "uint256[1] memory",
+                                      "value": "_result"
+                                    },
+                                    "id": 29175,
+                                    "name": "Identifier",
+                                    "src": "470:7:98"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "hexvalue": "30",
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": true,
+                                      "lValueRequested": false,
+                                      "subdenomination": null,
+                                      "token": "number",
+                                      "type": "int_const 0",
+                                      "value": "0"
+                                    },
+                                    "id": 29176,
+                                    "name": "Literal",
+                                    "src": "478:1:98"
+                                  }
+                                ],
+                                "id": 29177,
+                                "name": "IndexAccess",
+                                "src": "470:10:98"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 29150,
+                                  "type": "uint256",
+                                  "value": "OK"
+                                },
+                                "id": 29178,
+                                "name": "Identifier",
+                                "src": "484:2:98"
+                              }
+                            ],
+                            "id": 29179,
+                            "name": "BinaryOperation",
+                            "src": "470:16:98"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "commonType": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              },
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "operator": "!=",
+                              "type": "bool"
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "isStructConstructorCall": false,
+                                  "lValueRequested": false,
+                                  "names": [
+                                    null
+                                  ],
+                                  "type": "uint256",
+                                  "type_conversion": false
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": [
+                                        {
+                                          "typeIdentifier": "t_address",
+                                          "typeString": "address"
+                                        },
+                                        {
+                                          "typeIdentifier": "t_address",
+                                          "typeString": "address"
+                                        },
+                                        {
+                                          "typeIdentifier": "t_bytes4",
+                                          "typeString": "bytes4"
+                                        }
+                                      ],
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": false,
+                                      "lValueRequested": false,
+                                      "member_name": "takeExecutionFee",
+                                      "referencedDeclaration": 29503,
+                                      "type": "function (address,address,bytes4) external returns (uint256)"
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "arguments": [
+                                            null
+                                          ],
+                                          "isConstant": false,
+                                          "isLValue": false,
+                                          "isPure": false,
+                                          "isStructConstructorCall": false,
+                                          "lValueRequested": false,
+                                          "names": [
+                                            null
+                                          ],
+                                          "type": "contract FeatureFeeManager",
+                                          "type_conversion": false
+                                        },
+                                        "children": [
+                                          {
+                                            "attributes": {
+                                              "argumentTypes": [
+                                                null
+                                              ],
+                                              "overloadedDeclarations": [
+                                                null
+                                              ],
+                                              "referencedDeclaration": 29219,
+                                              "type": "function () returns (contract FeatureFeeManager)",
+                                              "value": "lookupFeatureFeeManager"
+                                            },
+                                            "id": 29180,
+                                            "name": "Identifier",
+                                            "src": "506:23:98"
+                                          }
+                                        ],
+                                        "id": 29181,
+                                        "name": "FunctionCall",
+                                        "src": "506:25:98"
+                                      }
+                                    ],
+                                    "id": 29182,
+                                    "name": "MemberAccess",
+                                    "src": "506:42:98"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": false,
+                                      "lValueRequested": false,
+                                      "member_name": "sender",
+                                      "referencedDeclaration": null,
+                                      "type": "address"
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "overloadedDeclarations": [
+                                            null
+                                          ],
+                                          "referencedDeclaration": 36974,
+                                          "type": "msg",
+                                          "value": "msg"
+                                        },
+                                        "id": 29183,
+                                        "name": "Identifier",
+                                        "src": "549:3:98"
+                                      }
+                                    ],
+                                    "id": 29184,
+                                    "name": "MemberAccess",
+                                    "src": "549:10:98"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": false,
+                                      "isStructConstructorCall": false,
+                                      "lValueRequested": false,
+                                      "names": [
+                                        null
+                                      ],
+                                      "type": "address",
+                                      "type_conversion": true
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": [
+                                            {
+                                              "typeIdentifier": "t_contract$_FeatureFeeAdapter_$29220",
+                                              "typeString": "contract FeatureFeeAdapter"
+                                            }
+                                          ],
+                                          "isConstant": false,
+                                          "isLValue": false,
+                                          "isPure": true,
+                                          "lValueRequested": false,
+                                          "type": "type(address)",
+                                          "value": "address"
+                                        },
+                                        "id": 29185,
+                                        "name": "ElementaryTypeNameExpression",
+                                        "src": "561:7:98"
+                                      },
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "overloadedDeclarations": [
+                                            null
+                                          ],
+                                          "referencedDeclaration": 37091,
+                                          "type": "contract FeatureFeeAdapter",
+                                          "value": "this"
+                                        },
+                                        "id": 29186,
+                                        "name": "Identifier",
+                                        "src": "569:4:98"
+                                      }
+                                    ],
+                                    "id": 29187,
+                                    "name": "FunctionCall",
+                                    "src": "561:13:98"
+                                  },
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": null,
+                                      "isConstant": false,
+                                      "isLValue": false,
+                                      "isPure": false,
+                                      "lValueRequested": false,
+                                      "member_name": "sig",
+                                      "referencedDeclaration": null,
+                                      "type": "bytes4"
+                                    },
+                                    "children": [
+                                      {
+                                        "attributes": {
+                                          "argumentTypes": null,
+                                          "overloadedDeclarations": [
+                                            null
+                                          ],
+                                          "referencedDeclaration": 36974,
+                                          "type": "msg",
+                                          "value": "msg"
+                                        },
+                                        "id": 29188,
+                                        "name": "Identifier",
+                                        "src": "576:3:98"
+                                      }
+                                    ],
+                                    "id": 29189,
+                                    "name": "MemberAccess",
+                                    "src": "576:7:98"
+                                  }
+                                ],
+                                "id": 29190,
+                                "name": "FunctionCall",
+                                "src": "506:78:98"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 29150,
+                                  "type": "uint256",
+                                  "value": "OK"
+                                },
+                                "id": 29191,
+                                "name": "Identifier",
+                                "src": "588:2:98"
+                              }
+                            ],
+                            "id": 29192,
+                            "name": "BinaryOperation",
+                            "src": "506:84:98"
+                          }
+                        ],
+                        "id": 29193,
+                        "name": "BinaryOperation",
+                        "src": "470:120:98"
+                      },
+                      {
+                        "children": [
+                          {
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "arguments": [
+                                    null
+                                  ],
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": false,
+                                  "isStructConstructorCall": false,
+                                  "lValueRequested": false,
+                                  "names": [
+                                    null
+                                  ],
+                                  "type": "tuple()",
+                                  "type_conversion": false
+                                },
+                                "children": [
+                                  {
+                                    "attributes": {
+                                      "argumentTypes": [
+                                        null
+                                      ],
+                                      "overloadedDeclarations": [
+                                        null
+                                      ],
+                                      "referencedDeclaration": 36978,
+                                      "type": "function () pure",
+                                      "value": "revert"
+                                    },
+                                    "id": 29194,
+                                    "name": "Identifier",
+                                    "src": "606:6:98"
+                                  }
+                                ],
+                                "id": 29195,
+                                "name": "FunctionCall",
+                                "src": "606:8:98"
+                              }
+                            ],
+                            "id": 29196,
+                            "name": "ExpressionStatement",
+                            "src": "606:8:98"
+                          }
+                        ],
+                        "id": 29197,
+                        "name": "Block",
+                        "src": "592:33:98"
+                      }
+                    ],
+                    "id": 29198,
+                    "name": "IfStatement",
+                    "src": "466:159:98"
+                  }
+                ],
+                "id": 29199,
+                "name": "Block",
+                "src": "212:419:98"
+              }
+            ],
+            "id": 29200,
+            "name": "ModifierDefinition",
+            "src": "170:461:98"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "constant": true,
+              "implemented": false,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "lookupManager",
+              "payable": false,
+              "scope": 29220,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_identifier",
+                      "scope": 29207,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "bytes32",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "bytes32",
+                          "type": "bytes32"
+                        },
+                        "id": 29201,
+                        "name": "ElementaryTypeName",
+                        "src": "700:7:98"
+                      }
+                    ],
+                    "id": 29202,
+                    "name": "VariableDeclaration",
+                    "src": "700:19:98"
+                  }
+                ],
+                "id": 29203,
+                "name": "ParameterList",
+                "src": "699:21:98"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "manager",
+                      "scope": 29207,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 29204,
+                        "name": "ElementaryTypeName",
+                        "src": "739:7:98"
+                      }
+                    ],
+                    "id": 29205,
+                    "name": "VariableDeclaration",
+                    "src": "739:15:98"
+                  }
+                ],
+                "id": 29206,
+                "name": "ParameterList",
+                "src": "738:17:98"
+              }
+            ],
+            "id": 29207,
+            "name": "FunctionDefinition",
+            "src": "677:79:98"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "lookupFeatureFeeManager",
+              "payable": false,
+              "scope": 29220,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "private"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 29208,
+                "name": "ParameterList",
+                "src": "794:2:98"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 29219,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "contract FeatureFeeManager",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "contractScope": null,
+                          "name": "FeatureFeeManager",
+                          "referencedDeclaration": 29504,
+                          "type": "contract FeatureFeeManager"
+                        },
+                        "id": 29209,
+                        "name": "UserDefinedTypeName",
+                        "src": "814:17:98"
+                      }
+                    ],
+                    "id": 29210,
+                    "name": "VariableDeclaration",
+                    "src": "814:17:98"
+                  }
+                ],
+                "id": 29211,
+                "name": "ParameterList",
+                "src": "813:19:98"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "functionReturnParameters": 29211
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "contract FeatureFeeManager",
+                          "type_conversion": true
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 29504,
+                              "type": "type(contract FeatureFeeManager)",
+                              "value": "FeatureFeeManager"
+                            },
+                            "id": 29212,
+                            "name": "Identifier",
+                            "src": "850:17:98"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "address",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_stringliteral_c8df636d27297fc23800b3a7316e0d2583b0ba7475dd208a2e82edf35108e363",
+                                      "typeString": "literal_string \"FeatureFeeManager\""
+                                    }
+                                  ],
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 29207,
+                                  "type": "function (bytes32) view returns (address)",
+                                  "value": "lookupManager"
+                                },
+                                "id": 29213,
+                                "name": "Identifier",
+                                "src": "868:13:98"
+                              },
+                              {
+                                "attributes": {
+                                  "argumentTypes": null,
+                                  "hexvalue": "466561747572654665654d616e61676572",
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "subdenomination": null,
+                                  "token": "string",
+                                  "type": "literal_string \"FeatureFeeManager\"",
+                                  "value": "FeatureFeeManager"
+                                },
+                                "id": 29214,
+                                "name": "Literal",
+                                "src": "882:19:98"
+                              }
+                            ],
+                            "id": 29215,
+                            "name": "FunctionCall",
+                            "src": "868:34:98"
+                          }
+                        ],
+                        "id": 29216,
+                        "name": "FunctionCall",
+                        "src": "850:53:98"
+                      }
+                    ],
+                    "id": 29217,
+                    "name": "Return",
+                    "src": "843:60:98"
+                  }
+                ],
+                "id": 29218,
+                "name": "Block",
+                "src": "833:77:98"
+              }
+            ],
+            "id": 29219,
+            "name": "FunctionDefinition",
+            "src": "762:148:98"
+          }
+        ],
+        "id": 29220,
+        "name": "ContractDefinition",
+        "src": "61:851:98"
+      }
+    ],
+    "id": 29221,
+    "name": "SourceUnit",
+    "src": "0:913:98"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "1.0.1",
+  "updatedAt": "2018-01-12T11:40:45.482Z"
+}
