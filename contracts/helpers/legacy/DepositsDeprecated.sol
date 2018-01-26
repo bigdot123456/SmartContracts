@@ -1,8 +1,9 @@
 pragma solidity ^0.4.11;
 
-import "./BaseManager.sol";
+import "../../core/common/BaseManager.sol";
 
-contract Deposits is BaseManager {
+
+contract DepositsDeprecated is BaseManager {
 
     StorageInterface.OrderedAddressesSet shareholders;
     StorageInterface.UIntOrderedSetMapping deposits;
@@ -12,7 +13,7 @@ contract Deposits is BaseManager {
     StorageInterface.UInt totalSharesStorage;
     StorageInterface.Address sharesContractStorage;
 
-    function Deposits(Storage _store, bytes32 _crate) BaseManager(_store, _crate) {
+    function DepositsDeprecated(Storage _store, bytes32 _crate) BaseManager(_store, _crate) {
         shareholders.init('shareholders');
         deposits.init('deposits');
         depositsIdCounter.init('depositsIdCounter');
@@ -31,7 +32,7 @@ contract Deposits is BaseManager {
      */
     function depositBalance(address _address) constant returns(uint) {
         uint balance;
-        StorageInterface.Iterator memory iterator = store.listIterator(deposits,bytes32(_address));
+        StorageInterface.Iterator memory iterator = store.listIterator(deposits, bytes32(_address));
         for(uint i = 0; store.canGetNextWithIterator(deposits,iterator); i++) {
             uint _cur_amount = store.get(amounts,_address,store.getNextWithIterator(deposits,iterator));
             balance += _cur_amount;

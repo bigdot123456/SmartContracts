@@ -3,27 +3,36 @@ pragma solidity ^0.4.11;
 import "./TimeHolderEmitter.sol";
 import "../core/common/BaseManager.sol";
 import "../core/common/ListenerInterface.sol";
-import "../core/common/Deposits.sol";
 import {ERC20Interface as Asset} from "../core/erc20/ERC20Interface.sol";
+import {ERC20Manager as ERC20Service} from "../core/erc20/ERC20Manager.sol";
 import "./DepositWalletInterface.sol";
+import "./ERC20DepositStorage.sol";
+import "../core/lib/SafeMath.sol";
+
 
 /// @title TimeHolder
-/// @notice Contract allows to block some amount of shares' balance to unlock
+/// @notice Contract allows to block some amount of shares" balance to unlock
 /// functionality inside a system.
-contract TimeHolder is Deposits, TimeHolderEmitter {
+contract TimeHolder is BaseManager, TimeHolderEmitter {
+
+    using SafeMath for uint;
 
     /** Error codes */
+
     uint constant ERROR_TIMEHOLDER_ALREADY_ADDED = 12000;
     uint constant ERROR_TIMEHOLDER_TRANSFER_FAILED = 12003;
     uint constant ERROR_TIMEHOLDER_INSUFFICIENT_BALANCE = 12006;
     uint constant ERROR_TIMEHOLDER_LIMIT_EXCEEDED = 12007;
 
     /** Storage keys */
+
+    StorageInterface.AddressesSet sharesTokenStorage;
+    StorageInterface.AddressUIntMapping limitsStorage;
+
     StorageInterface.AddressOrderedSetMapping listeners;
     StorageInterface.Address walletStorage;
     StorageInterface.Address feeWalletStorage;
-    StorageInterface.AddressUIntMapping limitsStorage;
-
+    StorageInterface.Address erc20DepositStorage;
 
     /// @dev Guards invokations only for FeatureManager
     modifier onlyFeatureFeeManager {
@@ -33,22 +42,31 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
 
     /// @dev only token registered in whitelist
     modifier onlyAllowedToken(address _token) {
-        require(store.includes(sharesTokenStorage, _token));
-        _;
+        if (store.includes(sharesTokenStorage, _token)) {
+            _;
+        }
     }
 
     /// @notice Constructor
-    function TimeHolder(Storage _store, bytes32 _crate) Deposits(_store, _crate) public {
-        listeners.init('listeners_v2');
-        feeWalletStorage.init("timeHolderFeeWalletStorage");
+    function TimeHolder(Storage _store, bytes32 _crate) BaseManager(_store, _crate) public {
+        sharesTokenStorage.init("sharesContractsStorage_v2");
+        limitsStorage.init("limitAmountsStorage_v2");
+        listeners.init("listeners_v2");
         walletStorage.init("timeHolderWalletStorage");
-        limitsStorage.init('limitAmountsStorage');
+        feeWalletStorage.init("timeHolderFeeWalletStorage");
+        erc20DepositStorage.init("erc20DepositStorage");
     }
 
     /// @notice Init TimeHolder contract.
     /// @param _contractsManager address.
     /// @return result code of an operation
-    function init(address _contractsManager, address _defaultToken, address _wallet, address _feeWallet)
+    function init(
+        address _contractsManager,
+        address _defaultToken,
+        address _wallet,
+        address _feeWallet,
+        address _erc20DepositStorage
+    )
     public
     onlyContractOwner
     returns (uint)
@@ -56,17 +74,69 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
         require(_defaultToken != 0x0);
         require(_wallet != 0x0);
         require(_feeWallet != 0x0);
+        require(_erc20DepositStorage != 0x0);
 
         BaseManager.init(_contractsManager, "TimeHolder");
 
         store.set(walletStorage, _wallet);
         store.set(feeWalletStorage, _feeWallet);
+        store.set(erc20DepositStorage, _erc20DepositStorage);
 
-        store.set(defaultSharesTokenStorage, _defaultToken);
         store.add(sharesTokenStorage, _defaultToken);
         store.set(limitsStorage, _defaultToken, 2**255);
 
+        ERC20DepositStorage(_erc20DepositStorage).setSharesContract(_defaultToken);
+
         return OK;
+    }
+
+     /// @notice Gets shares amount deposited by a particular shareholder.
+     ///
+     /// @param _depositor shareholder address.
+     ///
+     /// @return shares amount.
+    function depositBalance(address _depositor) public view returns (uint) {
+        var (_depositStorage, _defaultToken) = getDepositStorage();
+        return getDepositBalance(_defaultToken, _depositStorage, _depositor);
+    }
+
+    /// @notice Gets shares amount deposited by a particular shareholder.
+    ///
+    /// @param _token token symbol.
+    /// @param _depositor shareholder address.
+    ///
+    /// @return _balance shares amount.
+    function getDepositBalance(address _token, address _depositor) public view returns (uint) {
+        var (_depositStorage,) = getDepositStorage();
+        return getDepositBalance(_token, _depositStorage, _depositor);
+    }
+
+    /// @dev Gets balance of tokens deposited to TimeHolder
+    ///
+    /// @param _token token to check
+    /// @param _depositStorage address of DepositStorage contract
+    /// @param _depositor shareholder address
+    function getDepositBalance(
+        address _token,
+        address _depositStorage,
+        address _depositor
+    )
+    private
+    view
+    returns (uint _balance)
+    {
+        return ERC20DepositStorage(_depositStorage).depositBalance(_token, _depositor);
+    }
+
+    /// @dev Gets pair of depositStorage and default token set up for a deposits
+    ///
+    /// @return {
+    ///     "_depositStorage": "deposit storage contract",
+    ///     "_token": "default shares contract",
+    /// }
+    function getDepositStorage() private view returns (ERC20DepositStorage _depositStorage, address _token) {
+        _depositStorage = ERC20DepositStorage(store.get(erc20DepositStorage));
+        _token = _depositStorage.getSharesContract();
     }
 
     /// @notice Adds ERC20-compatible token symbols and put them in the whitelist to be used then as
@@ -111,9 +181,9 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
         }
     }
 
-    /// @dev Adds provided listener to observe changes of passed symbol when some amount will be deposited/withdrawn.
+    /// @notice Adds provided listener to observe changes of passed symbol when some amount will be deposited/withdrawn.
     /// Checks passed listener for HolderListenerInterface compatibility.
-    /// @notice Allowed only for CBEs
+    /// @dev Allowed only for CBEs
     ///
     /// @param _token token symbol to watch deposits and withdrawals
     /// @param _listener address of a listener to add
@@ -129,8 +199,8 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
         _emitListenerAdded(_listener, _token);
     }
 
-    /// @dev Removes provided listener from observing changes of passed symbol.
-    /// @notice Allowed only for CBEs
+    /// @notice Removes provided listener from observing changes of passed symbol.
+    /// @dev Allowed only for CBEs
     ///
     /// @param _token token symbol to stop watching by a listener
     /// @param _listener address of a listener to remove
@@ -145,7 +215,7 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
         _emitListenerRemoved(_listener, _token);
     }
 
-    /// @dev Sets fee wallet address.
+    /// @notice Sets fee wallet address.
     function setFeeWallet(address _feeWallet)
     public
     onlyAuthorized
@@ -153,7 +223,7 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
         store.set(feeWalletStorage, _feeWallet);
     }
 
-    /// @dev Deposits shares with provided symbol and prove possesion.
+    /// @notice Deposits shares with provided symbol and prove possesion.
     /// Amount should be less than or equal to current allowance value.
     ///
     /// Proof should be repeated for each active period. To prove possesion without
@@ -167,7 +237,7 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
         return depositFor(_token, msg.sender, _amount);
     }
 
-    /// @dev Deposit own shares and prove possession for arbitrary shareholder.
+    /// @notice Deposit own shares and prove possession for arbitrary shareholder.
     /// Amount should be less than or equal to caller current allowance value.
     ///
     /// Proof should be repeated for each active period. To prove possesion without
@@ -197,28 +267,21 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
             return _emitError(ERROR_TIMEHOLDER_TRANSFER_FAILED);
         }
 
-        store.add(shareholders, _target);
+        var (_depositStorage, _defaultToken) = getDepositStorage();
+        if (_token != _defaultToken) {
+            _depositStorage.depositFor(_token, _target, _amount);
+        } else {
+            _depositStorage.depositFor(_target, _amount);
+        }
 
-        bytes32 _key = getCompositeKey(_token, _target); // TODO: wtf?
-
-        uint _id = store.get(depositsIdCounters, _key) + 1;
-        store.set(depositsIdCounters, _key, _id);
-        store.add(deposits, _key, _id);
-        store.set(amounts, _key, bytes32(_id), bytes32(_amount));
-        store.set(timestamps, _key, bytes32(_id), bytes32(now));
-
-        _goThroughListeners(_token, _target, _amount, _notifyDepositListener);
+        _goThroughListeners(_token, _defaultToken, _depositStorage, _target, _amount, _notifyDepositListener);
 
         _emitDeposit(_token, _target, _amount);
-
-        uint prevAmount = store.get(totalSharesStorage, _token);
-        _amount = _amount.add(prevAmount);
-        store.set(totalSharesStorage, _token, _amount);
 
         return OK;
     }
 
-    /// @dev Withdraw shares from the contract, updating the possesion proof in active period.
+    /// @notice Withdraw shares from the contract, updating the possesion proof in active period.
     /// @param _token token symbol to withdraw from.
     /// @param _amount amount of shares to withdraw.
     /// @return resultCode result code of an operation.
@@ -226,7 +289,8 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
     public
     returns (uint resultCode)
     {
-        resultCode = _withdrawShares(_token, msg.sender, msg.sender, _amount);
+        var (_depositStorage, _defaultToken) = getDepositStorage();
+        resultCode = _withdrawShares(_token, _defaultToken, _depositStorage, msg.sender, msg.sender, _amount);
         if (resultCode != OK) {
             return _emitError(resultCode);
         }
@@ -236,8 +300,8 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
 
     /// @notice Force Withdraw Shares
     /// Only CBE members are permited to call this function.
-    /// Multisig concensus is required to withdraw shares from shareholder '_from'
-    /// and send it to '_to'.
+    /// Multisig concensus is required to withdraw shares from shareholder "_from"
+    /// and send it to "_to".
     function forceWithdrawShares(address _from, address _token, uint _amount, address _to)
     public
     onlyAuthorized
@@ -247,7 +311,8 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
             return _emitError(resultCode);
         }
 
-        resultCode = _withdrawShares(_token, _from, _to, _amount);
+        var (_depositStorage, _defaultToken) = getDepositStorage();
+        resultCode = _withdrawShares(_token, _defaultToken, _depositStorage, _from, _to, _amount);
         if (resultCode != OK) {
             return _emitError(resultCode);
         }
@@ -255,7 +320,7 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
         _emitWithdrawShares(_token, _from, _amount, _to);
     }
 
-    /// @dev Provides a way to support getting additional fee for using features of the system.
+    /// @notice Provides a way to support getting additional fee for using features of the system.
     /// @param _account holder of deposits, will pay for using a features
     /// @param _amount size of a fee
     /// @return resultCode result code of the operation
@@ -267,10 +332,10 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
         require(_account != 0x0);
         assert(feeWallet() != 0x0);
 
-        address token = store.get(defaultSharesTokenStorage);
-        assert(token != 0x0);
+        var (_depositStorage, _defaultToken) = getDepositStorage();
+        assert(_defaultToken != 0x0);
 
-        resultCode = _withdrawShares(token, _account, feeWallet(), _amount);
+        resultCode = _withdrawShares(_defaultToken, _defaultToken, _depositStorage, _account, feeWallet(), _amount);
         if (resultCode != OK) {
             return _emitError(resultCode);
         }
@@ -278,44 +343,52 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
         _emitFeatureFeeTaken(_account, feeWallet(), _amount);
     }
 
-    /// @dev Gets an associated wallet for the time holder
+    /// @notice Gets an associated wallet for the time holder
     function wallet() public view returns (address) {
         return store.get(walletStorage);
     }
 
-    /// @dev Gets an associated fee wallet for the time holder
+    /// @notice Gets an associated fee wallet for the time holder
     function feeWallet() public view returns (address) {
         return store.get(feeWalletStorage);
     }
 
-    /// @dev Total amount of shares for provided symbol
+    /// @notice Total amount of shares for provided symbol
     /// @param _token token address to check total shares amout
     /// @return total amount of shares
     function totalShares(address _token) public view returns (uint) {
-        return store.get(totalSharesStorage, _token);
+        var (_depositStorage,) = getDepositStorage();
+        return _depositStorage.totalShares(_token);
     }
 
-    /// @dev Number of shareholders
+    /// @notice Number of shareholders
     /// @return number of shareholders
     function shareholdersCount() public view returns (uint) {
-        return store.count(shareholders);
+        var (_depositStorage,) = getDepositStorage();
+        return _depositStorage.shareholdersCount();
     }
 
-    /// @dev Returns deposit/withdraw limit for shares with provided symbol
+    /// @notice Number of shareholders
+    /// @return number of shareholders
+    function shareholdersCount(address _token) public view returns (uint) {
+        var (_depositStorage,) = getDepositStorage();
+        return _depositStorage.shareholdersCount(_token);
+    }
+
+    /// @notice Returns deposit/withdraw limit for shares with provided symbol
     /// @param _token token address to get limit
     /// @return limit number for specified shares
     function getLimitForToken(address _token) public view returns (uint) {
         return store.get(limitsStorage, _token);
     }
 
-    /// TODO
-    ///
-    ///
+    /// @notice Gets shares contract that is set up as default (usually TIMEs)
     function getDefaultShares() public view returns (address) {
-        return store.get(defaultSharesTokenStorage);
+        var (, _token) = getDepositStorage();
+        return _token;
     }
 
-    /// @dev Withdraws deposited amount of tokens from account to a receiver address.
+    /// @notice Withdraws deposited amount of tokens from account to a receiver address.
     /// Emits its own errorCodes if some will be encountered.
     ///
     /// @param _account an address that have deposited tokens
@@ -323,11 +396,18 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
     /// @param _amount amount of tokens to withdraw to the _receiver
     ///
     /// @return result code of the operation
-    function _withdrawShares(address _token, address _account, address _receiver, uint _amount)
+    function _withdrawShares(
+        address _token,
+        address _defaultToken,
+        address _depositStorage,
+        address _account,
+        address _receiver,
+        uint _amount
+    )
     internal
     returns (uint)
     {
-        uint _depositBalance = getDepositBalance(_token, _account);
+        uint _depositBalance = getDepositBalance(_token, _depositStorage, _account);
 
         if (_amount > _depositBalance) {
             return _emitError(ERROR_TIMEHOLDER_INSUFFICIENT_BALANCE);
@@ -337,68 +417,15 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
             return _emitError(ERROR_TIMEHOLDER_TRANSFER_FAILED);
         }
 
-        _withdrawSharesFromDeposits(_depositBalance, _token, _account, _amount);
-        _goThroughListeners(_token, _account, _amount, _notifyWithdrawListener);
+        if (_token != _defaultToken) {
+            ERC20DepositStorage(_depositStorage).withdrawShares(_token, _account, _amount, _depositBalance);
+        } else {
+            ERC20DepositStorage(_depositStorage).withdrawShares(_account, _amount, _depositBalance);
+        }
 
-        store.set(totalSharesStorage, _token, store.get(totalSharesStorage, _token).sub(_amount));
+        _goThroughListeners(_token, _defaultToken, _depositStorage, _account, _amount, _notifyWithdrawListener);
 
         return OK;
-    }
-
-    /// @dev Withdraws shares from one of made deposits.
-    ///
-    /// @param _key composite key from keccak256(symbol, user)
-    /// @param _id deposit key
-    /// @param _amount deposit amount to withdraw
-    /// @param _depositsLeft number of deposits left
-    ///
-    /// @return {
-    ///   updated deposits left,
-    ///   updated amount left,
-    /// }
-    function _withdrawSharesFromDeposit(bytes32 _key, uint _id, uint _amount, uint _depositsLeft)
-    private
-    returns (uint, uint)
-    {
-        uint _cur_amount = uint(store.get(amounts, _key, bytes32(_id)));
-        if (_amount < _cur_amount) {
-            store.set(amounts, _key, bytes32(_id), bytes32(_cur_amount.sub(_amount)));
-            return (_depositsLeft, _amount);
-        }
-        if (_amount == _cur_amount) {
-            store.remove(deposits, _key, _id);
-            return (_depositsLeft.sub(1), _amount);
-        }
-        if (_amount > _cur_amount) {
-            store.remove(deposits, _key, _id);
-            return (_depositsLeft.sub(1), _amount.sub(_cur_amount));
-        }
-    }
-
-    /// @dev Withdraws shares with symbol back to provided account
-    ///
-    /// @param _totalDepositBalance total balance of shares
-    /// @param _token token address of shares
-    /// @param _account token recepient
-    /// @param _amount number of tokens to withdraw
-    function _withdrawSharesFromDeposits(uint _totalDepositBalance, address _token, address _account, uint _amount)
-    private
-    {
-        if (_totalDepositBalance == 0) {
-            return; // TODO: WTF?
-        }
-
-        bytes32 _key = getCompositeKey(_token, _account);
-        StorageInterface.Iterator memory iterator = store.listIterator(deposits, _key);
-        uint _deposits_count_left = iterator.count();
-        for (uint i = 0; store.canGetNextWithIterator(deposits, iterator); ++i) {
-            uint _id = store.getNextWithIterator(deposits, iterator);
-            (_deposits_count_left, _amount) = _withdrawSharesFromDeposit(_key, _id, _amount, _deposits_count_left);
-        }
-
-        if (_deposits_count_left == 0) {
-            store.remove(shareholders, _account);
-        }
     }
 
     /// @dev Notifies listener about depositing token with symbol
@@ -416,15 +443,25 @@ contract TimeHolder is Deposits, TimeHolderEmitter {
     }
 
     /// @dev Iterates through listeners of provided symbol and notifies by calling notification function
-    function _goThroughListeners(address _token, address _target, uint _amount, function (address, address, address, uint, uint) _notification)
+    function _goThroughListeners(
+        address _token,
+        address _defaultToken,
+        address _depositStorage,
+        address _target,
+        uint _amount,
+        function (address, address, address, uint, uint) _notification)
     private
     {
-        uint _depositBalance = getDepositBalance(_token, _target);
+        uint _depositBalance = getDepositBalance(_token, _depositStorage, _target);
         StorageInterface.Iterator memory iterator = store.listIterator(listeners, bytes32(_token));
         for (uint i = 0; store.canGetNextWithIterator(listeners, iterator); ++i) {
             address _listener = store.getNextWithIterator(listeners, iterator);
             _notification(_listener, _token, _target, _amount, _depositBalance);
         }
+    }
+
+    function lookupERC20Service() internal view returns (ERC20Service) {
+        return ERC20Service(lookupManager("ERC20Manager"));
     }
 
     /** Event emitting */

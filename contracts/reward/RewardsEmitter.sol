@@ -11,27 +11,27 @@ contract RewardsEmitter is MultiEventsHistoryAdapter {
     event PeriodClosed();
     event Error(address indexed self, uint errorCode);
 
-    function emitWithdrawnReward(address asset, address addr, uint amount) public {
+    function emitWithdrawnReward(address asset, address addr, uint amount) {
         WithdrawnRewardSuccess(asset, addr, amount);
     }
 
-    function emitWithdrawn(address addr, uint amount, uint total) public {
+    function emitWithdrawn(address addr, uint amount, uint total) {
         WithdrawnSuccess(addr, amount, total);
     }
 
-    function emitPeriodClosed() public {
+    function emitPeriodClosed() {
         PeriodClosed();
     }
 
-    function emitDepositStored(uint _part) public {
+    function emitDepositStored(uint _part) {
         DepositStored(_part);
     }
 
-    function emitAssetRegistered(address assetAddress) public {
+    function emitAssetRegistered(address assetAddress) {
         AssetRegistered(assetAddress);
     }
 
-    function emitError(uint error) public {
+    function emitError(uint error) {
         Error(_self(), error);
     }
 }

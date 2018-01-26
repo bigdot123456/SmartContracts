@@ -6,20 +6,16 @@ const MultiEventsHistory = artifacts.require("./MultiEventsHistory.sol");
 const PlatformsManager = artifacts.require('./PlatformsManager.sol')
 const ChronoBankPlatform = artifacts.require('./ChronoBankPlatform.sol')
 
+const ERC20DepositStorage = artifacts.require("./ERC20DepositStorage.sol")
+
 module.exports = async (deployer, network, accounts) => {
     deployer.then(async () => {
         let storageManager = await StorageManager.deployed()
-        await storageManager.giveAccess(Rewards.address, "Deposits")
+        await storageManager.giveAccess(ERC20DepositStorage.address, "Deposits")
 
-        let platformsManager = await PlatformsManager.deployed()
-        let platformAddr = await platformsManager.getPlatformForUserAtIndex.call(accounts[0], 0);
+        let erc20DepositStorage = await ERC20DepositStorage.deployed()
+        await erc20DepositStorage.init(ContractsManager.address)
 
-        let rewards = await Rewards.deployed()
-        await rewards.init(ContractsManager.address, RewardsWallet.address, platformAddr, 0)
-
-        let history = await MultiEventsHistory.deployed()
-        await history.authorize(Rewards.address)
-
-        console.log("[MIGRATION] [" + parseInt(require("path").basename(__filename)) + "] Rewards init: #done")
+        console.log("[MIGRATION] [" + parseInt(require("path").basename(__filename)) + "] ERC20DepositStorage init: #done")
     })
 }

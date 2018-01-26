@@ -2,6 +2,7 @@ const Rewards = artifacts.require("./Rewards.sol");
 const RewardsWallet = artifacts.require("./RewardsWallet.sol");
 const ContractsManager = artifacts.require("./ContractsManager.sol");
 const TimeHolder = artifacts.require("./TimeHolder.sol");
+const ERC20DepositStorage = artifacts.require('./ERC20DepositStorage.sol')
 const TimeHolderWallet = artifacts.require('./TimeHolderWallet.sol')
 const LOCManager = artifacts.require('./LOCManager.sol')
 const LOCWallet = artifacts.require('./LOCWallet.sol')
@@ -26,6 +27,7 @@ contract('Rewards', (accounts) => {
   let reward;
   let rewardsWallet;
   let timeHolder;
+  let erc20DepositStorage;
   let timeHolderWallet
   let storage;
   let userManager;
@@ -66,7 +68,8 @@ contract('Rewards', (accounts) => {
     .then(() => chronoMint.init(contractsManager.address, chronoMintWallet.address))
     .then(() => userManager.init(contractsManager.address))
     .then(() => timeHolderWallet.init(contractsManager.address))
-    .then(() => timeHolder.init(contractsManager.address, DEFAULT_SHARE_ADDRESS, timeHolderWallet.address, accounts[0]))
+    .then(() => erc20DepositStorage.init(contractsManager.address))
+    .then(() => timeHolder.init(contractsManager.address, DEFAULT_SHARE_ADDRESS, timeHolderWallet.address, accounts[0], erc20DepositStorage.address))
     .then(() => assetsManager.addAsset(asset1.address, 'LHT', chronoMintWallet.address))
     .then(() => multiEventsHistory.authorize(reward.address))
     .then(() => {})
@@ -140,6 +143,8 @@ contract('Rewards', (accounts) => {
     .then(instance => timeHolderWallet = instance)
     .then(() => TimeHolder.new(storage.address,'Deposits'))
     .then((instance) => timeHolder = instance)
+    .then(() => ERC20DepositStorage.new(storage.address,'Deposits'))
+    .then((instance) => erc20DepositStorage = instance)
     .then(() => ContractsManager.new(storage.address, "ContractsManager"))
     .then((instance) => contractsManager = instance)
     .then(() => UserManager.new(storage.address, 'UserManager'))
