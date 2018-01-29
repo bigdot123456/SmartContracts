@@ -28,7 +28,14 @@ contract PollBackend is Owned, MultiSigSupporter {
     uint constant UNAUTHORIZED = 0;
     uint constant ERROR_POLL_BACKEND_INVALID_INVOCATION = 26001;
     uint constant ERROR_POLL_BACKEND_NO_SHARES = 26002;
-    uint constant ERROR_POLL_BACKEND_INVALID_PARAMETER = 26003;
+    uint constant ERROR_POLL_BACKEND_INVALID_STATE = 26003;
+    uint constant ERROR_POLL_BACKEND_ALREADY_VOTED = 26004;
+
+    /// @title Defines finite number of poll's state:
+    /// - Prepare - poll is probably initialized and ready to be activated
+    /// - Active - poll is active, people could vote and poll could be ended
+    /// - Finished - poll is ended and ready to be utilized (killed)
+    enum State { Prepare, Active, Finished }
 
     /**
     * Storage variables. Duplicates @see PollRouter storage layout so
@@ -42,8 +49,8 @@ contract PollBackend is Owned, MultiSigSupporter {
     uint internal votelimit;
     uint internal deadline;
     uint internal creation;
-    bool public active;
-    bool internal status;
+    State state = State.Prepare;
+
     uint internal optionsCount;
 
     mapping(address => uint8) public memberOptions;
@@ -63,7 +70,7 @@ contract PollBackend is Owned, MultiSigSupporter {
     modifier onlyAuthorized {
         if (isAuthorized(msg.sender)) {
             _;
-        }        
+        }
     }
 
     ///  @notice Initializes internal fields. Contracts owner only.
@@ -74,6 +81,11 @@ contract PollBackend is Owned, MultiSigSupporter {
     function init(address _contractsManager) onlyContractOwner public returns (uint) {
         require(_contractsManager != 0x0);
         contractsManager = _contractsManager;
+    }
+
+    /// @notice Gets if a poll has active status and people still could vote
+    function active() public view returns (bool) {
+        return state == State.Active;
     }
 
     /// @notice Returns if _address is authorized (CBE)
@@ -95,7 +107,7 @@ contract PollBackend is Owned, MultiSigSupporter {
     }
 
     /// @notice returns listener to react on PollListenerInterface's actions
-    function getPollListener() public returns (PollListenerInterface) {
+    function getPollListener() public view returns (PollListenerInterface) {
         return PollListenerInterface(lookupManager("VotingManager"));
     }
 
@@ -136,12 +148,14 @@ contract PollBackend is Owned, MultiSigSupporter {
         uint _creation,
         uint _optionsCount
     ) {
+        State _state = state;
+
         _owner = contractOwner;
         _detailsIpfsHash = detailsIpfsHash;
         _votelimit = votelimit;
         _deadline = deadline;
-        _status = status;
-        _active = active;
+        _status = _state != State.Finished;
+        _active = _state == State.Active;
         _creation = creation;
         _optionsCount = optionsCount;
     }
@@ -178,13 +192,15 @@ contract PollBackend is Owned, MultiSigSupporter {
         require(_votelimit <= getVoteLimit());
         require(_deadline > now);
 
+        if (creation != 0) {
+            return _emitError(ERROR_POLL_BACKEND_INVALID_INVOCATION);
+        }
+
         optionsCount = _optionsCount;
         detailsIpfsHash = _detailsIpfsHash;
         votelimit = _votelimit;
         deadline = _deadline;
         creation = now;
-        active = false;
-        status = true;
 
         return OK;
     }
@@ -199,9 +215,14 @@ contract PollBackend is Owned, MultiSigSupporter {
     /// a balance in TimeHolder for the user is equal to zero.
     function vote(uint8 _choice) public returns (uint _resultCode) {
         require(_choice > 0 && _choice <= optionsCount);
-        require(memberOptions[msg.sender] == 0);
-        require(status == true);
-        require(active);
+
+        if (memberOptions[msg.sender] != 0) {
+            return _emitError(ERROR_POLL_BACKEND_ALREADY_VOTED);
+        }
+
+        if (!active()) {
+            return _emitError(ERROR_POLL_BACKEND_INVALID_STATE);
+        }
 
         address timeHolder = lookupManager("TimeHolder");
         uint balance = TimeHolderInterface(timeHolder).depositBalance(msg.sender);
@@ -230,14 +251,16 @@ contract PollBackend is Owned, MultiSigSupporter {
     ///
     /// @return _resultCode result code of an operation.
     function activatePoll() public returns (uint _resultCode) {
-        require(status == true);
+        if (state != State.Prepare || creation == 0) {
+            return _emitError(ERROR_POLL_BACKEND_INVALID_STATE);
+        }
 
         _resultCode = multisig();
         if (_resultCode != OK) {
             return _checkAndEmitError(_resultCode);
         }
 
-        active = true;
+        state = State.Active;
 
         getPollListener().onActivatePoll();
         getEventsHistory().emitPollActivated();
@@ -248,7 +271,9 @@ contract PollBackend is Owned, MultiSigSupporter {
     /// @dev delegatecall only. Multisignature required
     /// @return _resultCode result code of an operation.
     function endPoll() public returns (uint _resultCode) {
-        require(status == true);
+        if (!active()) {
+            return _emitError(ERROR_POLL_BACKEND_INVALID_STATE);
+        }
 
         _resultCode = multisig();
         if (OK != _resultCode) {
@@ -265,7 +290,9 @@ contract PollBackend is Owned, MultiSigSupporter {
     ///
     /// @return _resultCode result code of an operation.
     function killPoll() public onlyAuthorized {
-        require(!active || status == false);
+        if (active()) {
+            revert();
+        }
 
         getPollListener().onRemovePoll();
 
@@ -284,11 +311,11 @@ contract PollBackend is Owned, MultiSigSupporter {
     /// @param _amount a value of change
     /// @param _total total amount of tokens on _address's balance
     ///
-    /// @return result code of an operation    
-    function tokenDeposit(address token, address _address, uint _amount, uint _total) onlyVotingManager public returns (uint) {
+    /// @return result code of an operation
+    function tokenDeposit(address, address _address, uint _amount, uint _total) onlyVotingManager public returns (uint) {
         if (!hasMember(_address)) return UNAUTHORIZED;
 
-        if (status && active) {
+        if (active()) {
             uint8 _choice = memberOptions[_address];
             uint _value = optionsBalance[_choice];
             _value = _value.add(_amount);
@@ -314,10 +341,10 @@ contract PollBackend is Owned, MultiSigSupporter {
     /// @param _total total amount of tokens on _address's balance
     ///
     /// @return result code of an operation
-    function tokenWithdrawn(address token, address _address, uint _amount, uint _total) onlyVotingManager public returns (uint) {
+    function tokenWithdrawn(address, address _address, uint _amount, uint _total) onlyVotingManager public returns (uint) {
         if (!hasMember(_address)) return UNAUTHORIZED;
 
-        if (status && active) {
+        if (active()) {
             uint8 _choice = memberOptions[_address];
             uint _value = optionsBalance[_choice];
             _value = _value.sub(_amount);
@@ -354,14 +381,11 @@ contract PollBackend is Owned, MultiSigSupporter {
     }
 
     function _endPoll() private returns (uint _resultCode) {
-        assert(status == true);
-
-        if (!active) {
-            return _emitError(ERROR_POLL_BACKEND_INVALID_INVOCATION);
+        if (!active()) {
+            return _emitError(ERROR_POLL_BACKEND_INVALID_STATE);
         }
 
-        delete status;
-        delete active;
+        state = State.Finished;
 
         getPollListener().onEndPoll();
         getEventsHistory().emitPollEnded();

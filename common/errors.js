@@ -187,7 +187,8 @@ const errorsLibrary = {
 
     POLL_BACKEND_INVALID_INVOCATION: errorScope.poll_v2 + 1,
     POLL_BACKEND_NO_SHARES: errorScope.poll_v2 + 2,
-    POLL_BACKEND_INVALID_PARAMETER: errorScope.poll_v2 + 3,
+    POLL_BACKEND_INVALID_STATE: errorScope.poll_v2 + 3,
+    POLL_BACKEND_ALREADY_VOTED: errorScope.poll_v2 + 4,
 
     VOTING_ACTIVE_POLL_LIMIT_REACHED: errorScope.vote_v2 + 1,
 }
