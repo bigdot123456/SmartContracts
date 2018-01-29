@@ -11,7 +11,7 @@ contract BaseByzantiumRouter {
             let calldataMemoryOffset := mload(0x40)
             mstore(0x40, add(calldataMemoryOffset, calldatasize))
             calldatacopy(calldataMemoryOffset, 0x0, calldatasize)
-            let r := delegatecall(gas, _backend, calldataMemoryOffset, calldatasize, 0, 0)
+            let r := delegatecall(sub(gas, 10000), _backend, calldataMemoryOffset, calldatasize, 0, 0)
 
             let returndataMemoryOffset := mload(0x40)
             mstore(0x40, add(returndataMemoryOffset, returndatasize))
