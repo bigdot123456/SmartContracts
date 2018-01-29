@@ -75,44 +75,24 @@ contract ERC20DepositStorage is Managed {
         return store.get(sharesContractStorage);
     }
 
-    /// @notice Gets total number of deposited shares tokens
-    function totalShares() public view returns (uint) {
-        return store.get(totalSharesStorage);
-    }
-
     /// @notice Gets total number of deposited tokens provided as parameter
     /// @param _token token address to get info
     function totalShares(address _token) public view returns (uint) {
         if (_token == store.get(sharesContractStorage)) {
-            return totalShares();
+            return store.get(totalSharesStorage);
         }
 
         return store.get(totalSharesStorage_v2, _token);
-    }
-
-    /// @notice Number of shareholders for shares contract
-    /// @return number of shareholders
-    function shareholdersCount() public view returns (uint) {
-        return store.count(shareholders);
     }
 
     /// @notice Number of shareholders for provided token
     /// @return number of shareholders
     function shareholdersCount(address _token) public view returns (uint) {
         if (_token == store.get(sharesContractStorage)) {
-            return shareholdersCount();
+            return store.count(shareholders);
         }
 
         return store.count(shareholders_v2, bytes32(_token));
-    }
-
-    /// @notice Gets shares amount deposited by a particular shareholder.
-    ///
-    /// @param _depositor shareholder address.
-    ///
-    /// @return shares amount.
-    function depositBalance(address _depositor) public view returns (uint) {
-        return depositBalance(store.get(sharesContractStorage), _depositor);
     }
 
     /// @notice Gets token amount deposited by a particular shareholder.
@@ -123,43 +103,11 @@ contract ERC20DepositStorage is Managed {
     /// @return shares amount.
     function depositBalance(address _token, address _depositor) public view returns (uint _balance) {
         if (_token != store.get(sharesContractStorage)) {
-            bytes32 _key = getCompositeKey(_token, _depositor);
-
-            StorageInterface.Iterator memory iterator = store.listIterator(deposits, _key);
-            for (uint i = 0; store.canGetNextWithIterator(deposits, iterator); ++i) {
-                uint _cur_amount = uint(store.get(amounts_v2, _key, bytes32(store.getNextWithIterator(deposits, iterator))));
-                _balance = _balance.add(_cur_amount);
-            }
-        } else {
-            _balance = _depositBalance(_depositor);
+            bytes32 _key = _compileCompositeKey(_token, _depositor);
+            return _depositBalance(_key);
         }
-    }
 
-    /// @dev Iterates through deposits and calculates a sum
-    function _depositBalance(address _depositor) private view returns (uint _balance) {
-        StorageInterface.Iterator memory iterator = store.listIterator(deposits, bytes32(_depositor));
-        for (uint i = 0; store.canGetNextWithIterator(deposits, iterator); ++i) {
-            uint _cur_amount = store.get(amounts, _depositor, store.getNextWithIterator(deposits, iterator));
-            _balance = _balance.add(_cur_amount);
-        }
-    }
-
-    /* Action functions */
-
-    /// @notice Deposits for a _target for provided _amount of shares tokens
-    /// @dev Allowed only for TimeHolder call
-    ///
-    /// @param _target deposit destination
-    /// @param _amount amount of deposited tokens
-    function depositFor(address _target, uint _amount) onlyTimeHolder public {
-        store.add(shareholders, _target);
-
-        uint _id = store.get(depositsIdCounter) + 1;
-        store.set(depositsIdCounter, _id);
-        _addDeposit(bytes32(_target), bytes32(_id), _amount);
-
-        uint _prevAmount = store.get(totalSharesStorage);
-        store.set(totalSharesStorage, _amount.add(_prevAmount));
+        return _depositBalance(bytes32(_depositor));
     }
 
     /// @notice Deposits for a _target for provided _amount of specified tokens
@@ -169,48 +117,30 @@ contract ERC20DepositStorage is Managed {
     /// @param _target deposit destination
     /// @param _amount amount of deposited tokens
     function depositFor(address _token, address _target, uint _amount) onlyTimeHolder public {
-        store.add(shareholders_v2, bytes32(_token), _target);
+        uint id;
+        uint prevAmount;
 
-        bytes32 _key = getCompositeKey(_token, _target); // TODO: wtf?
+        if (_token == store.get(sharesContractStorage)) {
+            store.add(shareholders, _target);
 
-        uint _id = store.get(depositsIdCounters_v2, _key) + 1;
-        store.set(depositsIdCounters_v2, _key, _id);
-        _addDeposit(_key, bytes32(_id), _amount);
+            id = store.get(depositsIdCounter) + 1;
+            store.set(depositsIdCounter, id);
+            _addDeposit(bytes32(_target), bytes32(id), _amount);
 
-        uint _prevAmount = store.get(totalSharesStorage_v2, _token);
-        store.set(totalSharesStorage_v2, _token, _amount.add(_prevAmount));
-    }
+            prevAmount = store.get(totalSharesStorage);
+            store.set(totalSharesStorage, _amount.add(prevAmount));
+        } else {
+            store.add(shareholders_v2, bytes32(_token), _target);
 
-    /// @dev Saves deposit data with provided key
-    ///
-    /// @param _key might be a compositeKey or an account address
-    /// @param _id index of deposit
-    /// @param _amount amount of tokens to deposit
-    function _addDeposit(bytes32 _key, bytes32 _id, uint _amount) private {
-        store.add(deposits, _key, uint(_id));
-        store.set(amounts_v2, _key, _id, bytes32(_amount));
-        store.set(timestamps_v2, _key, _id, bytes32(now));
-    }
+            bytes32 key = _compileCompositeKey(_token, _target);
 
-    /// @notice Withdraws shares back to provided account
-    /// @dev Allowed only for TimeHolder call
-    ///
-    /// @param _account token recepient
-    /// @param _amount number of tokens to withdraw
-    /// @param _totalBalance total balance of shares
-    function withdrawShares(address _account, uint _amount, uint _totalBalance) onlyTimeHolder public {
-        if (_totalBalance == 0) {
-            return; // TODO: WTF?
+            id = store.get(depositsIdCounters_v2, key) + 1;
+            store.set(depositsIdCounters_v2, key, id);
+            _addDeposit(key, bytes32(id), _amount);
+
+            prevAmount = store.get(totalSharesStorage_v2, _token);
+            store.set(totalSharesStorage_v2, _token, _amount.add(prevAmount));
         }
-
-        uint _deposits_count_left = _withdrawShares(bytes32(_account), _amount);
-
-        if (_deposits_count_left == 0) {
-            store.remove(shareholders, _account);
-        }
-
-        uint _prevAmount = store.get(totalSharesStorage);
-        store.set(totalSharesStorage, _prevAmount.sub(_amount));
     }
 
     /// @notice Withdraws tokens back to provided account
@@ -222,18 +152,49 @@ contract ERC20DepositStorage is Managed {
     /// @param _totalBalance total balance of shares
     function withdrawShares(address _token, address _account, uint _amount, uint _totalBalance) onlyTimeHolder public {
         if (_totalBalance == 0) {
-            return; // TODO: WTF?
+            return;
         }
 
-        bytes32 _key = getCompositeKey(_token, _account);
-        uint _deposits_count_left = _withdrawShares(_key, _amount);
+        if (_token == store.get(sharesContractStorage)) {
+            uint deposits_count_left_v1 = _withdrawShares(bytes32(_account), _amount);
 
-        if (_deposits_count_left == 0) {
-            store.remove(shareholders_v2, bytes32(_token), _account);
+            if (deposits_count_left_v1 == 0) {
+                store.remove(shareholders, _account);
+            }
+
+            uint prevAmount_v1 = store.get(totalSharesStorage);
+            store.set(totalSharesStorage, prevAmount_v1.sub(_amount));
+        } else {
+            bytes32 _key = _compileCompositeKey(_token, _account);
+            uint deposits_count_left_v2 = _withdrawShares(_key, _amount);
+
+            if (deposits_count_left_v2 == 0) {
+                store.remove(shareholders_v2, bytes32(_token), _account);
+            }
+
+            uint prevAmount_v2 = store.get(totalSharesStorage_v2, _token);
+            store.set(totalSharesStorage_v2, _token, prevAmount_v2.sub(_amount));
         }
+    }
 
-        uint _prevAmount = store.get(totalSharesStorage_v2, _token);
-        store.set(totalSharesStorage_v2, _token, _prevAmount.sub(_amount));
+    /// @dev Iterates through deposits and calculates a sum
+    function _depositBalance(bytes32 _key) private view returns (uint _balance) {
+        StorageInterface.Iterator memory iterator = store.listIterator(deposits, _key);
+        for (uint i = 0; store.canGetNextWithIterator(deposits, iterator); ++i) {
+            uint _cur_amount = uint(store.get(amounts_v2, _key, bytes32(store.getNextWithIterator(deposits, iterator))));
+            _balance = _balance.add(_cur_amount);
+        }
+    }
+
+    /// @dev Saves deposit data with provided key
+    ///
+    /// @param _key might be a compositeKey or an account address
+    /// @param _id index of deposit
+    /// @param _amount amount of tokens to deposit
+    function _addDeposit(bytes32 _key, bytes32 _id, uint _amount) private {
+        store.add(deposits, _key, uint(_id));
+        store.set(amounts_v2, _key, _id, bytes32(_amount));
+        store.set(timestamps_v2, _key, _id, bytes32(now));
     }
 
     /// @dev Withdraws tokens for provided keys
@@ -279,7 +240,7 @@ contract ERC20DepositStorage is Managed {
     }
 
     /// @dev Gets key combined from token symbol and user's address
-    function getCompositeKey(address _token, address _address) private pure returns (bytes32) {
+    function _compileCompositeKey(address _token, address _address) private pure returns (bytes32) {
         return keccak256(_token, _address);
     }
 }
