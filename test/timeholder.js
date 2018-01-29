@@ -46,7 +46,7 @@ contract('New version of TimeHolder', (accounts) => {
 
     const fakeArgs = [0,0,0,0,0,0,0,0];
     const ZERO_INTERVAL = 0;
-    const SHARES_BALANCE = 10000;
+    const SHARES_BALANCE = 100000000;
     const CHRONOBANK_PLATFORM_ID = 1;
     const STUB_PLATFORM_ADDRESS = 0x0
 
@@ -218,6 +218,30 @@ contract('New version of TimeHolder', (accounts) => {
             assert.equal(initialBalance1.cmp(await asset1.balanceOf(accounts[0])), 0);
             assert.equal(initialBalance2.cmp(await asset2.balanceOf(accounts[0])), 0);
         });
+
+        it('should have right deposit balance after several deposits and single withdrawal', async () => {
+            let user = accounts[0]
+            const DEPOSIT_AMOUNT = 100
+            let initialBalance = await timeHolder.getDepositBalance.call(shares.address, user)
+            let initialAccountBalance = await shares.balanceOf(user)
+
+            await timeHolder.deposit(shares.address, DEPOSIT_AMOUNT, { from: user })
+            await timeHolder.deposit(shares.address, DEPOSIT_AMOUNT, { from: user })
+
+            let accountBalanceAfterDeposit = await shares.balanceOf.call(user)
+            assert.equal(accountBalanceAfterDeposit.toNumber(), initialAccountBalance.toNumber() - DEPOSIT_AMOUNT * 2)
+
+            let balanceAfterDeposit = await timeHolder.getDepositBalance.call(shares.address, user)
+            assert.equal(balanceAfterDeposit.toNumber(), DEPOSIT_AMOUNT * 2)
+
+            await timeHolder.withdrawShares(shares.address, DEPOSIT_AMOUNT, { from: user })
+
+            let accountBalanceAfterWithdrawal = await shares.balanceOf.call(user)
+            assert.equal(accountBalanceAfterWithdrawal.toNumber(), accountBalanceAfterDeposit.toNumber() + DEPOSIT_AMOUNT)
+
+            let balanceAfterWithdrawal = await timeHolder.getDepositBalance.call(shares.address, user)
+            assert.equal(balanceAfterWithdrawal.toNumber(), balanceAfterDeposit.toNumber() - DEPOSIT_AMOUNT)
+        })
 
         it('shouls allow to withdraw deposits in case of emergency');
     })

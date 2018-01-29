@@ -206,9 +206,12 @@ contract ERC20DepositStorage is Managed {
     function _withdrawShares(bytes32 _key, uint _amount) private returns (uint _deposits_count_left) {
         StorageInterface.Iterator memory iterator = store.listIterator(deposits, _key);
         _deposits_count_left = iterator.count();
-        for (uint i = 0; store.canGetNextWithIterator(deposits, iterator); ++i) {
+        while (store.canGetNextWithIterator(deposits, iterator)) {
             uint _id = store.getNextWithIterator(deposits, iterator);
             (_deposits_count_left, _amount) = _withdrawSharesFromDepositV2(_key, _id, _amount, _deposits_count_left);
+            if (_amount == 0) {
+                break;
+            }
         }
     }
 
@@ -227,16 +230,11 @@ contract ERC20DepositStorage is Managed {
         uint _cur_amount = uint(store.get(amounts_v2, _key, bytes32(_id)));
         if (_amount < _cur_amount) {
             store.set(amounts_v2, _key, bytes32(_id), bytes32(_cur_amount.sub(_amount)));
-            return (_depositsLeft, _amount);
+            return (_depositsLeft, 0);
         }
-        if (_amount == _cur_amount) {
-            store.remove(deposits, _key, _id);
-            return (_depositsLeft.sub(1), _amount);
-        }
-        if (_amount > _cur_amount) {
-            store.remove(deposits, _key, _id);
-            return (_depositsLeft.sub(1), _amount.sub(_cur_amount));
-        }
+
+        store.remove(deposits, _key, _id);
+        return (_depositsLeft.sub(1), _amount.sub(_cur_amount));
     }
 
     /// @dev Gets key combined from token symbol and user's address
