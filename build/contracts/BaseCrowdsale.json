@@ -300,10 +300,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\nimport \"../../core/common/Object.sol\";\nimport \"../../core/contracts/ContractsManagerInterface.sol\";\nimport \"../../core/lib/SafeMath.sol\";\nimport \"../../core/erc20/ERC20ManagerInterface.sol\";\nimport \"../../core/erc20/ERC20Interface.sol\";\nimport \"../../core/platform/ChronoBankAssetProxyInterface.sol\";\nimport \"../../core/platform/ChronoBankPlatformInterface.sol\";\n\ncontract Bounty {\n    function isAssetSymbolExists(bytes32 _symbol) constant returns (bool);\n    function isAssetOwner(bytes32 _symbol, address _owner) constant returns (bool);\n}\n\n\n/**\n* @title BaseCrowdsale is a base crowdsale contract.\n*/\ncontract BaseCrowdsale is Object {\n\n    uint constant OK = 1;\n\n    using SafeMath for uint;\n\n    /* token symbol, must be valid id for using with Bounty */\n    bytes32 private symbol;\n    /* the number of tokens already sold through this contract*/\n    uint private tokensSold = 0;\n\n    address serviceProvider;\n\n    event MintTokenEvent(address indexed sender, address beneficiary, uint amount);\n    event WithdrawToken(address indexed sender, address holder, uint amount);\n\n    /** @dev Crowdfunding running checks */\n    modifier onlyRunning {\n        if (!isRunning()) revert();\n        _;\n    }\n\n    /** @dev Crowdfundung failure checks */\n    modifier onlyFailure {\n        if (!isFailed()) revert();\n        _;\n    }\n\n    /** @dev Crowdfunding success checks */\n    modifier onlySuccess {\n        if (!isSuccessed()) revert();\n        _;\n    }\n\n    /** @dev Access rights checks */\n    modifier onlyAuthorised() {\n        if (lookupBounty().isAssetOwner(symbol, msg.sender)) _;\n    }\n\n    /**\n    *  @dev Crowdfunding contract initial\n    *  @param _serviceProvider address\n    *  @param _symbol Bounty token symbol\n    *  @notice this contract should be owner of bounty token\n    */\n    function BaseCrowdsale(address _serviceProvider, bytes32 _symbol) {\n        require(_serviceProvider != 0x0);\n        require(_symbol != 0x0);\n\n        serviceProvider = _serviceProvider;\n\n        // do not allow to create Crowdsale for unknown symbol\n        require(lookupBounty().isAssetSymbolExists(_symbol));\n\n        symbol = _symbol;\n    }\n\n    /**\n    *  Returns token's symbol;\n    */\n    function getSymbol() constant returns (bytes32) {\n        return symbol;\n    }\n\n    /**\n    *  How many tokens are sold.\n    */\n    function getTokensSold() constant returns (uint) {\n        return tokensSold;\n    }\n\n    /**\n    *  Destroy the Crowdsale contract. Throws if the Crowdsale is not ended yet.\n    */\n    function destroy() onlyContractOwner {\n        if (!hasEnded()) revert();\n\n        Owned.destroy();\n    }\n\n    /**\n    *  It is just a base constact which is designed to be inherited.\n    *  Implement payable function in dereved if necessary\n    */\n    function () payable onlyRunning {\n        revert();\n    }\n\n    function hasEnded() constant returns (bool) {\n        // withdraw() before destroy\n        if (isSuccessed() && this.balance > 0) return false;\n\n        // wait until all funds will be refunded\n        if (isFailed() && tokensSold > 0) return false;\n\n        // wait until success or fail\n        if (isRunning()) return false;\n\n        return true;\n    }\n\n    /**\n    *  Tells whether or not the Crowdsale is running\n    *  Must be implemented accorting to Crowdsale strategy\n    *\n    *  @return true if the Crowdsale is running\n    */\n    function isRunning() constant returns (bool);\n\n    /**\n    *  Tells whether or not the Crowdsale is failed\n    *  Must be implemented accorting to Crowdsale strategy\n    *\n    *  @return true if the Crowdsale is failed\n    */\n    function isFailed() constant returns (bool);\n\n    /**\n    *  Tells whether or not the Crowdsale is successed.\n    *  Must be implemented accorting to Crowdsale strategy\n    *\n    *  @return true if the Crowdsale is successed\n    */\n    function isSuccessed() constant returns (bool);\n\n    /**\n    *  This function mints the tokens and moves the crowdsale needle.\n    */\n    function mintTokensTo(address beneficiary, uint amount) internal onlyRunning {\n        tokensSold = tokensSold.add(amount);\n        ERC20ManagerInterface erc20Manager = ERC20ManagerInterface(lookupService(\"ERC20Manager\"));\n        ChronoBankAssetProxyInterface token = ChronoBankAssetProxyInterface(erc20Manager.getTokenAddressBySymbol(symbol));\n        ChronoBankPlatformInterface platform = ChronoBankPlatformInterface(token.chronoBankPlatform());\n\n        if (platform.reissueAsset(symbol, amount) != OK) {\n            revert();\n        }\n\n        if (!ERC20Interface(token).transfer(beneficiary, amount)) {\n            revert();\n        }\n\n        MintTokenEvent(address(this), beneficiary, amount);\n    }\n\n    /**\n    *  TODO\n    */\n    function withdrawTokensFrom(address holder) internal onlyFailure {\n        tokensSold = tokensSold.sub(0);\n\n        //TODO: ahiatsevich no way to calculate amount revoked tokens\n        //if (!lookupBounty().revokeAsset(symbol, amount)) revert();\n\n        WithdrawToken(address(this), holder, 0);\n    }\n\n    function lookupBounty() constant returns (Bounty) {\n        return Bounty(lookupService(\"AssetsManager\"));\n    }\n\n    function lookupService(bytes32 _identifier) constant returns (address manager) {\n        manager = ContractsManagerInterface(serviceProvider).getContractAddressByType(_identifier);\n        require(manager != 0x0);\n    }\n}\n",
-  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/crowdsale/base/BaseCrowdsale.sol",
+  "sourcePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/crowdsale/base/BaseCrowdsale.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/crowdsale/base/BaseCrowdsale.sol",
+      "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/crowdsale/base/BaseCrowdsale.sol",
       "exportedSymbols": {
         "BaseCrowdsale": [
           19242
@@ -330,7 +330,7 @@
       {
         "attributes": {
           "SourceUnit": 4931,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/common/Object.sol",
+          "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/common/Object.sol",
           "file": "../../core/common/Object.sol",
           "scope": 19243,
           "symbolAliases": [
@@ -345,7 +345,7 @@
       {
         "attributes": {
           "SourceUnit": 5391,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/contracts/ContractsManagerInterface.sol",
+          "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/contracts/ContractsManagerInterface.sol",
           "file": "../../core/contracts/ContractsManagerInterface.sol",
           "scope": 19243,
           "symbolAliases": [
@@ -360,7 +360,7 @@
       {
         "attributes": {
           "SourceUnit": 7557,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/lib/SafeMath.sol",
+          "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/lib/SafeMath.sol",
           "file": "../../core/lib/SafeMath.sol",
           "scope": 19243,
           "symbolAliases": [
@@ -375,7 +375,7 @@
       {
         "attributes": {
           "SourceUnit": 6814,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/erc20/ERC20ManagerInterface.sol",
+          "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/erc20/ERC20ManagerInterface.sol",
           "file": "../../core/erc20/ERC20ManagerInterface.sol",
           "scope": 19243,
           "symbolAliases": [
@@ -390,7 +390,7 @@
       {
         "attributes": {
           "SourceUnit": 5467,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/erc20/ERC20Interface.sol",
+          "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/erc20/ERC20Interface.sol",
           "file": "../../core/erc20/ERC20Interface.sol",
           "scope": 19243,
           "symbolAliases": [
@@ -405,7 +405,7 @@
       {
         "attributes": {
           "SourceUnit": 8675,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/platform/ChronoBankAssetProxyInterface.sol",
+          "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/platform/ChronoBankAssetProxyInterface.sol",
           "file": "../../core/platform/ChronoBankAssetProxyInterface.sol",
           "scope": 19243,
           "symbolAliases": [
@@ -420,7 +420,7 @@
       {
         "attributes": {
           "SourceUnit": 11307,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/platform/ChronoBankPlatformInterface.sol",
+          "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/platform/ChronoBankPlatformInterface.sol",
           "file": "../../core/platform/ChronoBankPlatformInterface.sol",
           "scope": 19243,
           "symbolAliases": [
@@ -1167,7 +1167,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37086,
+                                  "referencedDeclaration": 38161,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -1313,7 +1313,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37086,
+                                  "referencedDeclaration": 38161,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -1459,7 +1459,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37086,
+                                  "referencedDeclaration": 38161,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -1633,7 +1633,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37082,
+                                  "referencedDeclaration": 38157,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -1787,7 +1787,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -1884,7 +1884,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -2032,7 +2032,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -2550,7 +2550,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37086,
+                                  "referencedDeclaration": 38161,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -2737,7 +2737,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37086,
+                              "referencedDeclaration": 38161,
                               "type": "function () pure",
                               "value": "revert"
                             },
@@ -2919,7 +2919,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 37265,
+                                      "referencedDeclaration": 38340,
                                       "type": "contract BaseCrowdsale",
                                       "value": "this"
                                     },
@@ -4243,7 +4243,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 37086,
+                                      "referencedDeclaration": 38161,
                                       "type": "function () pure",
                                       "value": "revert"
                                     },
@@ -4450,7 +4450,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 37086,
+                                      "referencedDeclaration": 38161,
                                       "type": "function () pure",
                                       "value": "revert"
                                     },
@@ -4562,7 +4562,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37265,
+                                  "referencedDeclaration": 38340,
                                   "type": "contract BaseCrowdsale",
                                   "value": "this"
                                 },
@@ -4902,7 +4902,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37265,
+                                  "referencedDeclaration": 38340,
                                   "type": "contract BaseCrowdsale",
                                   "value": "this"
                                 },
@@ -5403,7 +5403,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -5498,5 +5498,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-26T09:34:40.115Z"
+  "updatedAt": "2018-01-29T17:03:42.654Z"
 }

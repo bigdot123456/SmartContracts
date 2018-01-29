@@ -707,10 +707,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\nimport \"../../core/common/Once.sol\";\nimport \"./BaseCrowdsale.sol\";\nimport \"../../priceticker/PriceTicker.sol\";\n\n/**\n*  @title GenericCrowdsale\n*\n*  Funds collected are not forwarded to a wallet as they arrive. Instead,\n*  this crowdasale contract is used for storing funds while a crowdsale is in progress.\n*\n*  Holds information about campaign contributors.\n*\n*  It features Smart Agent compatibility. The Sale Agent is a new type of contract\n*  (or just an address) that can authorise the minting of tokens on behalf\n*  of the traditional ERC20 token contract. This allows to distribute ICO tokens\n*  through multiple Sale Agents. Once a new Sale Agent contract is written,\n*  it can be permitted to sell tokens.\n*/\ncontract GenericCrowdsale is BaseCrowdsale , Once {\n    /* Data structure to hold information about campaign contributors\n    `what is donated` => (`who donated` => `how much is donated`) */\n    mapping (bytes32 => mapping(address => uint)) public donations;\n    /* How many crypto of funding we have raised */\n    mapping (bytes32 => uint) public raised;\n    /* Contract addresses that are authorised to mint tokens */\n    mapping (bytes32 => address) public salesAgents;\n    /* Contract addresse that provides exchange rates */\n    PriceTicker private priceTicker;\n\n    struct PriceQuery{address investor; bytes32 currencyCode; uint value;}\n    mapping (bytes32 => PriceQuery) private priceQueries;\n\n    /* For example, USD, from 10k to 30k, 50000 wei / 1 Token */\n    struct Goal {\n        bytes32 currencyCode;\n        uint minValue;\n        uint maxValue;\n        uint exchangeRate;\n        uint exchangeRateDecimals;\n    }\n\n    Goal private goal;\n    uint private goalRaised;\n\n    event SaleAgentRegistered(address indexed sender, address saleAgent, bytes32 symbol);\n    event SaleAgentDeleted(address indexed sender, address saleAgent, bytes32 symbol);\n\n    event NewSaleDone(address indexed sender, address investor, uint value, bytes32 currencyCode);\n    event NewRefund(address indexed sender, address investor, uint value, bytes32 currencyCode);\n\n    event PriceRequested(address indexed sender, address investor, uint value, bytes32 currencyCode, bytes32 query);\n    event PriceRequestFailed(address indexed sender, address investor, uint value, bytes32 currencyCode, bytes32 query);\n\n    /* Permitted only for sale agent */\n    modifier onlySaleAgent(bytes32 currencyId) {\n        if (salesAgents[currencyId] != msg.sender) revert();\n        _;\n    }\n\n    /* Permitted only for Price Ticker */\n    modifier onlyPriceTicker() {\n        if (msg.sender != address(priceTicker)) revert();\n        _;\n    }\n\n    /**\n    *  Constructor\n    */\n    function GenericCrowdsale (address _serviceProvider, bytes32 _symbol, address _priceTicker)\n                BaseCrowdsale(_serviceProvider, _symbol)\n    {\n        require(_priceTicker != 0x0);\n        priceTicker = PriceTicker(_priceTicker);\n    }\n\n    /**\n    *  Inits crowdsale. Sets a goal.\n    *\n    *  If the funding goal is not reached, investors may withdraw their funds.\n    *  PriceTicker should support given currency.\n    */\n    function init(\n        bytes32 _currencyCode,\n        uint _minValue,\n        uint _maxValue,\n        uint _exchangeRate,\n        uint _exchangeRateDecimals\n    ) onlyAuthorised onlyOnce internal {\n        require(_currencyCode != 0x0);\n        require(_minValue != 0);\n        require(_maxValue != 0);\n        require(_exchangeRate > 0);\n\n        goal.currencyCode = _currencyCode;\n        goal.minValue = _minValue;\n        goal.maxValue = _maxValue;\n        goal.exchangeRate = _exchangeRate;\n        goal.exchangeRateDecimals = _exchangeRateDecimals;\n    }\n\n    /**\n    *  This function mints the tokens and moves the crowdsale needle.\n    *\n    *  Amount of minted tokens is calculated according to a price\n    *  provided by PriceTicker, and an exchangeRate given during initialization.\n    *\n    *  This function is permited only for Sale Agent and can be executed only\n    *  when crawdsale is running.\n    *\n    *  Sale Agent must send some wei, because of price fetching is not free.\n    */\n    function sale(address _investor, uint _value, bytes32 _currencyCode) onlySaleAgent(_currencyCode) onlyRunning payable {\n        require(_investor != 0x0);\n        require(_currencyCode != 0x0);\n\n        donations[_currencyCode][_investor] = donations[_currencyCode][_investor].add(_value);\n        raised[_currencyCode] = raised[_currencyCode].add(_value);\n\n        if (priceTicker.isPriceAvailable(_currencyCode, goal.currencyCode)) {\n            // TODO\n            /* var (price, priceDecimals) = priceTicker.price(_currencyCode, goal.currencyCode);\n            mint(_investor, _value, price, priceDecimals); */\n\n            NewSaleDone(msg.sender, _investor, _value, _currencyCode);\n        } else {\n            var (priceQueryId, resultCode) = priceTicker.requestPrice(_currencyCode, goal.currencyCode);\n            assert(resultCode == OK);\n            priceQueries[priceQueryId] = PriceQuery(_investor, _currencyCode, _value);\n\n            PriceRequested(msg.sender, _investor, _value, _currencyCode, priceQueryId);\n        }\n    }\n\n    /**\n    *  Refunds donated fund.\n    */\n    function refund(address _investor, bytes32 _currencyCode) onlySaleAgent(_currencyCode) onlyFailure returns (uint) {\n        uint donation = donations[_currencyCode][_investor];\n        forceRefund(_investor, _currencyCode, donation);\n        return donation;\n    }\n\n    /**\n    *  Only PriceTicker is permited to execute this function.\n    */\n    function receivePrice(bytes32 queryId, uint price, uint decimals) onlyPriceTicker {\n        PriceQuery memory query = priceQueries[queryId];\n        require(query.investor != 0x0);\n\n        if (price > 0) {\n            mint(query.investor, query.value, price, decimals);\n            NewSaleDone(msg.sender, query.investor, query.value, query.currencyCode);\n        } else {\n            PriceRequestFailed(msg.sender, query.investor, query.value, query.currencyCode, queryId);\n            forceRefund(query.investor, query.currencyCode, query.value);\n        }\n    }\n\n    /**\n    *  Setter for PriceTicker\n    */\n    function setPriceTicker(address _priceTicker) onlyAuthorised {\n        require(_priceTicker != 0x0);\n        priceTicker = PriceTicker(_priceTicker);\n    }\n\n    /**\n    *  Allow SaleAgent to sale tokens.\n    */\n    function addSalesAgent(address _salesAgent, bytes32 _currencyCode) onlyAuthorised {\n        registerSalesAgent(_salesAgent, _currencyCode);\n    }\n\n    /**\n    *  Deny SaleAgent to sale tokens.\n    */\n    function removeSalesAgent(address _salesAgent, bytes32 _currencyCode) onlyAuthorised {\n        unregisterSalesAgent(_salesAgent, _currencyCode);\n    }\n\n    /**\n    *  Returns priceTicker address.\n    */\n    function getPriceTicker() constant returns (address) {\n        return address(priceTicker);\n    }\n\n    /**\n    *  Returns salesAgent by given `_symbol`.\n    */\n    function getSalesAgent(bytes32 _symbol) constant returns (address) {\n        return salesAgents[_symbol];\n    }\n\n    /**\n    *  Returns Crowdsale goal.\n    */\n    function getGoal() constant returns (bytes32, uint, uint, uint, uint) {\n        return (goal.currencyCode, goal.minValue, goal.maxValue, goal.exchangeRate, goal.exchangeRateDecimals);\n    }\n\n    /**\n    *  See BaseCrowdsale\n    */\n    function isRunning() constant returns (bool) {\n        return goalRaised < goal.maxValue;\n    }\n\n    /**\n    *  See BaseCrowdsale\n    */\n    function isSuccessed() constant returns (bool) {\n        return goalRaised > goal.minValue;\n    }\n\n    function registerSalesAgent(address _salesAgent, bytes32 _currencyCode) internal {\n        require(_salesAgent != 0x0);\n        require(_currencyCode != 0x0);\n\n        salesAgents[_currencyCode] = _salesAgent;\n\n        SaleAgentRegistered(msg.sender, _salesAgent, _currencyCode);\n    }\n\n    function unregisterSalesAgent(address _salesAgent, bytes32 _currencyCode) internal {\n        require(_salesAgent != 0x0);\n        require(_currencyCode != 0);\n\n        delete salesAgents[_currencyCode];\n\n        SaleAgentDeleted(msg.sender, _salesAgent, _currencyCode);\n    }\n\n    function mint(address _investor, uint _value, uint _price, uint _priceDecimanl) private {\n        uint goalValue = _value.mul(_price) / (10 ** _priceDecimanl);\n\n        goalRaised = goalRaised.add(goalValue);\n\n        uint tokensAmount = goalValue.mul(goal.exchangeRate) / (10 ** goal.exchangeRateDecimals);\n        mintTokensTo(_investor, tokensAmount);\n    }\n\n    function forceRefund(address _investor, bytes32 _currencyCode, uint _value) private {\n        require(_investor != 0x0);\n        require(_currencyCode != 0x0);\n\n        uint donation = donations[_currencyCode][_investor];\n        require(_value <= donation);\n\n        donations[_currencyCode][_investor] = donations[_currencyCode][_investor].sub(_value);\n        raised[_currencyCode] = raised[_currencyCode].sub(_value);\n\n        withdrawTokensFrom(_investor);\n\n        NewRefund(msg.sender, _investor, _value, _currencyCode);\n    }\n}\n",
-  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/crowdsale/base/GenericCrowdsale.sol",
+  "sourcePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/crowdsale/base/GenericCrowdsale.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/crowdsale/base/GenericCrowdsale.sol",
+      "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/crowdsale/base/GenericCrowdsale.sol",
       "exportedSymbols": {
         "GenericCrowdsale": [
           20565
@@ -734,7 +734,7 @@
       {
         "attributes": {
           "SourceUnit": 4956,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/common/Once.sol",
+          "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/common/Once.sol",
           "file": "../../core/common/Once.sol",
           "scope": 20566,
           "symbolAliases": [
@@ -749,7 +749,7 @@
       {
         "attributes": {
           "SourceUnit": 19243,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/crowdsale/base/BaseCrowdsale.sol",
+          "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/crowdsale/base/BaseCrowdsale.sol",
           "file": "./BaseCrowdsale.sol",
           "scope": 20566,
           "symbolAliases": [
@@ -764,7 +764,7 @@
       {
         "attributes": {
           "SourceUnit": 28515,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/priceticker/PriceTicker.sol",
+          "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/priceticker/PriceTicker.sol",
           "file": "../../priceticker/PriceTicker.sol",
           "scope": 20566,
           "symbolAliases": [
@@ -2239,7 +2239,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37082,
+                                  "referencedDeclaration": 38157,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -2285,7 +2285,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37086,
+                                  "referencedDeclaration": 38161,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -2380,7 +2380,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37082,
+                                  "referencedDeclaration": 38157,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -2479,7 +2479,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37086,
+                                  "referencedDeclaration": 38161,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -2705,7 +2705,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -3117,7 +3117,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -3214,7 +3214,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -3311,7 +3311,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -3408,7 +3408,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -4027,7 +4027,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -4124,7 +4124,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -4756,7 +4756,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 37082,
+                                          "referencedDeclaration": 38157,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -5008,7 +5008,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 37073,
+                                      "referencedDeclaration": 38148,
                                       "type": "function (bool) pure",
                                       "value": "assert"
                                     },
@@ -5299,7 +5299,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 37082,
+                                          "referencedDeclaration": 38157,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -6054,7 +6054,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -6409,7 +6409,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 37082,
+                                          "referencedDeclaration": 38157,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -6602,7 +6602,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 37082,
+                                          "referencedDeclaration": 38157,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -7012,7 +7012,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -8628,7 +8628,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -8725,7 +8725,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -8936,7 +8936,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37082,
+                                  "referencedDeclaration": 38157,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -9113,7 +9113,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -9210,7 +9210,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -9408,7 +9408,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37082,
+                                  "referencedDeclaration": 38157,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -10370,7 +10370,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -10467,7 +10467,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -10674,7 +10674,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -11254,7 +11254,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37082,
+                                  "referencedDeclaration": 38157,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -11345,5 +11345,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-26T09:34:40.284Z"
+  "updatedAt": "2018-01-29T17:03:42.994Z"
 }

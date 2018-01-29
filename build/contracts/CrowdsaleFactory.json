@@ -298,10 +298,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\nimport \"./crowdsales/BlockLimitedCrowdsale.sol\";\nimport \"./crowdsales/TimeLimitedCrowdsale.sol\";\nimport \"../core/common/BaseManager.sol\";\n\n/**\n*  @title CrowdsaleFactory\n*\n*  Is not designed for direct crowdsale creation via external calls from web application.\n*  Only CrowdsaleManager is authorised to create and delete crowdsale.\n*\n*  See CrowdsaleManager.\n*/\ncontract CrowdsaleFactory is BaseManager {\n    StorageInterface.Address priceTiker;\n\n    modifier onlyCrowdsaleManager() {\n        if (msg.sender == lookupManager(\"CrowdsaleManager\")) {\n            _;\n        }\n    }\n\n    function CrowdsaleFactory(Storage _store, bytes32 _crate) BaseManager(_store, _crate) {\n        priceTiker.init(\"priceTiker\");\n    }\n\n    function init(address _contractsManager, address _priceTiker) onlyContractOwner returns (uint) {\n        BaseManager.init(_contractsManager, store.crate);\n\n        setPriceTicker(_priceTiker);\n        return OK;\n    }\n\n    function setPriceTicker(address _priceTiker) onlyContractOwner {\n        require(_priceTiker != 0x0);\n\n        store.set(priceTiker, _priceTiker);\n    }\n\n    function createCrowdsale(bytes32 _symbol) returns (address);\n\n    function getPriceTicker() constant returns (address) {\n        return store.get(priceTiker);\n    }\n}\n\n/**\n*  @title TimeLimitedCrowdsaleFactory\n*\n*  Instantiates a TimeLimitedCrowdsale contract.\n*/\ncontract TimeLimitedCrowdsaleFactory is CrowdsaleFactory {\n    function TimeLimitedCrowdsaleFactory(Storage _store, bytes32 _crate) CrowdsaleFactory(_store, _crate) {\n    }\n\n    function createCrowdsale(bytes32 _symbol) onlyCrowdsaleManager returns (address) {\n        require(_symbol != 0x0);\n\n        address crowdsale = new TimeLimitedCrowdsale(contractsManager, _symbol, getPriceTicker());\n        BaseCrowdsale(crowdsale).changeContractOwnership(msg.sender);\n\n        return crowdsale;\n    }\n}\n\n/**\n*  @title BlockLimitedCrowdsaleFactory\n*\n*  Instantiates a BlockLimitedCrowdsale contract.\n*/\ncontract BlockLimitedCrowdsaleFactory is CrowdsaleFactory {\n    function BlockLimitedCrowdsaleFactory(Storage _store, bytes32 _crate) CrowdsaleFactory(_store, _crate) {\n    }\n\n    function createCrowdsale(bytes32 _symbol) onlyCrowdsaleManager returns (address) {\n        require(_symbol != 0x0);\n\n        address crowdsale = new BlockLimitedCrowdsale(contractsManager, _symbol, getPriceTicker());\n        BaseCrowdsale(crowdsale).changeContractOwnership(msg.sender);\n\n        return crowdsale;\n    }\n}\n",
-  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/crowdsale/CrowdsaleFactory.sol",
+  "sourcePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/crowdsale/CrowdsaleFactory.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/crowdsale/CrowdsaleFactory.sol",
+      "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/crowdsale/CrowdsaleFactory.sol",
       "exportedSymbols": {
         "BlockLimitedCrowdsaleFactory": [
           18512
@@ -331,7 +331,7 @@
       {
         "attributes": {
           "SourceUnit": 20688,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/crowdsale/crowdsales/BlockLimitedCrowdsale.sol",
+          "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/crowdsale/crowdsales/BlockLimitedCrowdsale.sol",
           "file": "./crowdsales/BlockLimitedCrowdsale.sol",
           "scope": 18513,
           "symbolAliases": [
@@ -346,7 +346,7 @@
       {
         "attributes": {
           "SourceUnit": 20806,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/crowdsale/crowdsales/TimeLimitedCrowdsale.sol",
+          "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/crowdsale/crowdsales/TimeLimitedCrowdsale.sol",
           "file": "./crowdsales/TimeLimitedCrowdsale.sol",
           "scope": 18513,
           "symbolAliases": [
@@ -361,7 +361,7 @@
       {
         "attributes": {
           "SourceUnit": 4542,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/common/BaseManager.sol",
+          "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/common/BaseManager.sol",
           "file": "../core/common/BaseManager.sol",
           "scope": 18513,
           "symbolAliases": [
@@ -505,7 +505,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37082,
+                                  "referencedDeclaration": 38157,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -1284,7 +1284,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -2038,7 +2038,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -2381,7 +2381,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37082,
+                                  "referencedDeclaration": 38157,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -2778,7 +2778,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37085,
+                              "referencedDeclaration": 38160,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -3121,7 +3121,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37082,
+                                  "referencedDeclaration": 38157,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -3194,5 +3194,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-26T09:34:40.270Z"
+  "updatedAt": "2018-01-29T17:03:42.929Z"
 }
