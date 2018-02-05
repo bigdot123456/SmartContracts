@@ -2,20 +2,6 @@
   "contractName": "ChronoBankAssetProxyInterface",
   "abi": [
     {
-      "constant": false,
-      "inputs": [],
-      "name": "getLatestVersion",
-      "outputs": [
-        {
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "constant": true,
       "inputs": [],
       "name": "chronoBankPlatform",
@@ -64,6 +50,41 @@
       "constant": false,
       "inputs": [
         {
+          "name": "_from",
+          "type": "address"
+        },
+        {
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "name": "_value",
+          "type": "uint256"
+        },
+        {
+          "name": "_reference",
+          "type": "string"
+        },
+        {
+          "name": "_sender",
+          "type": "address"
+        }
+      ],
+      "name": "__transferFromWithReference",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
           "name": "_spender",
           "type": "address"
         },
@@ -81,6 +102,20 @@
         {
           "name": "",
           "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "getLatestVersion",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
         }
       ],
       "payable": false,
@@ -127,41 +162,6 @@
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_from",
-          "type": "address"
-        },
-        {
-          "name": "_to",
-          "type": "address"
-        },
-        {
-          "name": "_value",
-          "type": "uint256"
-        },
-        {
-          "name": "_reference",
-          "type": "string"
-        },
-        {
-          "name": "_sender",
-          "type": "address"
-        }
-      ],
-      "name": "__transferFromWithReference",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
     }
   ],
   "bytecode": "0x",
@@ -169,10 +169,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\ncontract ChronoBankAssetProxyInterface {\n    address public chronoBankPlatform;\n    function __transferWithReference(address _to, uint _value, string _reference, address _sender) returns(bool);\n    function __transferFromWithReference(address _from, address _to, uint _value, string _reference, address _sender) returns(bool);\n    function __approve(address _spender, uint _value, address _sender) returns(bool);    \n    function getLatestVersion() returns(address);\n    function init(address _chronoBankPlatform, string _symbol, string _name);\n    function proposeUpgrade(address _newVersion) returns (bool);\n}\n",
-  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/platform/ChronoBankAssetProxyInterface.sol",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/platform/ChronoBankAssetProxyInterface.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/platform/ChronoBankAssetProxyInterface.sol",
+      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/platform/ChronoBankAssetProxyInterface.sol",
       "exportedSymbols": {
         "ChronoBankAssetProxyInterface": [
           8674
@@ -1019,9 +1019,9 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+    "version": "0.4.19+commit.c4cbbb05.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-02-05T07:55:47.231Z"
+  "updatedAt": "2018-02-05T14:43:54.680Z"
 }

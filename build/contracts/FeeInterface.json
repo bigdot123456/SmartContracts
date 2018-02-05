@@ -2,20 +2,6 @@
   "contractName": "FeeInterface",
   "abi": [
     {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_feePercent",
-          "type": "uint32"
-        }
-      ],
-      "name": "setFee",
-      "outputs": [],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "constant": true,
       "inputs": [],
       "name": "feeAddress",
@@ -41,25 +27,6 @@
       ],
       "payable": false,
       "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_feeAddress",
-          "type": "address"
-        }
-      ],
-      "name": "setFeeAddress",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -103,6 +70,39 @@
       "payable": false,
       "stateMutability": "nonpayable",
       "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_feeAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setFeeAddress",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_feePercent",
+          "type": "uint32"
+        }
+      ],
+      "name": "setFee",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
   ],
   "bytecode": "0x",
@@ -110,10 +110,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\ncontract FeeInterface {\n    // Fee collecting address, immutable.\n    address public feeAddress;\n\n    // Fee percent, immutable. 1 is 0.01%, 10000 is 100%.\n    uint32 public feePercent;\n\n    function calculateFee(uint _value) returns(uint);\n\n    function setupFee(address _feeAddress, uint32 _feePercent) returns (bool);\n\n    function setFeeAddress(address _feeAddress) returns (bool);\n\n    function setFee(uint32 _feePercent);\n}\n",
-  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/FeeInterface.sol",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/FeeInterface.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/FeeInterface.sol",
+      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/FeeInterface.sol",
       "exportedSymbols": {
         "FeeInterface": [
           1580
@@ -572,9 +572,9 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+    "version": "0.4.19+commit.c4cbbb05.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-02-05T07:55:47.128Z"
+  "updatedAt": "2018-02-05T14:43:54.557Z"
 }

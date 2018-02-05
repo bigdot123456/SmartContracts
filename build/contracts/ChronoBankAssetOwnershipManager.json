@@ -2,6 +2,62 @@
   "contractName": "ChronoBankAssetOwnershipManager",
   "abi": [
     {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_idx",
+          "type": "uint256"
+        }
+      ],
+      "name": "symbols",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "symbolsCount",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_symbol",
+          "type": "bytes32"
+        },
+        {
+          "name": "_partowner",
+          "type": "address"
+        }
+      ],
+      "name": "removeAssetPartOwner",
+      "outputs": [
+        {
+          "name": "errorCode",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "constant": false,
       "inputs": [
         {
@@ -17,44 +73,6 @@
       "outputs": [
         {
           "name": "errorCode",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_partowner",
-          "type": "address"
-        }
-      ],
-      "name": "removePartOwner",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_partowner",
-          "type": "address"
-        }
-      ],
-      "name": "addPartOwner",
-      "outputs": [
-        {
-          "name": "",
           "type": "uint256"
         }
       ],
@@ -86,40 +104,17 @@
       "type": "function"
     },
     {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "_idx",
-          "type": "uint256"
-        }
-      ],
-      "name": "symbols",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
       "constant": false,
       "inputs": [
-        {
-          "name": "_symbol",
-          "type": "bytes32"
-        },
         {
           "name": "_partowner",
           "type": "address"
         }
       ],
-      "name": "removeAssetPartOwner",
+      "name": "addPartOwner",
       "outputs": [
         {
-          "name": "errorCode",
+          "name": "",
           "type": "uint256"
         }
       ],
@@ -128,9 +123,14 @@
       "type": "function"
     },
     {
-      "constant": true,
-      "inputs": [],
-      "name": "symbolsCount",
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_partowner",
+          "type": "address"
+        }
+      ],
+      "name": "removePartOwner",
       "outputs": [
         {
           "name": "",
@@ -138,7 +138,7 @@
         }
       ],
       "payable": false,
-      "stateMutability": "view",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -170,10 +170,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\ncontract ChronoBankAssetOwnershipManager {\n    function symbols(uint _idx) public constant returns (bytes32);\n    function symbolsCount() public constant returns (uint);\n\n    function removeAssetPartOwner(bytes32 _symbol, address _partowner) returns (uint errorCode);\n    function addAssetPartOwner(bytes32 _symbol, address _partowner) returns (uint errorCode);\n    function hasAssetRights(address _owner, bytes32 _symbol) constant returns (bool);\n\n    function addPartOwner(address _partowner) returns (uint);\n    function removePartOwner(address _partowner) returns (uint);\n\n    function changeOwnership(bytes32 _symbol, address _newOwner) returns(uint errorCode);\n}\n\n\ncontract ChronoBankManagersRegistry {\n    function holdersCount() constant returns (uint);\n    function holders(uint _idx) constant returns (address _holderAddress);\n}\n",
-  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/platform/ChronoBankAssetOwnershipManager.sol",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/platform/ChronoBankAssetOwnershipManager.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/platform/ChronoBankAssetOwnershipManager.sol",
+      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/platform/ChronoBankAssetOwnershipManager.sol",
       "exportedSymbols": {
         "ChronoBankAssetOwnershipManager": [
           7948
@@ -1190,7 +1190,7 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+    "version": "0.4.19+commit.c4cbbb05.Emscripten.clang"
   },
   "networks": {
     "1": {
@@ -1215,5 +1215,5 @@
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-02-05T07:55:47.226Z"
+  "updatedAt": "2018-02-05T14:43:54.676Z"
 }

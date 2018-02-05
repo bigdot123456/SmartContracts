@@ -12,10 +12,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\n\n/// @title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.\ncontract BaseByzantiumRouter {\n\n    function() payable public {\n        address _backend = backend();\n\n        assembly {\n            let calldataMemoryOffset := mload(0x40)\n            mstore(0x40, add(calldataMemoryOffset, calldatasize))\n            calldatacopy(calldataMemoryOffset, 0x0, calldatasize)\n            let r := delegatecall(sub(gas, 10000), _backend, calldataMemoryOffset, calldatasize, 0, 0)\n\n            let returndataMemoryOffset := mload(0x40)\n            mstore(0x40, add(returndataMemoryOffset, returndatasize))\n            returndatacopy(returndataMemoryOffset, 0x0, returndatasize)\n\n            switch r\n            case 1 {\n                return(returndataMemoryOffset, returndatasize)\n            }\n            default {\n                revert(0, 0)\n            }\n        }\n    }\n\n    /// @notice Returns destination address for future calls\n    /// @dev abstract definition. should be implemented in sibling contracts\n    /// @return destination address\n    function backend() internal constant returns (address);\n}\n",
-  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/common/BaseByzantiumRouter.sol",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/common/BaseByzantiumRouter.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/common/BaseByzantiumRouter.sol",
+      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/common/BaseByzantiumRouter.sol",
       "exportedSymbols": {
         "BaseByzantiumRouter": [
           4386
@@ -279,9 +279,9 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+    "version": "0.4.19+commit.c4cbbb05.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-02-05T07:55:47.177Z"
+  "updatedAt": "2018-02-05T14:43:54.610Z"
 }

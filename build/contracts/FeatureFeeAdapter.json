@@ -26,10 +26,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\nimport \"./FeatureFeeManager.sol\";\n\ncontract FeatureFeeAdapter {\n    uint constant OK = 1;\n    uint constant FEATURE_IS_UNAVAILABE = 22000;\n\n    modifier featured(uint[1] memory _result) {\n        if (!lookupFeatureFeeManager().isExecutionAllowed(msg.sender, address(this), msg.sig)) {\n            assembly {\n                mstore(0, 22000) //FEATURE_IS_UNAVAILABE\n                return(0, 32)\n            }\n        }\n\n        _;\n\n        if (_result[0] == OK\n                && lookupFeatureFeeManager().takeExecutionFee(msg.sender, address(this), msg.sig) != OK) {\n            revert();\n        }\n    }\n\n    /**\n    *  Abstract function\n    */\n    function lookupManager(bytes32 _identifier) constant returns (address manager);\n\n    function lookupFeatureFeeManager() private returns (FeatureFeeManager) {\n        return FeatureFeeManager(lookupManager(\"FeatureFeeManager\"));\n    }\n}\n",
-  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/timeholder/FeatureFeeAdapter.sol",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/timeholder/FeatureFeeAdapter.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/timeholder/FeatureFeeAdapter.sol",
+      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/timeholder/FeatureFeeAdapter.sol",
       "exportedSymbols": {
         "FeatureFeeAdapter": [
           31063
@@ -53,7 +53,7 @@
       {
         "attributes": {
           "SourceUnit": 31348,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/timeholder/FeatureFeeManager.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/timeholder/FeatureFeeManager.sol",
           "file": "./FeatureFeeManager.sol",
           "scope": 31064,
           "symbolAliases": [
@@ -354,7 +354,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 37015,
+                                      "referencedDeclaration": 38164,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -407,7 +407,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 37132,
+                                      "referencedDeclaration": 38281,
                                       "type": "contract FeatureFeeAdapter",
                                       "value": "this"
                                     },
@@ -438,7 +438,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 37015,
+                                      "referencedDeclaration": 38164,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -707,7 +707,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 37015,
+                                          "referencedDeclaration": 38164,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -760,7 +760,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 37132,
+                                          "referencedDeclaration": 38281,
                                           "type": "contract FeatureFeeAdapter",
                                           "value": "this"
                                         },
@@ -791,7 +791,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 37015,
+                                          "referencedDeclaration": 38164,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -863,7 +863,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 37019,
+                                      "referencedDeclaration": 38168,
                                       "type": "function () pure",
                                       "value": "revert"
                                     },
@@ -1180,9 +1180,9 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+    "version": "0.4.19+commit.c4cbbb05.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-02-05T07:55:47.475Z"
+  "updatedAt": "2018-02-05T14:43:54.933Z"
 }

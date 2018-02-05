@@ -21,10 +21,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\nimport {TimeHolderInterface as TimeHolder} from \"../timeholder/TimeHolderInterface.sol\";\nimport \"../core/erc20/ERC20Interface.sol\";\nimport \"../assets/AssetsManagerInterface.sol\";\nimport \"../assets/PlatformsManagerInterface.sol\";\nimport \"../timeholder/DepositWalletInterface.sol\";\nimport \"../core/common/Managed.sol\";\nimport \"../core/common/Deposits.sol\";\nimport \"../reward/RewardsEmitter.sol\";\n\n/**\n* @title Defines interface for managers that can store any tokens and use for that purpose wallets\n* instead of keeping tokens on their own address. Keeps this contracts updatable with ease.\n*/\ncontract WalletBackedManagerInterface {\n    function wallet() constant returns (address);\n}\n\n/**\n * @title Universal decentralized ERC20 tokens rewards contract.\n *\n * One ERC20 token serves as a shares, and any number of other ERC20 tokens serve as rewards(assets).\n * Rewards distribution are divided in periods, the only thing that shareholder needs to do in\n * order to take part in distribution is prove to rewards contract that he possess certain amount\n * of shares before period closes. Prove is made through allowing rewards contract to take shares\n * from the shareholder, and then depositing it through a call to rewards contract. Proof is needed\n * for every period.\n *\n * When calculating rewards distribution, resulting amount is always rounded down.\n *\n * In order to be able to deposit shares, user needs to create allowance for wallet contract, using\n * standard ERC20 approve() function, so that contract can take shares from the user, when user\n * makes a dpeosit.\n *\n * Users can withdraw their shares at any moment, but only remaining shares will be used for\n * rewards distribution.\n * Users can withdraw their accumulated rewards at any moment.\n *\n * State flow:\n *   1. Period closed, next period started;\n *   2. Reward assets registered for last closed preiod;\n *   3. Rewards distributed for closed period;\n *   4. Shares deposited into current period;\n *   5. Repeat.\n *\n * Note: all the non constant functions return false instead of throwing in case if state change\n * didn't happen yet.\n */\ncontract Rewards is Deposits, RewardsEmitter {\n\n    uint constant ERROR_REWARD_NOT_FOUND = 9000;\n    uint constant ERROR_REWARD_INVALID_PARAMETER = 90001;\n    uint constant ERROR_REWARD_INVALID_INVOCATION = 9002;\n    uint constant ERROR_REWARD_INVALID_STATE = 9003;\n    uint constant ERROR_REWARD_INVALID_PERIOD = 9004;\n    uint constant ERROR_REWARD_NO_REWARDS_LEFT = 9005;\n    uint constant ERROR_REWARD_ASSET_TRANSFER_FAILED = 9006;\n    uint constant ERROR_REWARD_ALREADY_CALCULATED = 9007;\n    uint constant ERROR_REWARD_CALCULATION_FAILED = 9008;\n    uint constant ERROR_REWARD_CANNOT_CLOSE_PERIOD = 9009;\n    uint constant ERROR_REWARD_ASSET_ALREADY_REGISTERED = 9010;\n\n    StorageInterface.UInt closeInterval;\n    StorageInterface.UInt maxSharesTransfer;\n    StorageInterface.AddressAddressUIntMapping rewards;\n    StorageInterface.AddressUIntMapping rewardsLeft;\n    StorageInterface.UInt periods;\n    StorageInterface.UIntBoolMapping closed;\n    StorageInterface.UIntUIntMapping startDate;\n    StorageInterface.UIntUIntMapping totalShares;\n    StorageInterface.UIntAddressUIntMapping shares;\n    StorageInterface.UIntUIntMapping shareholdersCount;\n    StorageInterface.UIntAddressUIntMapping assetBalances;\n    StorageInterface.UIntAddressAddressBoolMapping calculated;\n    StorageInterface.Address targetPlatform;\n    StorageInterface.Address walletStorage;\n\n    function Rewards(Storage _store, bytes32 _crate) Deposits(_store, _crate) {\n        closeInterval.init('closeInterval');\n        maxSharesTransfer.init('maxSharesTransfer');\n        rewards.init('rewards');\n        rewardsLeft.init('rewardsLeft');\n        periods.init('periods');\n        totalShares.init('totalShares');\n        shareholdersCount.init('shareholdersCount');\n        closed.init('closed');\n        startDate.init('startDate');\n        assetBalances.init('assetBalances');\n        calculated.init('calculated');\n        shares.init('shares');\n        targetPlatform.init('targetPlatform');\n        walletStorage.init(\"rewardsWalletStorage\");\n    }\n\n    /**\n     * Sets ContractManager contract and period minimum length.\n     * Starts the first period.\n     *\n     * Can be set only once.\n     *\n     * @param _contractsManager contracts Manager contract address.\n     * @param _closeIntervalDays period minimum length, in days.\n     *\n     * @return result code, @see Errors\n     */\n    function init(address _contractsManager, address _wallet, address _targetPlatform, uint _closeIntervalDays) onlyContractOwner returns (uint) {\n        uint result = BaseManager.init(_contractsManager, \"Rewards\");\n\n        store.set(closeInterval, _closeIntervalDays);\n        store.set(targetPlatform, _targetPlatform);\n        store.set(walletStorage, _wallet);\n\n        // do not update default values if reinitialization\n        if (REINITIALIZED != result) {\n            store.set(startDate,0,now);\n            store.set(maxSharesTransfer,30);\n        }\n\n        return OK;\n    }\n\n    /**\n    * @dev Gets wallet address used to store tokens\n    *\n    * @return wallet address\n    */\n    function wallet() public constant returns (address) {\n        return store.get(walletStorage);\n    }\n\n    function getCloseInterval() constant returns(uint) {\n        return store.get(closeInterval);\n    }\n\n    function setCloseInterval(uint _closeInterval) onlyAuthorized returns(uint) {\n        store.set(closeInterval,_closeInterval);\n        return OK;\n    }\n\n    function getMaxSharesTransfer() constant returns(uint) {\n        return store.get(maxSharesTransfer);\n    }\n\n    function setMaxSharesTransfer(uint _maxSharesTransfer) onlyAuthorized returns (uint) {\n        store.set(maxSharesTransfer,_maxSharesTransfer);\n        return OK;\n    }\n\n    function getRewardsLeft(address shareholder) constant returns(uint) {\n        return store.get(rewardsLeft,shareholder);\n    }\n\n    function periodsLength() constant returns(uint) {\n        return store.get(periods);\n    }\n\n    function periodUnique(uint _period) constant returns(uint) {\n        if(_period == lastPeriod()) {\n            return store.count(shareholders);\n        } else {\n            return store.get(shareholdersCount,_period);\n        }\n    }\n\n    function getAssets() constant returns(address[] result) {\n        address _targetPlatform = store.get(targetPlatform);\n        AssetsManagerInterface assetsManager = AssetsManagerInterface(lookupManager(\"AssetsManager\"));\n        address chronoMintWallet = WalletBackedManagerInterface(lookupManager(\"LOCManager\")).wallet();\n        uint assetsCount = assetsManager.getAssetsForOwnerCount(_targetPlatform, chronoMintWallet);\n        result = new address[](assetsCount);\n        bytes32 symbol;\n        for (uint idx = 0; idx < assetsCount; ++idx) {\n            symbol = assetsManager.getAssetForOwnerAtIndex(_targetPlatform, chronoMintWallet, idx);\n            result[idx] = assetsManager.getAssetBySymbol(symbol);\n        }\n    }\n\n    /**\n     * Close current active period and start the new period.\n     *\n     * Can only be done if period was active longer than minimum length.\n     *\n     * @return success.\n     */\n    function closePeriod() onlyAuthorized returns (uint resultCode) {\n        uint period = lastPeriod();\n        if ((store.get(startDate,period) + (store.get(closeInterval) * 1 days)) > now) {\n            return _emitError(ERROR_REWARD_CANNOT_CLOSE_PERIOD);\n        }\n\n        uint _totalSharesPeriod = store.get(totalSharesStorage);\n        uint _shareholdersCount = store.count(shareholders);\n        store.set(totalShares, period, _totalSharesPeriod);\n        store.set(shareholdersCount, period, _shareholdersCount);\n        address[] memory assets = getAssets();\n        if (assets.length != 0) {\n            for (uint i = 0; i < assets.length; i++) {\n                uint result = registerAsset(assets[i], period);\n                if (OK != result) {\n                    // do not interrupt, just emit an Event\n                    emitError(result);\n                }\n            }\n        }\n        store.set(periods,++period);\n        store.set(startDate,period,now);\n        resultCode = storeDeposits(assets);\n        if (resultCode == OK) {\n            _emitPeriodClosed();\n        }\n    }\n\n    function getPeriodStartDate(uint _period) constant returns (uint) {\n        return store.get(startDate, _period);\n    }\n\n    /**\n    *  @return error code and still left shares. `sharesLeft` is actual only\n    *  if `errorCode` == OK, otherwise `sharesLeft` must be ignored.\n    */\n    function storeDeposits() onlyAuthorized returns (uint resultCode) {\n        resultCode = storeDeposits(getAssets());\n    }\n\n    function storeDeposits(address[] assets) internal returns (uint result) {\n        uint period = lastClosedPeriod();\n        uint period_end = getPeriodStartDate(lastPeriod());\n        StorageInterface.Iterator memory iterator = store.listIterator(shareholders);\n        uint amount;\n        uint j;\n        for(uint i = 0; store.canGetNextWithIterator(shareholders, iterator); i++) {\n            address shareholder = store.getNextWithIterator(shareholders, iterator);\n            amount = 0;\n            StorageInterface.Iterator memory iterator2 = store.listIterator(deposits,bytes32(shareholder));\n            for(j = 0; store.canGetNextWithIterator(deposits, iterator2); j++) {\n                uint id = store.getNextWithIterator(deposits,iterator2);\n                uint timestamp = store.get(timestamps,shareholder,id);\n                if(timestamp <= period_end) {\n                    amount += store.get(amounts,shareholder,id);\n                }\n            }\n            for(j = 0; j < assets.length; j++) {\n                result = calculateRewardFor(assets[j],shareholder,amount,period);\n                if(OK != result) {\n                    _emitError(result);\n                }\n            }\n            store.set(shares,period,shareholder,amount);\n        }\n\n        store.set(closed, period, true);\n\n        return OK;\n    }\n\n    function registerAsset(address _asset, uint _period) internal returns (uint) {\n        if (store.get(sharesContractStorage) == _asset) {\n            return _emitError(ERROR_REWARD_ASSET_ALREADY_REGISTERED);\n        }\n        uint period_balance = store.get(assetBalances,_period,_asset);\n        if (period_balance != 0) {\n            return _emitError(ERROR_REWARD_ASSET_ALREADY_REGISTERED);\n        }\n\n        uint balance = ERC20Interface(_asset).balanceOf(wallet());\n        uint left = store.get(rewardsLeft,_asset);\n        store.set(assetBalances,_period,_asset,balance - left);\n        store.set(rewardsLeft,_asset,balance);\n\n        _emitAssetRegistered(address(_asset));\n        return OK;\n    }\n\n    function calculateRewardFor(address _assetAddress, address _address, uint _amount, uint _period) internal returns (uint e) {\n        uint assetBalance = store.get(assetBalances,_period,_assetAddress);\n        if (assetBalance == 0) {\n            return ERROR_REWARD_CALCULATION_FAILED;\n        }\n\n        if (store.get(calculated,_period,_assetAddress,_address)) {\n            return ERROR_REWARD_ALREADY_CALCULATED;\n        }\n\n        uint totalSharesPeriod = store.get(totalShares,_period);\n        uint reward =  assetBalance * _amount / totalSharesPeriod;\n        uint cur_reward = store.get(rewards,_assetAddress,_address);\n        store.set(rewards,_assetAddress,_address,cur_reward + reward);\n        store.set(calculated,_period,_assetAddress,_address,true);\n\n        return OK;\n    }\n\n    /**\n     * Withdraw accumulated reward of a specified rewards asset.\n     *\n     * Withdrawal is made for caller and total amount.\n     *\n     * @param _asset registered rewards asset contract address.\n     *\n     * @return success.\n     */\n    function withdrawRewardTotal(address _asset) returns (uint) {\n        return withdrawRewardFor(_asset, msg.sender, rewardsFor(_asset, msg.sender));\n    }\n\n    /**\n     * Withdraw all accumulated rewards.\n     *\n     * Withdrawals are made for caller and total amount.\n     *\n     * @return result code.\n     */\n    function withdrawAllRewardsTotal() returns (uint) {\n        address[] memory _assets = getAssets();\n        for (uint i=0; i < _assets.length; i++) {\n            uint _rewards = rewardsFor(_assets[i], msg.sender);\n            if (_rewards > 0) {\n                uint result = withdrawRewardFor(_assets[i], msg.sender, _rewards);\n                if (OK != result) {\n                    return result;\n                }\n            }\n        }\n\n        return OK;\n    }\n\n    /**\n     * Withdraw accumulated reward of a specified rewards asset.\n     *\n     * Withdrawal is made for specified shareholder and total amount.\n     *\n     * This function meant to be used by some backend application to send rewards\n     * for arbitrary shareholders.\n     *\n     * @param _asset registered rewards asset contract address.\n     * @param _address shareholder address to withdraw for.\n     *\n     * @return success.\n     */\n    /*function withdrawRewardTotalFor(address _asset, address _address) returns (uint) {\n        return withdrawRewardFor(_asset, _address, rewardsFor(_asset, _address));\n    }*/\n\n    /**\n     * Withdraw accumulated reward of a specified rewards asset.\n     *\n     * Withdrawal is made for caller and specified amount.\n     *\n     * @param _asset registered rewards asset contract address.\n     * @param _amount amount to withdraw.\n     *\n     * @return success.\n     */\n    function withdrawReward(address _asset, uint _amount) returns (uint) {\n        return withdrawRewardFor(_asset, msg.sender, _amount);\n    }\n\n    /**\n     * Withdraw accumulated reward of a specified rewards asset.\n     *\n     * Withdrawal is made for specified shareholder and specified amount.\n     *\n     * @param _asset registered rewards asset contract address.\n     * @param _address shareholder address to withdraw for.\n     * @param _amount amount to withdraw.\n     *\n     * @return success.\n     */\n    function withdrawRewardFor(address _asset, address _address, uint _amount) internal returns (uint) {\n        if (store.get(rewardsLeft,_asset) == 0) {\n            return _emitError(ERROR_REWARD_NO_REWARDS_LEFT);\n        }\n\n        // Assuming that transfer(amount) of unknown asset may not result in exactly\n        // amount being taken from rewards contract(i. e. fees taken) we check contracts\n        // balance before and after transfer, and proceed with the difference.\n        address _wallet = wallet();\n        uint startBalance = ERC20Interface(_asset).balanceOf(_wallet);\n        if (!DepositWalletInterface(_wallet).withdraw(_asset, _address, _amount)) {\n            return _emitError(ERROR_REWARD_ASSET_TRANSFER_FAILED);\n        }\n\n        uint endBalance = ERC20Interface(_asset).balanceOf(_wallet);\n        uint diff = startBalance - endBalance;\n        if (rewardsFor(_asset, _address) < diff) {\n            revert();\n        }\n\n        store.set(rewards,_asset,_address,store.get(rewards,_asset,_address) - diff);\n        store.set(rewardsLeft,_asset, store.get(rewardsLeft,_asset) - diff);\n\n        _emitWithdrawnReward(_asset, _address, _amount);\n        return OK;\n    }\n\n    /**\n     * Returns proven amount of shares possessed by a shareholder in a period.\n     *\n     * @param _address shareholder address.\n     * @param _period period.\n     *\n     * @return shares amount.\n     */\n    function depositBalanceInPeriod(address _address, uint _period) constant returns (uint) {\n        if(_period == lastPeriod()) {\n            return depositBalance(_address);\n        }\n        return store.get(shares,_period,_address);\n    }\n\n    /**\n     * Returns total proven amount of shares possessed by shareholders in a period.\n     *\n     * @param _period period.\n     *\n     * @return shares amount.\n     */\n    function totalDepositInPeriod(uint _period) constant returns(uint) {\n        if(_period == lastPeriod()) {\n            return store.get(totalSharesStorage);\n        }\n        return store.get(totalShares,_period);\n    }\n\n    /**\n     * Returns current active period.\n     *\n     * @return period.\n     */\n    function lastPeriod() constant returns(uint) {\n        return store.get(periods);\n    }\n\n    /**\n     * Returns last closed period.\n     *\n     * @dev throws in case if there is no closed periods yet.\n     *\n     * @return period.\n     */\n    function lastClosedPeriod() constant returns(uint) {\n        if (store.get(periods) == 0) {\n            return ERROR_REWARD_NOT_FOUND;\n        }\n        return store.get(periods) - 1;\n    }\n\n    /**\n     * Check if period is closed or not.\n     *\n     * @param _period period.\n     *\n     * @return period closing state.\n     */\n    function isClosed(uint _period) constant returns(bool) {\n        return store.get(closed,_period);\n    }\n\n    /**\n     * Returns amount of accumulated rewards assets in a period.\n     * Always 0 for active period.\n     *\n     * @param _assetAddress rewards asset contract address.\n     * @param _period period.\n     *\n     * @return assets amount.\n     */\n    function assetBalanceInPeriod(address _assetAddress, uint _period) constant returns(uint) {\n        return store.get(assetBalances,_period,_assetAddress);\n    }\n\n    /**\n     * Check if shareholder have calculated rewards in a period.\n     *\n     * @param _assetAddress rewards asset contract address.\n     * @param _address shareholder address.\n     * @param _period period.\n     *\n     * @return reward calculation state.\n     */\n    function isCalculatedFor(address _assetAddress, address _address, uint _period) constant returns(bool) {\n        return store.get(calculated,_period,_assetAddress,_address);\n    }\n\n    /**\n     * Returns accumulated asset rewards available for withdrawal for shareholder.\n     *\n     * @param _assetAddress rewards asset contract address.\n     * @param _address shareholder address.\n     *\n     * @return rewards amount.\n     */\n    function rewardsFor(address _assetAddress, address _address) constant returns(uint) {\n        return store.get(rewards, _assetAddress, _address);\n    }\n\n    // Even emitter util functions\n\n    function _emitWithdrawnReward(address asset, address addr, uint amount) {\n        Rewards(getEventsHistory()).emitWithdrawnReward(asset, addr, amount);\n    }\n\n    function _emitWithdrawn(address addr, uint amount, uint total) {\n        Rewards(getEventsHistory()).emitWithdrawn(addr, amount, total);\n    }\n\n    function _emitDepositStored(uint _part) {\n        Rewards(getEventsHistory()).emitDepositStored(_part);\n    }\n\n    function _emitAssetRegistered(address assetAddress) {\n        Rewards(getEventsHistory()).emitAssetRegistered(assetAddress);\n    }\n\n    function _emitPeriodClosed() {\n        Rewards(getEventsHistory()).emitPeriodClosed();\n    }\n\n    function _emitError(uint e) returns (uint) {\n        Rewards(getEventsHistory()).emitError(e);\n        return e;\n    }\n\n    function() {\n        revert();\n    }\n}\n",
-  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/reward/Rewards.sol",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/reward/Rewards.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/reward/Rewards.sol",
+      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/reward/Rewards.sol",
       "exportedSymbols": {
         "Rewards": [
           29949
@@ -50,8 +50,8 @@
       },
       {
         "attributes": {
-          "SourceUnit": 31574,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/timeholder/TimeHolderInterface.sol",
+          "SourceUnit": 32723,
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/timeholder/TimeHolderInterface.sol",
           "file": "../timeholder/TimeHolderInterface.sol",
           "scope": 29950,
           "symbolAliases": [
@@ -69,7 +69,7 @@
       {
         "attributes": {
           "SourceUnit": 5467,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/erc20/ERC20Interface.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/erc20/ERC20Interface.sol",
           "file": "../core/erc20/ERC20Interface.sol",
           "scope": 29950,
           "symbolAliases": [
@@ -84,7 +84,7 @@
       {
         "attributes": {
           "SourceUnit": 1407,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/AssetsManagerInterface.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/AssetsManagerInterface.sol",
           "file": "../assets/AssetsManagerInterface.sol",
           "scope": 29950,
           "symbolAliases": [
@@ -99,7 +99,7 @@
       {
         "attributes": {
           "SourceUnit": 2805,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/PlatformsManagerInterface.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/PlatformsManagerInterface.sol",
           "file": "../assets/PlatformsManagerInterface.sol",
           "scope": 29950,
           "symbolAliases": [
@@ -114,7 +114,7 @@
       {
         "attributes": {
           "SourceUnit": 30203,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/timeholder/DepositWalletInterface.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/timeholder/DepositWalletInterface.sol",
           "file": "../timeholder/DepositWalletInterface.sol",
           "scope": 29950,
           "symbolAliases": [
@@ -129,7 +129,7 @@
       {
         "attributes": {
           "SourceUnit": 4866,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/common/Managed.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/common/Managed.sol",
           "file": "../core/common/Managed.sol",
           "scope": 29950,
           "symbolAliases": [
@@ -144,7 +144,7 @@
       {
         "attributes": {
           "SourceUnit": 4672,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/common/Deposits.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/common/Deposits.sol",
           "file": "../core/common/Deposits.sol",
           "scope": 29950,
           "symbolAliases": [
@@ -159,7 +159,7 @@
       {
         "attributes": {
           "SourceUnit": 30059,
-          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/reward/RewardsEmitter.sol",
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/reward/RewardsEmitter.sol",
           "file": "../reward/RewardsEmitter.sol",
           "scope": 29950,
           "symbolAliases": [
@@ -3208,7 +3208,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 37017,
+                                      "referencedDeclaration": 38166,
                                       "type": "uint256",
                                       "value": "now"
                                     },
@@ -6652,7 +6652,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37017,
+                              "referencedDeclaration": 38166,
                               "type": "uint256",
                               "value": "now"
                             },
@@ -7997,7 +7997,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37017,
+                              "referencedDeclaration": 38166,
                               "type": "uint256",
                               "value": "now"
                             },
@@ -13815,7 +13815,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37015,
+                                  "referencedDeclaration": 38164,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -13898,7 +13898,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 37015,
+                                      "referencedDeclaration": 38164,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -14380,7 +14380,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 37015,
+                                          "referencedDeclaration": 38164,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -14597,7 +14597,7 @@
                                                   "overloadedDeclarations": [
                                                     null
                                                   ],
-                                                  "referencedDeclaration": 37015,
+                                                  "referencedDeclaration": 38164,
                                                   "type": "msg",
                                                   "value": "msg"
                                                 },
@@ -14966,7 +14966,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 37015,
+                                  "referencedDeclaration": 38164,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -16193,7 +16193,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 37019,
+                                      "referencedDeclaration": 38168,
                                       "type": "function () pure",
                                       "value": "revert"
                                     },
@@ -20545,7 +20545,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 37019,
+                              "referencedDeclaration": 38168,
                               "type": "function () pure",
                               "value": "revert"
                             },
@@ -20585,9 +20585,9 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+    "version": "0.4.19+commit.c4cbbb05.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-02-05T07:55:47.453Z"
+  "updatedAt": "2018-02-05T14:43:54.939Z"
 }

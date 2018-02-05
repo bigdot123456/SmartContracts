@@ -5,19 +5,15 @@
       "constant": true,
       "inputs": [
         {
-          "name": "_platform",
-          "type": "address"
-        },
-        {
-          "name": "_owner",
-          "type": "address"
+          "name": "_symbol",
+          "type": "bytes32"
         }
       ],
-      "name": "getAssetsForOwnerCount",
+      "name": "isAssetSymbolExists",
       "outputs": [
         {
           "name": "",
-          "type": "uint256"
+          "type": "bool"
         }
       ],
       "payable": false,
@@ -76,6 +72,29 @@
         {
           "name": "_owner",
           "type": "address"
+        }
+      ],
+      "name": "getAssetsForOwnerCount",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_platform",
+          "type": "address"
+        },
+        {
+          "name": "_owner",
+          "type": "address"
         },
         {
           "name": "idx",
@@ -87,44 +106,6 @@
         {
           "name": "",
           "type": "bytes32"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": false,
-      "inputs": [
-        {
-          "name": "_platform",
-          "type": "address"
-        }
-      ],
-      "name": "requestTokenExtension",
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "_symbol",
-          "type": "bytes32"
-        }
-      ],
-      "name": "isAssetSymbolExists",
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool"
         }
       ],
       "payable": false,
@@ -149,6 +130,25 @@
       "payable": false,
       "stateMutability": "view",
       "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_platform",
+          "type": "address"
+        }
+      ],
+      "name": "requestTokenExtension",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
     }
   ],
   "bytecode": "0x",
@@ -156,10 +156,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\ncontract AssetsManagerInterface {\n    function isAssetSymbolExists(bytes32 _symbol) constant returns (bool);\n\n    function isAssetOwner(bytes32 _symbol, address _user) constant returns (bool);\n    function getAssetBySymbol(bytes32 _symbol) constant returns (address);\n\n    function getAssetsForOwnerCount(address _platform, address _owner) constant returns (uint);\n    function getAssetForOwnerAtIndex(address _platform, address _owner, uint idx) constant returns (bytes32);\n\n    function getTokenExtension(address _platform) constant returns (address);\n    function requestTokenExtension(address _platform) returns (uint);\n}\n\n\ncontract TokenExtensionRegistry {\n    function containsTokenExtension(address _tokenExtension) public constant returns (bool);\n}\n",
-  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/AssetsManagerInterface.sol",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/AssetsManagerInterface.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/AssetsManagerInterface.sol",
+      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/AssetsManagerInterface.sol",
       "exportedSymbols": {
         "AssetsManagerInterface": [
           1398
@@ -1044,9 +1044,9 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+    "version": "0.4.19+commit.c4cbbb05.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-02-05T07:55:47.103Z"
+  "updatedAt": "2018-02-05T14:43:54.557Z"
 }
