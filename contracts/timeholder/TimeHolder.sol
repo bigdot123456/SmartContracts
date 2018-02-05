@@ -339,7 +339,7 @@ contract TimeHolder is BaseManager, TimeHolderEmitter {
 
     /// @notice Number of shareholders
     /// @return number of shareholders
-    function shareholdersCount() public view returns (uint) {
+    function defaultShareholdersCount() public view returns (uint) {
         return getDepositStorage().shareholdersCount(getDefaultShares());
     }
 
