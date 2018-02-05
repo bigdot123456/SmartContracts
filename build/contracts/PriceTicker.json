@@ -117,10 +117,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\n/**\n*  PriceFetcher Interface. Defines how a price could be fetched\n*/\ncontract PriceProvider {\n    uint constant OK = 1;\n\n    event ExchangePriceUpdated(address initiator, bytes32 indexed fsym, bytes32 indexed tsym, uint indexed updateTime, uint exchangePrice, uint rateDecimals);\n\n    /**\n    *  Check if the price of a `fsym` currency against 'tsym' currency is availbale.\n    *\n    *  @dev Note:\n    *      1. must return `true` for equivalent symbols;\n    *      2. `Ether` and `ETH` are equivalent.\n    *\n    *  @param fsym From Symbol\n    *  @param tsym To Symbol\n    *\n    *  @return true if the price is an available.\n    */\n    function isPriceAvailable(bytes32 fsym, bytes32 tsym) public view returns (bool);\n\n    /**\n    *  Get the price of a `fsym` currency against 'tsym' currency.\n    *  Will throw if price is an unavailable;\n    *\n    *  @dev Note:\n    *        1. must return 1 ** 18 if `fsym` equivalent for `tsym`,\n    *           since price is always availbale to the same currency symbols;\n    *        2. `Ether` and `ETH` are equivalent.\n    *\n    *  @param fsym From Symbol\n    *  @param tsym To Symbol\n    *\n    *  @return a price (its decimals == 18)\n    */\n    function price(bytes32 fsym, bytes32 tsym) public view returns (uint);\n}\n\n\n/**\n*  PriceTicker Interface.\n*/\ncontract PriceTicker is PriceProvider {\n    uint constant PRICE_TICKER_OK_UPDATING = 24002;\n    uint constant PRICE_TICKER_INSUFFICIENT_BALANCE = 24003;\n    uint constant PRICE_TICKER_INVALID_INVOCATION = 24004;\n\n    /**\n    *  Request asynchronously the price of a `fsym` currency against 'tsym' currency.\n    *\n    *  Note:\n    *      1. Caller must implement PriceTickerCallback.\n    *      2. Result will be returned via callback `receivePrice`.\n    *      3. ETH symbol is used for getting price for Ether.\n    *\n    *  Since price of equivalent symbols is always 1, do not use async method\n    *  for getting price of equivalent symbols.\n    *\n    *  @param fsym From Symbol\n    *  @param tsym To Symbol\n    *\n    *  @return oraclize query id\n    */\n    function requestPrice(bytes32 fsym, bytes32 tsym) public payable returns (bytes32, uint);\n}\n",
-  "sourcePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/priceticker/PriceTicker.sol",
+  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/priceticker/PriceTicker.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/priceticker/PriceTicker.sol",
+      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/priceticker/PriceTicker.sol",
       "exportedSymbols": {
         "PriceProvider": [
           28491
@@ -938,5 +938,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-29T17:03:43.183Z"
+  "updatedAt": "2018-02-05T07:55:47.439Z"
 }
