@@ -35,7 +35,7 @@ contract PollRouter is BaseByzantiumRouter, PollEmitter {
 
     /// @notice Gets address of a backend contract
     /// @return _backend address of a backend contract
-    function backend() internal constant returns (address) {
+    function backend() internal view returns (address) {
         return backendAddress;
     }
 }

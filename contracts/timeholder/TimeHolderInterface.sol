@@ -8,7 +8,8 @@ contract TimeHolderInterface {
     function totalShares(bytes32 symbol) public constant returns (uint);
     function sharesContract() public constant returns (address);
     function getDefaultShares() public view returns (address);
-    function shareholdersCount() public constant returns (uint);
+    function defaultShareholdersCount() public constant returns (uint);
+    function shareholdersCount(address) public constant returns (uint);
     function depositBalance(address _address) public constant returns(uint);
     function takeFeatureFee(address _account, uint _amount) public returns (uint resultCode);
 }

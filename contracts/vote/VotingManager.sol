@@ -49,13 +49,13 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
 
     /** Modifiers */
 
-    /** @dev Guards invocation only to TimeHolder */
+    /// @dev Guards invocation only to TimeHolder
     modifier onlyTimeHolder {
         if (msg.sender != lookupManager("TimeHolder")) revert();
         _;
     }
 
-    /** @dev Guards invocation only to a poll registered in this manager */
+    /// @dev Guards invocation only to a poll registered in this manager
     modifier onlyPoll {
         if (!store.includes(pollsStorage, msg.sender)) revert();
         _;
@@ -64,6 +64,7 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
 
     /** PUBLIC section */
 
+    /// @notice Contstructor
     function VotingManager(Storage _store, bytes32 _crate) BaseManager(_store, _crate) public {
         pollsStorage.init("pollsStorage");
         pollsFactoryStorage.init("pollsFactoryStorage");
@@ -192,15 +193,11 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
 
     /// @notice Emits PollVoted event in case of successful voting.
     /// @dev DO NOT СALL IT DIRECTLY. Used by a poll contract.
-    /// @param _user address of a user who votes
-    /// @param _choice option chosen by user
-    /// @return result code of an operation
-    function onVote(address _user, uint8 _choice) onlyPoll public {
+    function onVote(address, uint8) onlyPoll public {
     }
 
     /// @notice Emits PollRemoved event in case of successful removal.
     /// @dev DO NOT СALL IT DIRECTLY. Used by a poll contract.
-    /// @return result code of an operation
     function onRemovePoll() onlyPoll public {
         store.remove(pollsStorage, msg.sender);
         MultiEventsHistory(getEventsHistory()).reject(msg.sender);
@@ -209,7 +206,6 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
 
     /// @notice Emits PollActivated event in case of successful activation.
     /// @dev DO NOT СALL IT DIRECTLY. Used by a poll contract.
-    /// @return result code of an operation
     function onActivatePoll() onlyPoll public {
         uint _activeCount = store.get(activeCountStorage);
         if (_activeCount + 1 > ACTIVE_POLLS_MAX) {
@@ -221,7 +217,6 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
 
     /// @notice Emits PollActivated event in case of successful ending (completing).
     /// @dev DO NOT СALL IT DIRECTLY. Used by a poll contract.
-    /// @return result code of an operation
     function onEndPoll() onlyPoll public {
         uint _activeCount = store.get(activeCountStorage);
         assert(_activeCount != 0);
@@ -264,6 +259,7 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
     }
 
     /** ListenerInterface interface */
+
     function tokenDeposit(address _token, address _who, uint _amount, uint _total)
     public
     onlyTimeHolder

@@ -9,20 +9,20 @@ contract PollInterface is OwnedInterface {
     /** Getters */
 
     /// @notice Gets poll's owner address
-    function owner() public constant returns (address);
+    function owner() public view returns (address);
 
     /// @notice Gets if poll is active or not
-    function active() public constant returns (bool);
+    function active() public view returns (bool);
 
     /// @notice Gets an index of an option chosen by user
     /// @param _member voted user
     /// @return choice of provided user
-    function memberOptions(address _member) public constant returns (uint8);
+    function memberOptions(address _member) public view returns (uint8);
 
     /// @notice Checks if provided user is already voted in this poll
     /// @param _user user to check
     /// @return `true` if user has voted, `false` otherwise
-    function hasMember(address _user) public constant returns (bool);
+    function hasMember(address _user) public view returns (bool);
 
     /*/// @notice Setup eventsHistory for a poll
     /// @param _eventsHistory address of eventsHistory contract
@@ -56,7 +56,7 @@ contract PollInterface is OwnedInterface {
     function killPoll() public;
 
     /// @notice Get full poll details
-    function getDetails() public constant returns (
+    function getDetails() public view returns (
         address _owner,
         bytes32 _detailsIpfsHash,
         uint _votelimit,
@@ -68,7 +68,7 @@ contract PollInterface is OwnedInterface {
     );
 
     /// @notice Get information about current poll situation for existed options: how much tokens are placed for which options.
-    function getVotesBalances() public constant returns (uint8[], uint[]);
+    function getVotesBalances() public view returns (uint8[], uint[]);
 }
 
 
