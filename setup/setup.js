@@ -22,9 +22,7 @@ const UserManager = artifacts.require("./UserManager.sol")
 const MultiEventsHistory = artifacts.require('./MultiEventsHistory.sol')
 const ProxyFactory = artifacts.require("./ProxyFactory.sol")
 const StorageManager = artifacts.require('StorageManager.sol')
-const VoteActor = artifacts.require("./VoteActor.sol");
-const PollManager = artifacts.require("./PollManager.sol");
-const PollDetails = artifacts.require("./PollDetails.sol");
+const VotingManager = artifacts.require('VotingManager.sol')
 const PlatformTokenExtensionGatewayManager = artifacts.require('./PlatformTokenExtensionGatewayManager.sol')
 const AssetOwnershipDelegateResolver = artifacts.require('./AssetOwnershipDelegateResolver.sol')
 //const CrowdsaleManager = artifacts.require("./CrowdsaleManager.sol");
@@ -36,12 +34,16 @@ const contractTypes = {
   ERC20Manager: "ERC20Manager", // ERC20Manager
   ExchangeManager: "ExchangeManager", // ExchangeManager
   TrackersManager: "TrackersManager", // TrackersManager
+  // DEPRECATED
   Voting: "PollManager", // Voting
+  VotingManager: "VotingManager", // Voting v.2
   Rewards: "Rewards", // Rewards
   AssetsManager: "AssetsManager", // AssetsManager
   TimeHolder: "TimeHolder", //TimeHolder
   CrowdsaleManager: "CrowdsaleManager",
+  // DEPRECATED
   VotingActor: "VoteActor",
+  // DEPRECATED
   VotingDetails: "PollDetails",
   CrowdsaleManager: "CrowdsaleManager",
   TokenExtensionGateway: "TokenExtensionGateway",
@@ -62,9 +64,7 @@ let shareable
 let erc20Manager
 let rewards
 let rewardsWallet
-let voteActor
-let pollManager
-let pollDetails
+let votingManager
 let userManager
 let exchangeManager
 let chronoBankAsset
@@ -122,9 +122,7 @@ var setup = function (callback) {
       ExchangeManager.deployed(),
       Rewards.deployed(),
       RewardsWallet.deployed(),
-      VoteActor.deployed(),
-      PollManager.deployed(),
-      PollDetails.deployed(),
+      VotingManager.deployed(),
       TimeHolder.deployed(),
       TimeHolderWallet.deployed(),
       MultiEventsHistory.deployed(),
@@ -153,9 +151,7 @@ var setup = function (callback) {
       exchangeManager,
       rewards,
       rewardsWallet,
-      voteActor,
-      pollManager,
-      pollDetails,
+      votingManager,
       timeHolder,
       timeHolderWallet,
       multiEventsHistory,
@@ -186,7 +182,7 @@ var setup = function (callback) {
     module.exports.chronoBankAssetProxy = chronoBankAssetProxy
     module.exports.chronoBankAssetWithFee = chronoBankAssetWithFee
     module.exports.chronoBankAssetWithFeeProxy = chronoBankAssetWithFeeProxy
-    module.exports.vote = { manager: pollManager, details: pollDetails, actor: voteActor }
+    module.exports.votingManager = votingManager // voting v.2
     module.exports.multiEventsHistory = multiEventsHistory
     module.exports.storageManager = storageManager
     module.exports.tokenExtensionGateway = tokenExtensionGateway
@@ -201,5 +197,19 @@ var setup = function (callback) {
   })
 }
 
+let setupPromise = async () => {
+    return new Promise((resolve,reject) => {
+        setup((e) => {
+            if (e === undefined || e === null) {
+                resolve()
+            } else {
+                reject(e)
+            }
+        })
+    })
+}
+
 module.exports.setup = setup
+module.exports.setupPromise = setupPromise
+
 module.exports.contractTypes = contractTypes

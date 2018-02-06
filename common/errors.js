@@ -6,7 +6,7 @@ const errorScope = {
     storage: 5000,
     exchange: 6000,
     exchangeStock: 7000,
-    vote: 8000,
+    vote: 8000, // DEPRECATED
     reward: 9000,
     contract: 10000,
     assets: 30000,
@@ -15,7 +15,9 @@ const errorScope = {
     walletsmanager: 14000,
     chronobankplatform: 15000,
     platforms: 21000,
-    tokenextension: 23000
+    tokenextension: 23000,
+    poll_v2: 26000,
+    vote_v2: 27000,
 }
 
 const errorsLibrary = {
@@ -71,6 +73,8 @@ const errorsLibrary = {
     ERROR_EXCHANGE_STOCK_INTERNAL: errorScope.exchangeStock + 1,
     ERROR_EXCHANGE_STOCK_UNKNOWN_SYMBOL: errorScope.exchangeStock + 2,
 
+    // DEPRECATED: all errorScope.vote is deprecated and shouldn't be used anymore.
+
     VOTE_INVALID_PARAMETER: errorScope.vote + 0,
     VOTE_INVALID_INVOCATION: errorScope.vote + 1,
     VOTE_ADD_CONTRACT: errorScope.vote + 2,
@@ -116,6 +120,7 @@ const errorsLibrary = {
     TIMEHOLDER_DEPOSIT_FAILED: errorScope.timeholder + 5,
     TIMEHOLDER_INSUFFICIENT_BALANCE: errorScope.timeholder + 6,
     TIMEHOLDER_LIMIT_EXCEEDED: errorScope.timeholder + 7,
+    TIMEHOLDER_SHARES_IS_NOT_ALLOWED: errorScope.timeholder + 8,
 
     ERCMANAGER_INVALID_INVOCATION: errorScope.ercmanager + 0,
     ERCMANAGER_INVALID_STATE: errorScope.ercmanager + 1,
@@ -179,6 +184,13 @@ const errorsLibrary = {
     TOKEN_EXTENSION_CANNOT_CLAIM_ASSET_OWNERSHIP: errorScope.tokenextension + 55,
 
     FEATURE_IS_UNAVAILABE: 22000,
+
+    POLL_BACKEND_INVALID_INVOCATION: errorScope.poll_v2 + 1,
+    POLL_BACKEND_NO_SHARES: errorScope.poll_v2 + 2,
+    POLL_BACKEND_INVALID_STATE: errorScope.poll_v2 + 3,
+    POLL_BACKEND_ALREADY_VOTED: errorScope.poll_v2 + 4,
+
+    VOTING_ACTIVE_POLL_LIMIT_REACHED: errorScope.vote_v2 + 1,
 }
 
 module.exports = errorsLibrary
