@@ -1,0 +1,454 @@
+{
+  "contractName": "BaseRouter",
+  "abi": [
+    {
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "fallback"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.4.11;\n\n/**\n* @title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.\n*/\ncontract BaseRouter {\n\n    function() payable public {\n        uint r;\n        address _backend = backend();\n\n        // Make the call\n        assembly {\n            calldatacopy(mload(0x40), 0, calldatasize)\n            r := delegatecall(sub(gas, 700), _backend, mload(0x40), calldatasize, mload(0x40), 32) // WARNING: 32 - size of the return value\n        }\n\n        // Throw if the call failed\n        if (r != 1) revert();\n\n        // Pass on the return value\n        assembly {\n            return(mload(0x40), 32) // WARNING: 32 - size of the return value\n        }\n    }\n\n    /**\n    * @dev Returns destination address for future calls\n    *\n    * @return destination address\n    */\n    function backend() internal constant returns (address);\n}\n",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
+  "ast": {
+    "attributes": {
+      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
+      "exportedSymbols": {
+        "BaseRouter": [
+          3023
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.4",
+            ".11"
+          ]
+        },
+        "id": 2996,
+        "name": "PragmaDirective",
+        "src": "0:24:16"
+      },
+      {
+        "attributes": {
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "contract",
+          "documentation": "@title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.",
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            3023
+          ],
+          "name": "BaseRouter",
+          "scope": 3024
+        },
+        "children": [
+          {
+            "attributes": {
+              "constant": false,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "",
+              "payable": true,
+              "scope": 3023,
+              "stateMutability": "payable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 2997,
+                "name": "ParameterList",
+                "src": "185:2:16"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 2998,
+                "name": "ParameterList",
+                "src": "203:0:16"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "assignments": [
+                        null
+                      ],
+                      "initialValue": null
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "constant": false,
+                          "name": "r",
+                          "scope": 3017,
+                          "stateVariable": false,
+                          "storageLocation": "default",
+                          "type": "uint256",
+                          "value": null,
+                          "visibility": "internal"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "uint",
+                              "type": "uint256"
+                            },
+                            "id": 2999,
+                            "name": "ElementaryTypeName",
+                            "src": "213:4:16"
+                          }
+                        ],
+                        "id": 3000,
+                        "name": "VariableDeclaration",
+                        "src": "213:6:16"
+                      }
+                    ],
+                    "id": 3001,
+                    "name": "VariableDeclarationStatement",
+                    "src": "213:6:16"
+                  },
+                  {
+                    "attributes": {
+                      "assignments": [
+                        3003
+                      ]
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "constant": false,
+                          "name": "_backend",
+                          "scope": 3017,
+                          "stateVariable": false,
+                          "storageLocation": "default",
+                          "type": "address",
+                          "value": null,
+                          "visibility": "internal"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "address",
+                              "type": "address"
+                            },
+                            "id": 3002,
+                            "name": "ElementaryTypeName",
+                            "src": "229:7:16"
+                          }
+                        ],
+                        "id": 3003,
+                        "name": "VariableDeclaration",
+                        "src": "229:16:16"
+                      },
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            null
+                          ],
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "address",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                null
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 3022,
+                              "type": "function () view returns (address)",
+                              "value": "backend"
+                            },
+                            "id": 3004,
+                            "name": "Identifier",
+                            "src": "248:7:16"
+                          }
+                        ],
+                        "id": 3005,
+                        "name": "FunctionCall",
+                        "src": "248:9:16"
+                      }
+                    ],
+                    "id": 3006,
+                    "name": "VariableDeclarationStatement",
+                    "src": "229:28:16"
+                  },
+                  {
+                    "attributes": {
+                      "externalReferences": [
+                        {
+                          "r": {
+                            "declaration": 3000,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "371:1:16",
+                            "valueSize": 1
+                          }
+                        },
+                        {
+                          "_backend": {
+                            "declaration": 3003,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "404:8:16",
+                            "valueSize": 1
+                          }
+                        }
+                      ],
+                      "operations": "{\n    calldatacopy(mload(0x40), 0, calldatasize)\n    r := delegatecall(sub(gas, 700), _backend, mload(0x40), calldatasize, mload(0x40), 32)\n}"
+                    },
+                    "children": [],
+                    "id": 3007,
+                    "name": "InlineAssembly",
+                    "src": "293:264:16"
+                  },
+                  {
+                    "attributes": {
+                      "falseBody": null
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "commonType": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          },
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "!=",
+                          "type": "bool"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 3000,
+                              "type": "uint256",
+                              "value": "r"
+                            },
+                            "id": 3008,
+                            "name": "Identifier",
+                            "src": "559:1:16"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "hexvalue": "31",
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "lValueRequested": false,
+                              "subdenomination": null,
+                              "token": "number",
+                              "type": "int_const 1",
+                              "value": "1"
+                            },
+                            "id": 3009,
+                            "name": "Literal",
+                            "src": "564:1:16"
+                          }
+                        ],
+                        "id": 3010,
+                        "name": "BinaryOperation",
+                        "src": "559:6:16"
+                      },
+                      {
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "arguments": [
+                                null
+                              ],
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "tuple()",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    null
+                                  ],
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 38168,
+                                  "type": "function () pure",
+                                  "value": "revert"
+                                },
+                                "id": 3011,
+                                "name": "Identifier",
+                                "src": "567:6:16"
+                              }
+                            ],
+                            "id": 3012,
+                            "name": "FunctionCall",
+                            "src": "567:8:16"
+                          }
+                        ],
+                        "id": 3013,
+                        "name": "ExpressionStatement",
+                        "src": "567:8:16"
+                      }
+                    ],
+                    "id": 3014,
+                    "name": "IfStatement",
+                    "src": "555:20:16"
+                  },
+                  {
+                    "attributes": {
+                      "externalReferences": [
+                        null
+                      ],
+                      "operations": "{\n    return(mload(0x40), 32)\n}"
+                    },
+                    "children": [],
+                    "id": 3015,
+                    "name": "InlineAssembly",
+                    "src": "622:104:16"
+                  }
+                ],
+                "id": 3016,
+                "name": "Block",
+                "src": "203:523:16"
+              }
+            ],
+            "id": 3017,
+            "name": "FunctionDefinition",
+            "src": "177:549:16"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "constant": true,
+              "implemented": false,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "backend",
+              "payable": false,
+              "scope": 3023,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 3018,
+                "name": "ParameterList",
+                "src": "859:2:16"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 3022,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 3019,
+                        "name": "ElementaryTypeName",
+                        "src": "889:7:16"
+                      }
+                    ],
+                    "id": 3020,
+                    "name": "VariableDeclaration",
+                    "src": "889:7:16"
+                  }
+                ],
+                "id": 3021,
+                "name": "ParameterList",
+                "src": "888:9:16"
+              }
+            ],
+            "id": 3022,
+            "name": "FunctionDefinition",
+            "src": "843:55:16"
+          }
+        ],
+        "id": 3023,
+        "name": "ContractDefinition",
+        "src": "150:750:16"
+      }
+    ],
+    "id": 3024,
+    "name": "SourceUnit",
+    "src": "0:901:16"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.19+commit.c4cbbb05.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "1.0.1",
+  "updatedAt": "2018-02-05T14:43:54.583Z"
+}

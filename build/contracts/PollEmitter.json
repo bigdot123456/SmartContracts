@@ -1,0 +1,1063 @@
+{
+  "contractName": "PollEmitter",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "self",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "choice",
+          "type": "uint8"
+        }
+      ],
+      "name": "PollVoted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "self",
+          "type": "address"
+        }
+      ],
+      "name": "PollActivated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "self",
+          "type": "address"
+        }
+      ],
+      "name": "PollEnded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "self",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "errorCode",
+          "type": "uint256"
+        }
+      ],
+      "name": "Error",
+      "type": "event"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "errorCode",
+          "type": "uint256"
+        }
+      ],
+      "name": "emitError",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "choice",
+          "type": "uint8"
+        }
+      ],
+      "name": "emitPollVoted",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "emitPollActivated",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "emitPollEnded",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6060604052341561000f57600080fd5b6102318061001e6000396000f3006060604052600436106100615763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166314696c8381146100665780636c24d51e1461007b578063df26ca081461008e578063e2bb323b146100a4575b600080fd5b341561007157600080fd5b6100796100bd565b005b341561008657600080fd5b610079610109565b341561009957600080fd5b610079600435610155565b34156100af57600080fd5b61007960ff600435166101a9565b6100c5610201565b73ffffffffffffffffffffffffffffffffffffffff167f5628e52d43406d18add7d63a4c9e07f573165f6faff201802fcf178e314c67b460405160405180910390a2565b610111610201565b73ffffffffffffffffffffffffffffffffffffffff167f65de543be011e1b68dcea0af69bf30d0d04a847764a396cc7af2aaa3986d13aa60405160405180910390a2565b61015d610201565b73ffffffffffffffffffffffffffffffffffffffff167f9cf38cf2dbf9139f5c32639950507b10775fbbe0421f3e168bc2d1bb1ae3208c8260405190815260200160405180910390a250565b6101b1610201565b73ffffffffffffffffffffffffffffffffffffffff167f4e38c414740d6fff0089331e9a30e4db17b2ce069c6711c34e2049c9c610ae638260405160ff909116815260200160405180910390a250565b33905600a165627a7a72305820876eb01fe0556b8770290b12fec017234a353ea2db24c261e09b286749b2a0b20029",
+  "deployedBytecode": "0x6060604052600436106100615763ffffffff7c010000000000000000000000000000000000000000000000000000000060003504166314696c8381146100665780636c24d51e1461007b578063df26ca081461008e578063e2bb323b146100a4575b600080fd5b341561007157600080fd5b6100796100bd565b005b341561008657600080fd5b610079610109565b341561009957600080fd5b610079600435610155565b34156100af57600080fd5b61007960ff600435166101a9565b6100c5610201565b73ffffffffffffffffffffffffffffffffffffffff167f5628e52d43406d18add7d63a4c9e07f573165f6faff201802fcf178e314c67b460405160405180910390a2565b610111610201565b73ffffffffffffffffffffffffffffffffffffffff167f65de543be011e1b68dcea0af69bf30d0d04a847764a396cc7af2aaa3986d13aa60405160405180910390a2565b61015d610201565b73ffffffffffffffffffffffffffffffffffffffff167f9cf38cf2dbf9139f5c32639950507b10775fbbe0421f3e168bc2d1bb1ae3208c8260405190815260200160405180910390a250565b6101b1610201565b73ffffffffffffffffffffffffffffffffffffffff167f4e38c414740d6fff0089331e9a30e4db17b2ce069c6711c34e2049c9c610ae638260405160ff909116815260200160405180910390a250565b33905600a165627a7a72305820876eb01fe0556b8770290b12fec017234a353ea2db24c261e09b286749b2a0b20029",
+  "sourceMap": "161:637:111:-;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "161:637:111:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;648:75;;;;;;;;;;;;;;729:67;;;;;;;;;;;;465:84;;;;;;;;;;;;;;555:87;;;;;;;;;;;;;;;;648:75;708:7;:5;:7::i;:::-;694:22;;;;;;;;;;;;648:75::o;729:67::-;781:7;:5;:7::i;:::-;771:18;;;;;;;;;;;;729:67::o;465:84::-;523:7;:5;:7::i;:::-;517:25;;;532:9;517:25;;;;;;;;;;;;;;465:84;:::o;555:87::-;619:7;:5;:7::i;:::-;609:26;;;628:6;609:26;;;;;;;;;;;;;;;;;555:87;:::o;234::37:-;304:10;234:87;:::o",
+  "source": "pragma solidity ^0.4.11;\n\nimport '../core/event/MultiEventsHistoryAdapter.sol';\n\n/// @title Emitter with support of events history for PollEntity implementation\ncontract PollEmitter is MultiEventsHistoryAdapter {\n\n    /** Events */\n\n    event PollVoted(address indexed self, uint8 choice);\n\n    event PollActivated(address indexed self);\n\n    event PollEnded(address indexed self);\n\n    event Error(address indexed self, uint errorCode);\n\n\n    /** Emitters */\n\n    function emitError(uint errorCode) public {\n        Error(_self(), errorCode);\n    }\n\n    function emitPollVoted(uint8 choice) public {\n        PollVoted(_self(), choice);\n    }\n\n    function emitPollActivated() public {\n        PollActivated(_self());\n    }\n\n    function emitPollEnded() public {\n        PollEnded(_self());\n    }\n}\n",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/vote/PollEmitter.sol",
+  "ast": {
+    "attributes": {
+      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/vote/PollEmitter.sol",
+      "exportedSymbols": {
+        "PollEmitter": [
+          33796
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.4",
+            ".11"
+          ]
+        },
+        "id": 33730,
+        "name": "PragmaDirective",
+        "src": "0:24:111"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 6913,
+          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/event/MultiEventsHistoryAdapter.sol",
+          "file": "../core/event/MultiEventsHistoryAdapter.sol",
+          "scope": 33797,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 33731,
+        "name": "ImportDirective",
+        "src": "26:53:111"
+      },
+      {
+        "attributes": {
+          "contractDependencies": [
+            6912
+          ],
+          "contractKind": "contract",
+          "documentation": "@title Emitter with support of events history for PollEntity implementation",
+          "fullyImplemented": true,
+          "linearizedBaseContracts": [
+            33796,
+            6912
+          ],
+          "name": "PollEmitter",
+          "scope": 33797
+        },
+        "children": [
+          {
+            "attributes": {
+              "arguments": [
+                null
+              ]
+            },
+            "children": [
+              {
+                "attributes": {
+                  "contractScope": null,
+                  "name": "MultiEventsHistoryAdapter",
+                  "referencedDeclaration": 6912,
+                  "type": "contract MultiEventsHistoryAdapter"
+                },
+                "id": 33732,
+                "name": "UserDefinedTypeName",
+                "src": "185:25:111"
+              }
+            ],
+            "id": 33733,
+            "name": "InheritanceSpecifier",
+            "src": "185:25:111"
+          },
+          {
+            "attributes": {
+              "anonymous": false,
+              "name": "PollVoted"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": true,
+                      "name": "self",
+                      "scope": 33739,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 33734,
+                        "name": "ElementaryTypeName",
+                        "src": "253:7:111"
+                      }
+                    ],
+                    "id": 33735,
+                    "name": "VariableDeclaration",
+                    "src": "253:20:111"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": false,
+                      "name": "choice",
+                      "scope": 33739,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint8",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint8",
+                          "type": "uint8"
+                        },
+                        "id": 33736,
+                        "name": "ElementaryTypeName",
+                        "src": "275:5:111"
+                      }
+                    ],
+                    "id": 33737,
+                    "name": "VariableDeclaration",
+                    "src": "275:12:111"
+                  }
+                ],
+                "id": 33738,
+                "name": "ParameterList",
+                "src": "252:36:111"
+              }
+            ],
+            "id": 33739,
+            "name": "EventDefinition",
+            "src": "237:52:111"
+          },
+          {
+            "attributes": {
+              "anonymous": false,
+              "name": "PollActivated"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": true,
+                      "name": "self",
+                      "scope": 33743,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 33740,
+                        "name": "ElementaryTypeName",
+                        "src": "315:7:111"
+                      }
+                    ],
+                    "id": 33741,
+                    "name": "VariableDeclaration",
+                    "src": "315:20:111"
+                  }
+                ],
+                "id": 33742,
+                "name": "ParameterList",
+                "src": "314:22:111"
+              }
+            ],
+            "id": 33743,
+            "name": "EventDefinition",
+            "src": "295:42:111"
+          },
+          {
+            "attributes": {
+              "anonymous": false,
+              "name": "PollEnded"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": true,
+                      "name": "self",
+                      "scope": 33747,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 33744,
+                        "name": "ElementaryTypeName",
+                        "src": "359:7:111"
+                      }
+                    ],
+                    "id": 33745,
+                    "name": "VariableDeclaration",
+                    "src": "359:20:111"
+                  }
+                ],
+                "id": 33746,
+                "name": "ParameterList",
+                "src": "358:22:111"
+              }
+            ],
+            "id": 33747,
+            "name": "EventDefinition",
+            "src": "343:38:111"
+          },
+          {
+            "attributes": {
+              "anonymous": false,
+              "name": "Error"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": true,
+                      "name": "self",
+                      "scope": 33753,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 33748,
+                        "name": "ElementaryTypeName",
+                        "src": "399:7:111"
+                      }
+                    ],
+                    "id": 33749,
+                    "name": "VariableDeclaration",
+                    "src": "399:20:111"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "indexed": false,
+                      "name": "errorCode",
+                      "scope": 33753,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 33750,
+                        "name": "ElementaryTypeName",
+                        "src": "421:4:111"
+                      }
+                    ],
+                    "id": 33751,
+                    "name": "VariableDeclaration",
+                    "src": "421:14:111"
+                  }
+                ],
+                "id": 33752,
+                "name": "ParameterList",
+                "src": "398:38:111"
+              }
+            ],
+            "id": 33753,
+            "name": "EventDefinition",
+            "src": "387:50:111"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "emitError",
+              "payable": false,
+              "scope": 33796,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "errorCode",
+                      "scope": 33765,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint256",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint",
+                          "type": "uint256"
+                        },
+                        "id": 33754,
+                        "name": "ElementaryTypeName",
+                        "src": "484:4:111"
+                      }
+                    ],
+                    "id": 33755,
+                    "name": "VariableDeclaration",
+                    "src": "484:14:111"
+                  }
+                ],
+                "id": 33756,
+                "name": "ParameterList",
+                "src": "483:16:111"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 33757,
+                "name": "ParameterList",
+                "src": "507:0:111"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                },
+                                {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 33753,
+                              "type": "function (address,uint256)",
+                              "value": "Error"
+                            },
+                            "id": 33758,
+                            "name": "Identifier",
+                            "src": "517:5:111"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "arguments": [
+                                null
+                              ],
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "address",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    null
+                                  ],
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 6911,
+                                  "type": "function () view returns (address)",
+                                  "value": "_self"
+                                },
+                                "id": 33759,
+                                "name": "Identifier",
+                                "src": "523:5:111"
+                              }
+                            ],
+                            "id": 33760,
+                            "name": "FunctionCall",
+                            "src": "523:7:111"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 33755,
+                              "type": "uint256",
+                              "value": "errorCode"
+                            },
+                            "id": 33761,
+                            "name": "Identifier",
+                            "src": "532:9:111"
+                          }
+                        ],
+                        "id": 33762,
+                        "name": "FunctionCall",
+                        "src": "517:25:111"
+                      }
+                    ],
+                    "id": 33763,
+                    "name": "ExpressionStatement",
+                    "src": "517:25:111"
+                  }
+                ],
+                "id": 33764,
+                "name": "Block",
+                "src": "507:42:111"
+              }
+            ],
+            "id": 33765,
+            "name": "FunctionDefinition",
+            "src": "465:84:111"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "emitPollVoted",
+              "payable": false,
+              "scope": 33796,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "choice",
+                      "scope": 33777,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint8",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint8",
+                          "type": "uint8"
+                        },
+                        "id": 33766,
+                        "name": "ElementaryTypeName",
+                        "src": "578:5:111"
+                      }
+                    ],
+                    "id": 33767,
+                    "name": "VariableDeclaration",
+                    "src": "578:12:111"
+                  }
+                ],
+                "id": 33768,
+                "name": "ParameterList",
+                "src": "577:14:111"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 33769,
+                "name": "ParameterList",
+                "src": "599:0:111"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                },
+                                {
+                                  "typeIdentifier": "t_uint8",
+                                  "typeString": "uint8"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 33739,
+                              "type": "function (address,uint8)",
+                              "value": "PollVoted"
+                            },
+                            "id": 33770,
+                            "name": "Identifier",
+                            "src": "609:9:111"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "arguments": [
+                                null
+                              ],
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "address",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    null
+                                  ],
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 6911,
+                                  "type": "function () view returns (address)",
+                                  "value": "_self"
+                                },
+                                "id": 33771,
+                                "name": "Identifier",
+                                "src": "619:5:111"
+                              }
+                            ],
+                            "id": 33772,
+                            "name": "FunctionCall",
+                            "src": "619:7:111"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 33767,
+                              "type": "uint8",
+                              "value": "choice"
+                            },
+                            "id": 33773,
+                            "name": "Identifier",
+                            "src": "628:6:111"
+                          }
+                        ],
+                        "id": 33774,
+                        "name": "FunctionCall",
+                        "src": "609:26:111"
+                      }
+                    ],
+                    "id": 33775,
+                    "name": "ExpressionStatement",
+                    "src": "609:26:111"
+                  }
+                ],
+                "id": 33776,
+                "name": "Block",
+                "src": "599:43:111"
+              }
+            ],
+            "id": 33777,
+            "name": "FunctionDefinition",
+            "src": "555:87:111"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "emitPollActivated",
+              "payable": false,
+              "scope": 33796,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 33778,
+                "name": "ParameterList",
+                "src": "674:2:111"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 33779,
+                "name": "ParameterList",
+                "src": "684:0:111"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 33743,
+                              "type": "function (address)",
+                              "value": "PollActivated"
+                            },
+                            "id": 33780,
+                            "name": "Identifier",
+                            "src": "694:13:111"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "arguments": [
+                                null
+                              ],
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "address",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    null
+                                  ],
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 6911,
+                                  "type": "function () view returns (address)",
+                                  "value": "_self"
+                                },
+                                "id": 33781,
+                                "name": "Identifier",
+                                "src": "708:5:111"
+                              }
+                            ],
+                            "id": 33782,
+                            "name": "FunctionCall",
+                            "src": "708:7:111"
+                          }
+                        ],
+                        "id": 33783,
+                        "name": "FunctionCall",
+                        "src": "694:22:111"
+                      }
+                    ],
+                    "id": 33784,
+                    "name": "ExpressionStatement",
+                    "src": "694:22:111"
+                  }
+                ],
+                "id": 33785,
+                "name": "Block",
+                "src": "684:39:111"
+              }
+            ],
+            "id": 33786,
+            "name": "FunctionDefinition",
+            "src": "648:75:111"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "emitPollEnded",
+              "payable": false,
+              "scope": 33796,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 33787,
+                "name": "ParameterList",
+                "src": "751:2:111"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 33788,
+                "name": "ParameterList",
+                "src": "761:0:111"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "tuple()",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_address",
+                                  "typeString": "address"
+                                }
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 33747,
+                              "type": "function (address)",
+                              "value": "PollEnded"
+                            },
+                            "id": 33789,
+                            "name": "Identifier",
+                            "src": "771:9:111"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "arguments": [
+                                null
+                              ],
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "isStructConstructorCall": false,
+                              "lValueRequested": false,
+                              "names": [
+                                null
+                              ],
+                              "type": "address",
+                              "type_conversion": false
+                            },
+                            "children": [
+                              {
+                                "attributes": {
+                                  "argumentTypes": [
+                                    null
+                                  ],
+                                  "overloadedDeclarations": [
+                                    null
+                                  ],
+                                  "referencedDeclaration": 6911,
+                                  "type": "function () view returns (address)",
+                                  "value": "_self"
+                                },
+                                "id": 33790,
+                                "name": "Identifier",
+                                "src": "781:5:111"
+                              }
+                            ],
+                            "id": 33791,
+                            "name": "FunctionCall",
+                            "src": "781:7:111"
+                          }
+                        ],
+                        "id": 33792,
+                        "name": "FunctionCall",
+                        "src": "771:18:111"
+                      }
+                    ],
+                    "id": 33793,
+                    "name": "ExpressionStatement",
+                    "src": "771:18:111"
+                  }
+                ],
+                "id": 33794,
+                "name": "Block",
+                "src": "761:35:111"
+              }
+            ],
+            "id": 33795,
+            "name": "FunctionDefinition",
+            "src": "729:67:111"
+          }
+        ],
+        "id": 33796,
+        "name": "ContractDefinition",
+        "src": "161:637:111"
+      }
+    ],
+    "id": 33797,
+    "name": "SourceUnit",
+    "src": "0:799:111"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.19+commit.c4cbbb05.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "1.0.1",
+  "updatedAt": "2018-02-05T14:43:54.953Z"
+}
