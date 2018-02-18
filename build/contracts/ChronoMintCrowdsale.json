@@ -1003,10 +1003,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\nimport \"./GenericCrowdsale.sol\";\nimport \"../../core/erc20/ERC20Interface.sol\";\nimport {ERC20Manager as ERC20Service} from \"../../core/erc20/ERC20Manager.sol\";\n\n/**\n*  @title ChronoMintCrowdsale contract\n*  Accepts Ether and ERC20 tokens.\n*/\ncontract ChronoMintCrowdsale is GenericCrowdsale {\n    using SafeMath for uint;\n\n    /* raised wie will be transfered to this address if success */\n    address public fund;\n    /* ERC20 tokens white list */\n    mapping (address => bool) allowedERC20;\n\n    event NewFund(address indexed sender, address fund);\n    event ReceivedEther(address indexed sender, address indexed investor, uint weiValue);\n    event RefundedEther(address indexed sender, address indexed investor, uint weiValue);\n    event ReceivedERC20(address indexed sender, address indexed investor, uint erc20Value, bytes32 symbol);\n    event RefundedERC20(address indexed sender, address indexed investor, uint erc20Value, bytes32 symbol);\n    event WithdrawEther(address indexed sender, uint amout);\n\n    /**\n    * Checks if ERC20 sale is enabled for gined token.\n    */\n    modifier isERC20Sale(address token) {\n        if (token == 0x0 || !allowedERC20[token]) revert();\n        _;\n    }\n\n    /**\n    *  Check if Ether sale is enabled.\n    */\n    modifier isEtherSale() {\n        if (fund == 0x0) revert();\n        _;\n    }\n\n    /**\n    *  @dev Constructor\n    *\n    *  @param _serviceProvider address\n    *  @param _symbol Bounty token symbol\n    *  @param _priceTicker Price ticker address\n    *\n    *  @notice this contract should be owner of bounty token\n    */\n    function ChronoMintCrowdsale(address _serviceProvider, bytes32 _symbol, address _priceTicker)\n                    GenericCrowdsale(_serviceProvider, _symbol, _priceTicker) {\n    }\n\n    /**\n    *  Enable Ether sale\n    */\n    function enableEtherSale(address _fund) onlyAuthorised returns (uint) {\n        require(_fund != 0x0);\n        fund = _fund;\n\n        registerSalesAgent(address(this), \"ETH\");\n\n        return OK;\n    }\n\n    /**\n    *  Disable Ether sale\n    */\n    function disableEtherSale() onlyAuthorised returns (uint) {\n        delete fund;\n        unregisterSalesAgent(this, \"ETH\");\n\n        return OK;\n    }\n\n    /**\n    *  Allow to receive ERC20 token with given symbols.\n    */\n    function enableERC20Sale(bytes32[] whiteList) onlyAuthorised returns (uint) {\n        ERC20Service erc20Service = lookupERC20Service();\n        for (uint i = 0; i < whiteList.length; i++) {\n            address allowedToken = erc20Service.getTokenAddressBySymbol(whiteList[i]);\n            if (allowedToken != 0x0) {\n                allowedERC20[allowedToken] = true;\n                registerSalesAgent(this, whiteList[i]);\n            }\n        }\n\n        return OK;\n    }\n\n    /**\n    *  Deny to receive ERC20 token with given symbols.\n    */\n    function disableERC20Sale(bytes32[] blackList) onlyAuthorised returns (uint) {\n        ERC20Service erc20Service = lookupERC20Service();\n        for (uint i = 0; i < blackList.length; i++) {\n            address disallowedToken = erc20Service.getTokenAddressBySymbol(blackList[i]);\n            if (disallowedToken != 0x0) {\n                delete allowedERC20[disallowedToken];\n                unregisterSalesAgent(this, blackList[i]);\n            }\n        }\n\n        return OK;\n    }\n\n    /**\n    * The basic entry point to participate the crowdsale process.\n    * Pay for funding, get invested tokens back in the sender address.\n    *\n    * Ether sale must be enabled.\n    */\n    function () onlyRunning isEtherSale payable {\n        this.sale(msg.sender, msg.value, \"ETH\");\n\n        ReceivedEther(address(this), msg.sender, msg.value);\n    }\n\n    /**\n    * Investors can claim refund (only Ether deposit).\n    *\n    * Note that any refunds from proxy buyers should be handled separately,\n    * and not through this contract.\n    */\n    function refund() onlyFailure {\n        uint weiDonation = this.refund(msg.sender, \"ETH\");\n        if (!msg.sender.send(weiDonation)) revert();\n\n        RefundedEther(address(this), msg.sender, weiDonation);\n    }\n\n    /**\n    * @dev Receive ERC20 Token and send bounty.\n    *\n    * ERC20 sale must be enabled to token with given symbol.\n    */\n    function sellERC20(address _token) onlyRunning isERC20Sale(_token) payable {\n        uint remaining = ERC20Interface(_token).allowance(msg.sender, this);\n        bytes32 symbol = getTokenSymbol(_token);\n\n        uint initialBalance = ERC20Interface(_token).balanceOf(this);\n        if (!ERC20Interface(_token).transferFrom(msg.sender, this, remaining)) revert();\n\n        assert(remaining == ERC20Interface(_token).balanceOf(this) - initialBalance);\n\n        this.sale(msg.sender, remaining, symbol);\n\n        ReceivedERC20(address(this), msg.sender, remaining, symbol);\n    }\n\n    /**\n    * Investors can claim refund (only ERC20 deposit).\n    *\n    * Note that any refunds from proxy buyers should be handled separately,\n    * and not through this contract.\n    */\n    function refundERC20(address _token) onlyFailure payable {\n        require(_token != 0x0);\n        require(lookupERC20Service().isTokenExists(_token));\n\n        uint erc20Donation = this.refund(msg.sender, getTokenSymbol(_token));\n        bytes32 symbol = getTokenSymbol(_token);\n\n        uint initialBalance = ERC20Interface(_token).balanceOf(this);\n        if (!ERC20Interface(_token).transfer(msg.sender, erc20Donation)) revert();\n\n        assert(erc20Donation == initialBalance - ERC20Interface(_token).balanceOf(this));\n\n        RefundedERC20(address(this), msg.sender, erc20Donation, symbol);\n    }\n\n    /**\n    * @dev Withdrawal Ether balance on successfull finish\n    */\n    function withdraw() onlySuccess onlyAuthorised isEtherSale {\n        uint balance = this.balance;\n        if (!fund.send(balance)) revert();\n\n        WithdrawEther(address(this), balance);\n    }\n\n    function lookupERC20Service() constant returns (ERC20Service) {\n        return ERC20Service(lookupService(\"ERC20Manager\"));\n    }\n\n    /**\n    *   Returns token symbol by given address.\n    */\n    function getTokenSymbol(address _token) constant returns (bytes32) {\n        var (token, name, symbol, url, decimals, ipfsHash, swarmHash) =\n              lookupERC20Service().getTokenMetaData(_token);\n        return symbol;\n    }\n}\n",
-  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/crowdsale/base/ChronoMintCrowdsale.sol",
+  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/crowdsale/base/ChronoMintCrowdsale.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/crowdsale/base/ChronoMintCrowdsale.sol",
+      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/crowdsale/base/ChronoMintCrowdsale.sol",
       "exportedSymbols": {
         "ChronoMintCrowdsale": [
           19809
@@ -1030,7 +1030,7 @@
       {
         "attributes": {
           "SourceUnit": 20566,
-          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/crowdsale/base/GenericCrowdsale.sol",
+          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/crowdsale/base/GenericCrowdsale.sol",
           "file": "./GenericCrowdsale.sol",
           "scope": 19810,
           "symbolAliases": [
@@ -1045,7 +1045,7 @@
       {
         "attributes": {
           "SourceUnit": 5467,
-          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/erc20/ERC20Interface.sol",
+          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/erc20/ERC20Interface.sol",
           "file": "../../core/erc20/ERC20Interface.sol",
           "scope": 19810,
           "symbolAliases": [
@@ -1060,7 +1060,7 @@
       {
         "attributes": {
           "SourceUnit": 6749,
-          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/erc20/ERC20Manager.sol",
+          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/erc20/ERC20Manager.sol",
           "file": "../../core/erc20/ERC20Manager.sol",
           "scope": 19810,
           "symbolAliases": [
@@ -2019,7 +2019,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38168,
+                                  "referencedDeclaration": 38074,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -2160,7 +2160,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38168,
+                                  "referencedDeclaration": 38074,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -2521,7 +2521,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 38167,
+                              "referencedDeclaration": 38073,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -2721,7 +2721,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38355,
+                                  "referencedDeclaration": 38261,
                                   "type": "contract ChronoMintCrowdsale",
                                   "value": "this"
                                 },
@@ -2964,7 +2964,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 38355,
+                              "referencedDeclaration": 38261,
                               "type": "contract ChronoMintCrowdsale",
                               "value": "this"
                             },
@@ -3716,7 +3716,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 38355,
+                                              "referencedDeclaration": 38261,
                                               "type": "contract ChronoMintCrowdsale",
                                               "value": "this"
                                             },
@@ -4498,7 +4498,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 38355,
+                                              "referencedDeclaration": 38261,
                                               "type": "contract ChronoMintCrowdsale",
                                               "value": "this"
                                             },
@@ -4750,7 +4750,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38355,
+                                  "referencedDeclaration": 38261,
                                   "type": "contract ChronoMintCrowdsale",
                                   "value": "this"
                                 },
@@ -4781,7 +4781,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38164,
+                                  "referencedDeclaration": 38070,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -4812,7 +4812,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38164,
+                                  "referencedDeclaration": 38070,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -4936,7 +4936,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38355,
+                                  "referencedDeclaration": 38261,
                                   "type": "contract ChronoMintCrowdsale",
                                   "value": "this"
                                 },
@@ -4967,7 +4967,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38164,
+                                  "referencedDeclaration": 38070,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -4998,7 +4998,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38164,
+                                  "referencedDeclaration": 38070,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -5169,7 +5169,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38355,
+                                  "referencedDeclaration": 38261,
                                   "type": "contract ChronoMintCrowdsale",
                                   "value": "this"
                                 },
@@ -5200,7 +5200,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38164,
+                                  "referencedDeclaration": 38070,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -5307,7 +5307,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 38164,
+                                          "referencedDeclaration": 38070,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -5377,7 +5377,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38168,
+                                  "referencedDeclaration": 38074,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -5484,7 +5484,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38355,
+                                  "referencedDeclaration": 38261,
                                   "type": "contract ChronoMintCrowdsale",
                                   "value": "this"
                                 },
@@ -5515,7 +5515,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38164,
+                                  "referencedDeclaration": 38070,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -5827,7 +5827,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38164,
+                                  "referencedDeclaration": 38070,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -5846,7 +5846,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 38355,
+                              "referencedDeclaration": 38261,
                               "type": "contract ChronoMintCrowdsale",
                               "value": "this"
                             },
@@ -6084,7 +6084,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 38355,
+                              "referencedDeclaration": 38261,
                               "type": "contract ChronoMintCrowdsale",
                               "value": "this"
                             },
@@ -6235,7 +6235,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 38164,
+                                      "referencedDeclaration": 38070,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -6254,7 +6254,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38355,
+                                  "referencedDeclaration": 38261,
                                   "type": "contract ChronoMintCrowdsale",
                                   "value": "this"
                                 },
@@ -6314,7 +6314,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38168,
+                                  "referencedDeclaration": 38074,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -6365,7 +6365,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 38155,
+                              "referencedDeclaration": 38061,
                               "type": "function (bool) pure",
                               "value": "assert"
                             },
@@ -6513,7 +6513,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 38355,
+                                          "referencedDeclaration": 38261,
                                           "type": "contract ChronoMintCrowdsale",
                                           "value": "this"
                                         },
@@ -6608,7 +6608,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38355,
+                                  "referencedDeclaration": 38261,
                                   "type": "contract ChronoMintCrowdsale",
                                   "value": "this"
                                 },
@@ -6639,7 +6639,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38164,
+                                  "referencedDeclaration": 38070,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -6778,7 +6778,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38355,
+                                  "referencedDeclaration": 38261,
                                   "type": "contract ChronoMintCrowdsale",
                                   "value": "this"
                                 },
@@ -6809,7 +6809,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38164,
+                                  "referencedDeclaration": 38070,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -6983,7 +6983,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 38167,
+                              "referencedDeclaration": 38073,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -7080,7 +7080,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 38167,
+                              "referencedDeclaration": 38073,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -7268,7 +7268,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38355,
+                                  "referencedDeclaration": 38261,
                                   "type": "contract ChronoMintCrowdsale",
                                   "value": "this"
                                 },
@@ -7299,7 +7299,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38164,
+                                  "referencedDeclaration": 38070,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -7595,7 +7595,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 38355,
+                              "referencedDeclaration": 38261,
                               "type": "contract ChronoMintCrowdsale",
                               "value": "this"
                             },
@@ -7742,7 +7742,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 38164,
+                                      "referencedDeclaration": 38070,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -7807,7 +7807,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38168,
+                                  "referencedDeclaration": 38074,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -7858,7 +7858,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 38155,
+                              "referencedDeclaration": 38061,
                               "type": "function (bool) pure",
                               "value": "assert"
                             },
@@ -8020,7 +8020,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 38355,
+                                          "referencedDeclaration": 38261,
                                           "type": "contract ChronoMintCrowdsale",
                                           "value": "this"
                                         },
@@ -8141,7 +8141,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38355,
+                                  "referencedDeclaration": 38261,
                                   "type": "contract ChronoMintCrowdsale",
                                   "value": "this"
                                 },
@@ -8172,7 +8172,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38164,
+                                  "referencedDeclaration": 38070,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -8399,7 +8399,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 38355,
+                              "referencedDeclaration": 38261,
                               "type": "contract ChronoMintCrowdsale",
                               "value": "this"
                             },
@@ -8537,7 +8537,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38168,
+                                  "referencedDeclaration": 38074,
                                   "type": "function () pure",
                                   "value": "revert"
                                 },
@@ -8640,7 +8640,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38355,
+                                  "referencedDeclaration": 38261,
                                   "type": "contract ChronoMintCrowdsale",
                                   "value": "this"
                                 },
@@ -9232,5 +9232,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-02-05T14:43:54.803Z"
+  "updatedAt": "2018-02-18T14:59:26.290Z"
 }

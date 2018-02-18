@@ -26,10 +26,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\nimport { PendingManagerInterface as Shareable } from \"./PendingManagerInterface.sol\";\n\n\n/**\n* @title Defines a way to support multisignature invocation integrated into smart contracts.\n* Uses a system of contracts connected by ContractsManager.\n* Partially abstract contact.\n*/\ncontract MultiSigSupporter {\n\n    /** Constants */\n\n    uint constant OK = 1;\n    uint constant MULTISIG_ADDED = 3;\n\n    /**\n    * @dev Registers and checks invocations for signature and provided multisignature support\n    * via ContractsManager and PendingManager.\n    *\n    * @return _resultCode result code of an operation. In case of successful registration of\n    * signature returns MULTISIG_ADDED until all required signatures will be gathered.\n    */\n    function multisig() internal returns (uint _resultCode) {\n        address _shareable = lookupManager(\"PendingManager\");\n\n        if (msg.sender != _shareable) {\n            bytes32 _r = keccak256(msg.data);\n            _resultCode = Shareable(_shareable).addTx(_r, msg.data, this, msg.sender);\n\n            return (_resultCode == OK) ? MULTISIG_ADDED : _resultCode;\n        }\n\n        return OK;\n    }\n\n    /**\n    * @dev Abstract. Implementation is needed in contracts that will inherit from this one.\n    */\n    function lookupManager(bytes32 _identifier) public constant returns (address);\n}\n",
-  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/pending/MultiSigSupporter.sol",
+  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/pending/MultiSigSupporter.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/pending/MultiSigSupporter.sol",
+      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/pending/MultiSigSupporter.sol",
       "exportedSymbols": {
         "MultiSigSupporter": [
           27322
@@ -52,8 +52,8 @@
       },
       {
         "attributes": {
-          "SourceUnit": 28454,
-          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/pending/PendingManagerInterface.sol",
+          "SourceUnit": 28360,
+          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/pending/PendingManagerInterface.sol",
           "file": "./PendingManagerInterface.sol",
           "scope": 27323,
           "symbolAliases": [
@@ -364,7 +364,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 38164,
+                                  "referencedDeclaration": 38070,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -457,7 +457,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 38158,
+                                      "referencedDeclaration": 38064,
                                       "type": "function () pure returns (bytes32)",
                                       "value": "keccak256"
                                     },
@@ -483,7 +483,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 38164,
+                                          "referencedDeclaration": 38070,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -573,7 +573,7 @@
                                           "isPure": false,
                                           "lValueRequested": false,
                                           "member_name": "addTx",
-                                          "referencedDeclaration": 28452,
+                                          "referencedDeclaration": 28358,
                                           "type": "function (bytes32,bytes memory,address,address) external returns (uint256)"
                                         },
                                         "children": [
@@ -603,7 +603,7 @@
                                                   "overloadedDeclarations": [
                                                     null
                                                   ],
-                                                  "referencedDeclaration": 28453,
+                                                  "referencedDeclaration": 28359,
                                                   "type": "type(contract PendingManagerInterface)",
                                                   "value": "Shareable"
                                                 },
@@ -667,7 +667,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 38164,
+                                              "referencedDeclaration": 38070,
                                               "type": "msg",
                                               "value": "msg"
                                             },
@@ -686,7 +686,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 38427,
+                                          "referencedDeclaration": 38333,
                                           "type": "contract MultiSigSupporter",
                                           "value": "this"
                                         },
@@ -712,7 +712,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 38164,
+                                              "referencedDeclaration": 38070,
                                               "type": "msg",
                                               "value": "msg"
                                             },
@@ -1005,5 +1005,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-02-05T14:43:54.870Z"
+  "updatedAt": "2018-02-18T14:59:26.377Z"
 }

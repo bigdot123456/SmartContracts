@@ -49,10 +49,10 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\nimport '../common/Object.sol';\n\ncontract Manager {\n    function isAllowed(address _actor, bytes32 _role) constant returns(bool);\n    function hasAccess(address _actor) constant returns(bool);\n}\n\ncontract Storage is Object {\n    struct Crate {\n        mapping(bytes32 => uint) uints;\n        mapping(bytes32 => address) addresses;\n        mapping(bytes32 => bool) bools;\n        mapping(bytes32 => int) ints;\n        mapping(bytes32 => bytes32) bytes32s;\n    }\n\n    mapping(bytes32 => Crate) crates;\n    Manager public manager;\n\n    modifier onlyAllowed(bytes32 _role) {\n        if (!manager.isAllowed(msg.sender, _role)) {\n            throw;\n        }\n        _;\n    }\n\n    function setManager(Manager _manager) onlyContractOwner() returns(bool) {\n        manager = _manager;\n        return true;\n    }\n\n    function setUInt(bytes32 _crate, bytes32 _key, uint _value) onlyAllowed(_crate) {\n        crates[_crate].uints[_key] = _value;\n    }\n\n    function getUInt(bytes32 _crate, bytes32 _key) constant returns(uint) {\n        return crates[_crate].uints[_key];\n    }\n\n    function setAddress(bytes32 _crate, bytes32 _key, address _value) onlyAllowed(_crate) {\n        crates[_crate].addresses[_key] = _value;\n    }\n\n    function getAddress(bytes32 _crate, bytes32 _key) constant returns(address) {\n        return crates[_crate].addresses[_key];\n    }\n\n    function setBool(bytes32 _crate, bytes32 _key, bool _value) onlyAllowed(_crate) {\n        crates[_crate].bools[_key] = _value;\n    }\n\n    function getBool(bytes32 _crate, bytes32 _key) constant returns(bool) {\n        return crates[_crate].bools[_key];\n    }\n\n    function setInt(bytes32 _crate, bytes32 _key, int _value) onlyAllowed(_crate) {\n        crates[_crate].ints[_key] = _value;\n    }\n\n    function getInt(bytes32 _crate, bytes32 _key) constant returns(int) {\n        return crates[_crate].ints[_key];\n    }\n\n    function setBytes32(bytes32 _crate, bytes32 _key, bytes32 _value) onlyAllowed(_crate) {\n        crates[_crate].bytes32s[_key] = _value;\n    }\n\n    function getBytes32(bytes32 _crate, bytes32 _key) constant returns(bytes32) {\n        return crates[_crate].bytes32s[_key];\n    }\n}\n",
-  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/storage/Storage.sol",
+  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/storage/Storage.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/storage/Storage.sol",
+      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/storage/Storage.sol",
       "exportedSymbols": {
         "Manager": [
           11338
@@ -79,7 +79,7 @@
       {
         "attributes": {
           "SourceUnit": 4931,
-          "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/common/Object.sol",
+          "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/common/Object.sol",
           "file": "../common/Object.sol",
           "scope": 11596,
           "symbolAliases": [
@@ -801,7 +801,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 38164,
+                                      "referencedDeclaration": 38070,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -3589,5 +3589,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-02-05T14:43:54.728Z"
+  "updatedAt": "2018-02-18T14:59:26.223Z"
 }
