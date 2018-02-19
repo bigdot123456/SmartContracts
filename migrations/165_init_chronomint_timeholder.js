@@ -17,6 +17,7 @@ module.exports = async (deployer, network, accounts) => {
 
         let timeHolder = await TimeHolder.deployed()
         await timeHolder.setEventsHistory(MultiEventsHistory.address)
+        await timeHolder.setContractsManager(ContractsManager.address)
 
         let contractsManager = await ContractsManager.deployed()
         await contractsManager.addContract(TimeHolder.address, "TimeHolder")
