@@ -85,7 +85,7 @@ contract PendingManager is PendingManagerEmitter, BaseManager {
     ///     "_timestamp": "list of timestamps"
     /// }
     function getTxs() public view returns (bytes32[] _hashes, uint[] _yetNeeded, uint[] _ownersDone, uint[] _timestamp) {
-        uint _txHashesCount = txHashesCount;
+        uint _txHashesCount = pendingsCount();
         if (_txHashesCount == 0) {
             return;
         }
@@ -94,8 +94,8 @@ contract PendingManager is PendingManagerEmitter, BaseManager {
         _yetNeeded = new uint[](_txHashesCount);
         _ownersDone = new uint[](_txHashesCount);
         _timestamp = new uint[](_txHashesCount);
-        for (uint _idx = 1; _idx <= _txHashesCount; ++_idx) {
-            bytes32 _hash = index2hashMapping[_idx];
+        for (uint _idx = 0; _idx < _txHashesCount; ++_idx) {
+            bytes32 _hash = index2hashMapping[_idx + 1];
             Transaction storage _tx = txBodies[_hash];
 
             _hashes[_idx] = _hash;

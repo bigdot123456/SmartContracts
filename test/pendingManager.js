@@ -53,7 +53,7 @@ contract('Pending Manager', function(accounts) {
         })
 
         it("shouldn't allow setRequired signatures 2.", async () =>  {
-            await Setup.userManager.setRequired(2)
+            await Setup.userManager.setRequired(2, { from: nonOwner })
             assert.equal(await Setup.userManager.required.call(), 0)
         })
 
@@ -94,6 +94,14 @@ contract('Pending Manager', function(accounts) {
                 assert.equal(await Setup.shareable.pendingsCount.call(), 1)
             })
 
+            it("should be able to get first pending tx details by hash", async () => {
+                const [ txData, txYetNeeded, txOwnersDone, txTimestamp ] = await Setup.shareable.getTx.call(hash1)
+                assert.isDefined(txData)
+                assert.equal(txYetNeeded, 1)
+                assert.notEqual(txOwnersDone, 0)
+                assert.notEqual(txTimestamp, 0)
+            })
+
             it("should allow other CBE to propose the same user as CBE with multisig", async () => {
                 const addCbeTx = await Setup.userManager.addCBE(tempCBE, 0x0, { from: owner })
                 const confirmationEvent = (await eventsHelper.findEvent([Setup.shareable], addCbeTx, "Confirmation"))[0]
@@ -102,6 +110,21 @@ contract('Pending Manager', function(accounts) {
                 hash2 = confirmationEvent.args.hash
                 assert.notEqual(hash2, hash1)
                 assert.equal(await Setup.shareable.pendingsCount.call(), 2)
+            })
+
+            it("should be able to get second pending tx details by hash", async () => {
+                const [ txData, txYetNeeded, txOwnersDone, txTimestamp ] = await Setup.shareable.getTx.call(hash1)
+                assert.isDefined(txData)
+                assert.equal(txYetNeeded, 1)
+                assert.notEqual(txOwnersDone, 0)
+                assert.notEqual(txTimestamp, 0)
+            })
+
+            it("should be able to get all pending tx details", async () => {
+                const [ gtxHashes, ] = await Setup.shareable.getTxs.call()
+                assert.lengthOf(gtxHashes, await Setup.shareable.pendingsCount.call())
+                assert.include(gtxHashes, hash1)
+                assert.include(gtxHashes, hash2)
             })
 
             it("should be able to successfully confirm second proposition and got `user already is cbe` for the first", async () => {
