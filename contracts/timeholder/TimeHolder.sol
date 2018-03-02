@@ -283,21 +283,16 @@ contract TimeHolder is BaseManager, TimeHolderEmitter {
     /// Only CBE members are permited to call this function.
     /// Multisig concensus is required to withdraw shares from shareholder "_from"
     /// and send it to "_to".
-    function forceWithdrawShares(address _from, address _token, uint _amount, address _to)
+    function forceWithdrawShares(address _from, address _token, uint _amount)
     public
-    onlyAuthorized
+    onlyContractOwner
     returns (uint resultCode) {
-        resultCode = multisig();
-        if (OK != resultCode) {
-            return _emitError(resultCode);
-        }
-
-        resultCode = _withdrawShares(_token, _from, _to, _amount);
+        resultCode = _withdrawShares(_token, _from, contractOwner, _amount);
         if (resultCode != OK) {
             return _emitError(resultCode);
         }
 
-        _emitWithdrawShares(_token, _from, _amount, _to);
+        _emitWithdrawShares(_token, _from, _amount, contractOwner);
     }
 
     /// @notice Provides a way to support getting additional fee for using features of the system.

@@ -1,0 +1,287 @@
+{
+  "contractName": "BaseByzantiumRouter",
+  "abi": [
+    {
+      "payable": true,
+      "stateMutability": "payable",
+      "type": "fallback"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.4.11;\n\n\n/// @title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.\ncontract BaseByzantiumRouter {\n\n    function() payable public {\n        address _backend = backend();\n\n        assembly {\n            let calldataMemoryOffset := mload(0x40)\n            mstore(0x40, add(calldataMemoryOffset, calldatasize))\n            calldatacopy(calldataMemoryOffset, 0x0, calldatasize)\n            let r := delegatecall(sub(gas, 10000), _backend, calldataMemoryOffset, calldatasize, 0, 0)\n\n            let returndataMemoryOffset := mload(0x40)\n            mstore(0x40, add(returndataMemoryOffset, returndatasize))\n            returndatacopy(returndataMemoryOffset, 0x0, returndatasize)\n\n            switch r\n            case 1 {\n                return(returndataMemoryOffset, returndatasize)\n            }\n            default {\n                revert(0, 0)\n            }\n        }\n    }\n\n    /// @notice Returns destination address for future calls\n    /// @dev abstract definition. should be implemented in sibling contracts\n    /// @return destination address\n    function backend() internal constant returns (address);\n}\n",
+  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/common/BaseByzantiumRouter.sol",
+  "ast": {
+    "attributes": {
+      "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/core/common/BaseByzantiumRouter.sol",
+      "exportedSymbols": {
+        "BaseByzantiumRouter": [
+          4386
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.4",
+            ".11"
+          ]
+        },
+        "id": 4370,
+        "name": "PragmaDirective",
+        "src": "0:24:20"
+      },
+      {
+        "attributes": {
+          "baseContracts": [
+            null
+          ],
+          "contractDependencies": [
+            null
+          ],
+          "contractKind": "contract",
+          "documentation": "@title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.",
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            4386
+          ],
+          "name": "BaseByzantiumRouter",
+          "scope": 4387
+        },
+        "children": [
+          {
+            "attributes": {
+              "constant": false,
+              "implemented": true,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "",
+              "payable": true,
+              "scope": 4386,
+              "stateMutability": "payable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 4371,
+                "name": "ParameterList",
+                "src": "190:2:20"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 4372,
+                "name": "ParameterList",
+                "src": "208:0:20"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "assignments": [
+                        4374
+                      ]
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "constant": false,
+                          "name": "_backend",
+                          "scope": 4380,
+                          "stateVariable": false,
+                          "storageLocation": "default",
+                          "type": "address",
+                          "value": null,
+                          "visibility": "internal"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "name": "address",
+                              "type": "address"
+                            },
+                            "id": 4373,
+                            "name": "ElementaryTypeName",
+                            "src": "218:7:20"
+                          }
+                        ],
+                        "id": 4374,
+                        "name": "VariableDeclaration",
+                        "src": "218:16:20"
+                      },
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            null
+                          ],
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "isStructConstructorCall": false,
+                          "lValueRequested": false,
+                          "names": [
+                            null
+                          ],
+                          "type": "address",
+                          "type_conversion": false
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": [
+                                null
+                              ],
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 4385,
+                              "type": "function () view returns (address)",
+                              "value": "backend"
+                            },
+                            "id": 4375,
+                            "name": "Identifier",
+                            "src": "237:7:20"
+                          }
+                        ],
+                        "id": 4376,
+                        "name": "FunctionCall",
+                        "src": "237:9:20"
+                      }
+                    ],
+                    "id": 4377,
+                    "name": "VariableDeclarationStatement",
+                    "src": "218:28:20"
+                  },
+                  {
+                    "attributes": {
+                      "externalReferences": [
+                        {
+                          "_backend": {
+                            "declaration": 4374,
+                            "isOffset": false,
+                            "isSlot": false,
+                            "src": "503:8:20",
+                            "valueSize": 1
+                          }
+                        }
+                      ],
+                      "operations": "{\n    let calldataMemoryOffset := mload(0x40)\n    mstore(0x40, add(calldataMemoryOffset, calldatasize))\n    calldatacopy(calldataMemoryOffset, 0x0, calldatasize)\n    let r := delegatecall(sub(gas, 10000), _backend, calldataMemoryOffset, calldatasize, 0, 0)\n    let returndataMemoryOffset := mload(0x40)\n    mstore(0x40, add(returndataMemoryOffset, returndatasize))\n    returndatacopy(returndataMemoryOffset, 0x0, returndatasize)\n    switch r\n    case 1 {\n        return(returndataMemoryOffset, returndatasize)\n    }\n    default {\n        revert(0, 0)\n    }\n}"
+                    },
+                    "children": [],
+                    "id": 4378,
+                    "name": "InlineAssembly",
+                    "src": "257:695:20"
+                  }
+                ],
+                "id": 4379,
+                "name": "Block",
+                "src": "208:744:20"
+              }
+            ],
+            "id": 4380,
+            "name": "FunctionDefinition",
+            "src": "182:770:20"
+          },
+          {
+            "attributes": {
+              "body": null,
+              "constant": true,
+              "implemented": false,
+              "isConstructor": false,
+              "modifiers": [
+                null
+              ],
+              "name": "backend",
+              "payable": false,
+              "scope": 4386,
+              "stateMutability": "view",
+              "superFunction": null,
+              "visibility": "internal"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 4381,
+                "name": "ParameterList",
+                "src": "1148:2:20"
+              },
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "",
+                      "scope": 4385,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "address",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "address",
+                          "type": "address"
+                        },
+                        "id": 4382,
+                        "name": "ElementaryTypeName",
+                        "src": "1178:7:20"
+                      }
+                    ],
+                    "id": 4383,
+                    "name": "VariableDeclaration",
+                    "src": "1178:7:20"
+                  }
+                ],
+                "id": 4384,
+                "name": "ParameterList",
+                "src": "1177:9:20"
+              }
+            ],
+            "id": 4385,
+            "name": "FunctionDefinition",
+            "src": "1132:55:20"
+          }
+        ],
+        "id": 4386,
+        "name": "ContractDefinition",
+        "src": "146:1043:20"
+      }
+    ],
+    "id": 4387,
+    "name": "SourceUnit",
+    "src": "0:1190:20"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.19+commit.c4cbbb05.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "1.0.1",
+  "updatedAt": "2018-02-18T14:59:26.120Z"
+}

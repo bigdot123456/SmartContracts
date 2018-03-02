@@ -243,6 +243,38 @@ contract('New version of TimeHolder', (accounts) => {
             assert.equal(balanceAfterWithdrawal.toNumber(), balanceAfterDeposit.toNumber() - DEPOSIT_AMOUNT)
         })
 
-        it('shouls allow to withdraw deposits in case of emergency');
+        it('should allow to withdraw deposits in case of emergency for contract owner', async () => {
+            const DEPOSIT_AMOUNT = 200;
+            let user = accounts[1];
+            let owner = accounts[0];
+
+            await timeHolder.deposit(shares.address, DEPOSIT_AMOUNT, {from: user});
+            assert.equal(await timeHolder.depositBalance(user), DEPOSIT_AMOUNT);
+
+            let walletBalance = await shares.balanceOf(await timeHolder.wallet());
+            let ownerBalance = await shares.balanceOf(owner);
+
+            assert.equal(await timeHolder.forceWithdrawShares.call(user, shares.address, DEPOSIT_AMOUNT), ErrorsEnum.OK);
+            await timeHolder.forceWithdrawShares(user, shares.address, DEPOSIT_AMOUNT);
+
+            assert.equal(await shares.balanceOf(await timeHolder.wallet()), walletBalance - DEPOSIT_AMOUNT);
+            assert.equal(await timeHolder.depositBalance(user), 0);
+            assert.equal(ownerBalance.add(DEPOSIT_AMOUNT).cmp(await shares.balanceOf(owner)), 0);
+        });
+
+        it('shouldn\'t allow to withdraw deposits in case of emergency for non-owner', async () => {
+            const DEPOSIT_AMOUNT = 200;
+            let user = accounts[1];
+
+            await timeHolder.deposit(shares.address, DEPOSIT_AMOUNT, {from: user});
+            assert.equal(await timeHolder.depositBalance(user), DEPOSIT_AMOUNT);
+            let walletBalance = await shares.balanceOf(await timeHolder.wallet());
+
+            assert.equal(await timeHolder.forceWithdrawShares.call(user, shares.address, DEPOSIT_AMOUNT, {from: accounts[2]}), ErrorsEnum.UNAUTHORIZED);
+            await timeHolder.forceWithdrawShares(user, shares.address, DEPOSIT_AMOUNT, {from: accounts[2]});
+
+            assert.equal(await timeHolder.depositBalance(user), DEPOSIT_AMOUNT);
+            assert.equal(walletBalance.cmp(await shares.balanceOf(await timeHolder.wallet())), 0);
+        });
     })
 });
