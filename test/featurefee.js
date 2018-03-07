@@ -156,7 +156,50 @@ contract("FeatureFeeManager", function(accounts) {
 
     it("should not allow to execute TokenManagementInterface#createCrowdsaleCampaign() account with deposit < feature_price")
 
-    it("should allow to execute PlatformManager#createPlatform() account with deposit > feature_price")
+    it("should allow to execute PlatformManager#createPlatform() account with deposit > feature_price",  async () => {
+        const CreatePlatformFeatureRequiredBalance = 2;
+        const CreatePlatformFeatureFee = 1;
 
-    it("should not allow to execute PlatformManager#createPlatform() account with deposit < feature_price")
+        let sig = Setup.platformsManager.contract.createPlatform.getData().slice(0, 10);
+        await featureFeeManager.setFeatureFee(Setup.platformsManager.address, sig, CreatePlatformFeatureRequiredBalance, CreatePlatformFeatureFee);
+
+        let holderBalance = await timeHolder.depositBalance.call(timeHolder1);
+        assert.isTrue(holderBalance >= CreatePlatformFeatureRequiredBalance);
+        assert.isTrue(holderBalance >= CreatePlatformFeatureFee);
+
+        let feeWalletBalance = await TIME.balanceOf(feeHolderWallet);
+
+        let result = await Setup.platformsManager.createPlatform.call({from: timeHolder1});
+        assert.equal(result, ErrorsEnum.OK);
+
+        let createExchangeTx = await Setup.platformsManager.createPlatform({from: timeHolder1});
+
+        let events = eventsHelper.extractEvents(createExchangeTx, "PlatformRequested");
+        assert.equal(events.length, 1);
+
+        assert.equal(web3.toBigNumber(holderBalance).sub(CreatePlatformFeatureFee).cmp(await timeHolder.depositBalance.call(timeHolder1)), 0);
+        assert.equal(web3.toBigNumber(feeWalletBalance).add(CreatePlatformFeatureFee).cmp(await TIME.balanceOf(feeHolderWallet)), 0);
+    })
+
+    it("should not allow to execute PlatformManager#createPlatform() account with deposit < feature_price",  async () => {
+        const CreatePlatformFeatureRequiredBalance = 2;
+        const CreatePlatformFeatureFee = 1;
+
+        let sig = Setup.platformsManager.contract.createPlatform.getData().slice(0, 10);
+        await featureFeeManager.setFeatureFee(Setup.platformsManager.address, sig, CreatePlatformFeatureRequiredBalance, CreatePlatformFeatureFee);
+
+        let holderBalance = await timeHolder.depositBalance.call(timeHolder4);
+        assert.isTrue(holderBalance < CreatePlatformFeatureRequiredBalance);
+        assert.isTrue(holderBalance < CreatePlatformFeatureFee);
+
+        let feeWalletBalance = await TIME.balanceOf(feeHolderWallet);
+
+        let result = await Setup.platformsManager.createPlatform.call({from: timeHolder4});
+        assert.equal(result, ErrorsEnum.FEATURE_IS_UNAVAILABE);
+
+        let createExchangeTx = await Setup.platformsManager.createPlatform({from: timeHolder4});
+
+        assert.equal(web3.toBigNumber(holderBalance).cmp(await timeHolder.depositBalance.call(timeHolder4)), 0);
+        assert.equal(web3.toBigNumber(feeWalletBalance).cmp(await TIME.balanceOf(feeHolderWallet)), 0);
+    })
 })

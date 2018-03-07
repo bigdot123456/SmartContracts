@@ -260,6 +260,8 @@ contract PlatformsManager is FeatureFeeAdapter, BaseManager, PlatformsManagerEmi
 
         OwnedInterface(_platform).transferContractOwnership(msg.sender);
         _emitPlatformRequested(_platform, _tokenExtension, msg.sender);
+
+        _result[0] = OK;
         return OK;
     }
 
