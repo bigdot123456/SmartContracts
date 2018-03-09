@@ -74,7 +74,7 @@ contract ChronoBankAsset is ChronoBankAssetInterface {
      * @return success.
      * @dev function is final, and must not be overridden.
      */
-    function init(ChronoBankAssetProxy _proxy) returns(bool) {
+    function init(ChronoBankAssetProxy _proxy) public returns(bool) {
         if (address(proxy) != 0x0) {
             return false;
         }
@@ -134,7 +134,7 @@ contract ChronoBankAsset is ChronoBankAssetInterface {
      * @return success.
      * @dev function is final, and must not be overridden.
      */
-    function __transferWithReference(address _to, uint _value, string _reference, address _sender) onlyProxy() returns(bool) {
+    function __transferWithReference(address _to, uint _value, string _reference, address _sender) public onlyProxy() returns(bool) {
         return _transferWithReference(_to, _value, _reference, _sender);
     }
 
@@ -163,7 +163,7 @@ contract ChronoBankAsset is ChronoBankAssetInterface {
      * @return success.
      * @dev function is final, and must not be overridden.
      */
-    function __transferFromWithReference(address _from, address _to, uint _value, string _reference, address _sender) onlyProxy() returns(bool) {
+    function __transferFromWithReference(address _from, address _to, uint _value, string _reference, address _sender) public onlyProxy() returns(bool) {
         return _transferFromWithReference(_from, _to, _value, _reference, _sender);
     }
 
@@ -193,7 +193,7 @@ contract ChronoBankAsset is ChronoBankAssetInterface {
      * @return success.
      * @dev function is final, and must not be overridden.
      */
-    function __approve(address _spender, uint _value, address _sender) onlyProxy() returns(bool) {
+    function __approve(address _spender, uint _value, address _sender) public onlyProxy() returns(bool) {
         return _approve(_spender, _value, _sender);
     }
 
