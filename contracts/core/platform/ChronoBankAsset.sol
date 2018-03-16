@@ -247,6 +247,6 @@ contract ChronoBankAsset is ChronoBankAssetInterface {
 
     function eventsHistory() public view returns (address) {
         ChronoBankPlatform platform = ChronoBankPlatform(proxy.chronoBankPlatform());
-        return platform.eventsHistory();
+        return platform.eventsHistory() != address(platform) ? platform.eventsHistory() : this;
     }
 }

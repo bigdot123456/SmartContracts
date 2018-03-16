@@ -25,7 +25,7 @@ contract('ChronoBankAsset', function(accounts) {
   var stub;
 
   before('setup others', function(done) {
-    Stub.deployed().then(function(instance) {
+    Stub.new().then(function(instance) {
     stub = instance;
     ChronoBankAsset.new().then(function(instance) {
     chronoBankAsset = instance;
@@ -1173,16 +1173,26 @@ contract('ChronoBankAsset', function(accounts) {
   });
 
   it('should be possible to pause/resume contract', async() => {
+    await chronoBankPlatform.setupEventsHistory(chronoBankPlatform.address);
+    
     const holder = accounts[1];
 
     let code = await chronoBankAsset.pause.call();
     assert.isTrue(code);
 
-    await chronoBankAsset.pause();
+    let pauseTx = await chronoBankAsset.pause();
     assert.isTrue(await chronoBankAsset.paused());
 
-    await chronoBankAsset.unpause();
+    let pauseEvent = await eventsHelper.extractEvents(pauseTx, "Paused")[0];
+    assert.isDefined(pauseEvent);
+    assert.equal(pauseEvent.args.symbol, bytes32(SYMBOL));
+
+    let unpauseTx = await chronoBankAsset.unpause();
     assert.isFalse(await chronoBankAsset.paused());
+
+    let unpauseEvent = eventsHelper.extractEvents(unpauseTx, "Unpaused")[0];
+    assert.isDefined(unpauseEvent);
+    assert.equal(unpauseEvent.args.symbol, bytes32(SYMBOL));
 
     await chronoBankAsset.unpause();
     assert.isFalse(await chronoBankAsset.paused());
@@ -1215,14 +1225,22 @@ contract('ChronoBankAsset', function(accounts) {
 
   it('should be not be possible to transfer if target address in blacklist', async() => {
     await chronoBankPlatform.setProxy(chronoBankAssetProxy.address, SYMBOL);
+    await chronoBankPlatform.setupEventsHistory(chronoBankPlatform.address);
 
     const holder = accounts[1];
     const balance = 100;
 
+
     assert.isTrue(await chronoBankAssetProxy.balanceOf(accounts[0]) > balance);
     assert.isTrue(await chronoBankAssetProxy.transfer.call(holder, balance));
 
-    await chronoBankAsset.restrict([holder]);
+    let restrictTx = await chronoBankAsset.restrict([holder]);
+
+    let restrictEvent = eventsHelper.extractEvents(restrictTx, "Restricted")[0];
+    assert.isDefined(restrictEvent);
+    assert.equal(restrictEvent.args.symbol, bytes32(SYMBOL));
+    assert.equal(restrictEvent.args.restricted, holder);
+
     assert.isFalse(await chronoBankAssetProxy.transfer.call(holder, balance));
 
     let expectedBalance = await chronoBankAssetProxy.balanceOf(holder);
@@ -1232,8 +1250,13 @@ contract('ChronoBankAsset', function(accounts) {
     let actualBalance = await chronoBankAssetProxy.balanceOf(holder);
     assert.equal(expectedBalance.valueOf(), actualBalance.valueOf());
 
-    await chronoBankAsset.unrestrict([holder]);
+    let unrestrictTx = await chronoBankAsset.unrestrict([holder]);
     assert.isTrue(await chronoBankAssetProxy.transfer.call(holder, balance));
+
+    let unrestrictEvent = eventsHelper.extractEvents(unrestrictTx, "Unrestricted")[0];
+    assert.isDefined(unrestrictEvent);
+    assert.equal(unrestrictEvent.args.symbol, bytes32(SYMBOL));
+    assert.equal(unrestrictEvent.args.unrestricted, holder);
   });
 
   it('should be not be possible to transfer if sender address in blacklist', async() => {

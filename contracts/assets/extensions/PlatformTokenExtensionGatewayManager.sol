@@ -264,9 +264,6 @@ contract PlatformTokenExtensionGatewayManager is FeatureFeeAdapter {
         }
 
         address _asset = _createAsset(getTokenFactory());
-
-        require(MultiEventsHistory(ChronoBankPlatformInterface(platform).eventsHistory()).authorize(_asset));
-
         address _token = _bindAssetWithToken(getTokenFactory(), _asset, _symbol, _name, _decimals, _tokenImageIpfsHash);
 
         _emitAssetCreated(platform, _symbol, _token, msg.sender);
@@ -332,8 +329,6 @@ contract PlatformTokenExtensionGatewayManager is FeatureFeeAdapter {
         }
 
         address _token = _bindAssetWithToken(getTokenFactory(), _deployAssetWithFee(getTokenFactory(), _feeAddress, _feePercent), _symbol, _name, _decimals, _tokenImageIpfsHash);
-
-        require(MultiEventsHistory(ChronoBankPlatformInterface(platform).eventsHistory()).authorize(_token));
 
         _emitAssetCreated(platform, _symbol, _token, msg.sender);
 
@@ -485,6 +480,7 @@ contract PlatformTokenExtensionGatewayManager is FeatureFeeAdapter {
     function _deployAssetWithFee(TokenFactoryInterface _factory, address _feeAddress, uint32 _fee) private returns (address _asset) {
         _asset = _factory.createOwnedAsset("ChronoBankAssetWithFee", this);
         FeeInterface(_asset).setupFee(_feeAddress, _fee);
+        require(MultiEventsHistory(ChronoBankPlatformInterface(platform).eventsHistory()).authorize(_asset));
         OwnedInterface(_asset).transferContractOwnership(msg.sender);
     }
 
@@ -497,6 +493,7 @@ contract PlatformTokenExtensionGatewayManager is FeatureFeeAdapter {
     */
     function _createAsset(TokenFactoryInterface _factory) private returns (address _asset) {
         _asset = _factory.createAsset("ChronoBankAsset");
+        require(MultiEventsHistory(ChronoBankPlatformInterface(platform).eventsHistory()).authorize(_asset));
     }
 
     /**
