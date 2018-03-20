@@ -42,6 +42,12 @@ networks: {
       port: 8545,
       network_id: '*', // Match any network id
       gas: 4700000
+    },
+    chronobank: {
+      network_id: 456719,
+      provider: new HDWalletProvider(getWallet(),'QWEpoi123','https://private-full-geth-node.chronobank.io'),
+      port: 8545,
+      gas: 4700000
     }
   },
   solc: {
