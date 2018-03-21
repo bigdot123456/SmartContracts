@@ -13,6 +13,8 @@ contract PollEmitter is MultiEventsHistoryAdapter {
 
     event PollEnded(address indexed self);
 
+    event PollDetailsHashUpdated(address indexed self, bytes32 hash);
+
     event Error(address indexed self, uint errorCode);
 
 
@@ -32,5 +34,9 @@ contract PollEmitter is MultiEventsHistoryAdapter {
 
     function emitPollEnded() public {
         PollEnded(_self());
+    }
+
+    function emitPollDetailsHashUpdated(bytes32 hash) public {
+        PollDetailsHashUpdated(_self(), hash);
     }
 }

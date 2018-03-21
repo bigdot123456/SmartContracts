@@ -86,12 +86,17 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
             return _resultCode;
         }
 
-        if (REINITIALIZED != _resultCode) {
+        if (store.get(sharesPercentStorage) == 0) {
             store.set(sharesPercentStorage, DEFAULT_SHARES_PERCENT);
         }
 
-        store.set(pollsFactoryStorage, _pollsFactory);
-        store.set(pollBackendStorage, _pollBackend);
+        if (store.get(pollsFactoryStorage) != _pollsFactory) {
+            store.set(pollsFactoryStorage, _pollsFactory);
+        }
+
+        if (store.get(pollBackendStorage) != _pollBackend) {
+            store.set(pollBackendStorage, _pollBackend);
+        }
 
         return OK;
     }
@@ -115,7 +120,7 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
 
         store.set(sharesPercentStorage, _percent);
 
-        _emitSharesPercentUpdated();
+        _emitSharesPercentUpdated(_percent);
         return OK;
     }
 
@@ -185,7 +190,7 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
 
         store.add(pollsStorage, _poll);
 
-        _emitPollCreated(_poll);
+        _emitPollCreated(_poll, _optionsCount, _detailsIpfsHash, _votelimit, _deadline);
         return OK;
     }
 
@@ -331,12 +336,12 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
         return _error;
     }
 
-    function _emitSharesPercentUpdated() internal {
-        VotingManagerEmitter(getEventsHistory()).emitVotingSharesPercentUpdated();
+    function _emitSharesPercentUpdated(uint _percent) internal {
+        VotingManagerEmitter(getEventsHistory()).emitVotingSharesPercentUpdated(_percent);
     }
 
-    function _emitPollCreated(address _pollAddress) internal {
-        VotingManagerEmitter(getEventsHistory()).emitPollCreated(_pollAddress);
+    function _emitPollCreated(address _pollAddress, uint _optionsCount, bytes32 _detailsIpfsHash, uint _votelimit, uint _deadline) internal {
+        VotingManagerEmitter(getEventsHistory()).emitPollCreated(_pollAddress, _optionsCount, _detailsIpfsHash, _votelimit, _deadline);
     }
     function _emitPollRemoved(address _pollAddress) internal {
         VotingManagerEmitter(getEventsHistory()).emitPollRemoved(_pollAddress);
