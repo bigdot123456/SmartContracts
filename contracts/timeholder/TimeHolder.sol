@@ -195,11 +195,13 @@ contract TimeHolder is BaseManager, TimeHolderEmitter {
     external
     onlyAuthorized
     {
-        require(store.includes(listeners, bytes32(_token), _listener));
-
         store.remove(listeners, bytes32(_token), _listener);
 
         _emitListenerRemoved(_listener, _token);
+    }
+
+    function isListener(address _token, address _listener) public view returns (bool) {
+        return store.includes(listeners, bytes32(_token), _listener);
     }
 
     /// @notice Sets fee wallet address.

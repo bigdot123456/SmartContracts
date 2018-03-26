@@ -72,13 +72,14 @@ contract('LOC Manager', function(accounts) {
     });
 
     context("with one CBE key", function(){
-        it("Platform has correct TIME proxy address.", function() {
-            return Setup.chronoBankPlatform.proxies.call(SYMBOL).then(_proxy => {
-                return Setup.erc20Manager.getTokenAddressBySymbol.call(SYMBOL).then(_token => {
-                    assert.equal(_proxy, _token);
-                })
-            })
-        })
+        // AG: deprecated
+        // it("Platform has correct TIME proxy address.", function() {
+        //     return Setup.chronoBankPlatform.proxies.call(SYMBOL).then(_proxy => {
+        //         return Setup.erc20Manager.getTokenAddressBySymbol.call(SYMBOL).then(_token => {
+        //             assert.equal(_proxy, _token);
+        //         })
+        //     })
+        // })
 
         it("Platform has correct LHT proxy address.", async () => {
             const platformAddresses = await getAllPlatformsForUser(owner)
