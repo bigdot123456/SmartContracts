@@ -35,7 +35,7 @@ module.exports = async (deployer, network) => {
 
           await timePlatform.setProxy(proxy.address, TIME_SYMBOL);
           await proxy.proposeUpgrade(asset.address);
-          await proxy.commitUpgrade();          
+          //await proxy.commitUpgrade();
 
           console.log("[MIGRATION] [" + parseInt(require("path").basename(__filename)) + "] Oroginal Time deploy: #done")
       })
