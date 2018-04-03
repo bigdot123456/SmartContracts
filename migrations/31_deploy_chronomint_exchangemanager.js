@@ -7,7 +7,7 @@ const MultiEventsHistory = artifacts.require("./MultiEventsHistory.sol");
 
 module.exports = function(deployer, network) {
     deployer.deploy(ExchangeFactory)
-      .then(() => deployer. deploy(ExchangeManager, Storage.address, 'ExchangeManager'))
+      .then(() => deployer.deploy(ExchangeManager, Storage.address, 'ExchangeManager'))
       .then(() => StorageManager.deployed())
       .then(_storageManager => _storageManager.giveAccess(ExchangeManager.address, 'ExchangeManager'))
       .then(() => ExchangeManager.deployed())
