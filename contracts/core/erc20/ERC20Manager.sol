@@ -89,7 +89,7 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
             return _emitError(ERROR_ERCMANAGER_INVALID_INVOCATION);
         }
 
-        store.add(tokenAddresses, _token);
+        _addToken(_token);
         store.set(tokenBySymbol, _symbol, _token);
         store.set(name, _token, _name);
         store.set(symbol, _token, _symbol);
@@ -150,7 +150,8 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
         }
         if(_token != _newToken) {
             Asset(_newToken).totalSupply();
-            store.set(tokenAddresses,_token,_newToken);
+            _replaceToken(_token, _newToken);
+
             if(!changed) {
                 store.set(tokenBySymbol,_symbol,_newToken);
                 store.set(symbol,_newToken,_symbol);
@@ -228,7 +229,7 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     view
     returns (address)
     {
-        return store.get(tokenAddresses, _id);
+        return _getTokenByIndex(_id);
     }
 
     /// @notice Provides a registered token's address when given the token symbol.
@@ -279,7 +280,7 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     view
     returns (uint)
     {
-        return store.count(tokenAddresses);
+        return _countTokens();
     }
 
     /// @dev Returns an array containing all token addresses.
@@ -288,7 +289,7 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     public
     view
     returns (address[]) {
-        return store.get(tokenAddresses);
+        return _getTokens();
     }
 
     /// @notice Provides details of a given tokens
@@ -354,7 +355,7 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
 
     /// @notice Tells whether a given token exists or not
     function isTokenExists(address _token) public view returns (bool) {
-        return store.includes(tokenAddresses, _token);
+        return _includesToken(_token);
     }
 
     /// @notice Tells whether a given token exists or not
@@ -390,7 +391,7 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
 
         store.set(tokenBySymbol, store.get(symbol,_token), address(0));
 
-        store.remove(tokenAddresses, _token);
+        _removeToken(_token);
         // TODO: ahiatsevich clean up url, decimals, ipfsHash, swarmHash
 
         return OK;
@@ -443,5 +444,62 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     function _emitError(uint e) private returns (uint)   {
         ERC20Manager(getEventsHistory()).emitError(e);
         return e;
+    }
+
+    function _addToken(address _token) private {
+        if (_includesToken(_token)) {
+            return;
+        }
+
+        uint _lastIdx = _countTokens() + 1;
+        store.set(tokenAddresses.innerSet.values, bytes32(_lastIdx), bytes32(_token));
+        store.set(tokenAddresses.innerSet.indexes, bytes32(_token), bytes32(_lastIdx));
+        store.set(tokenAddresses.innerSet.count, _lastIdx);
+    }
+
+    function _removeToken(address _token) private {
+        if (!_includesToken(_token)) {
+            return;
+        }
+
+        uint _lastIdx = _countTokens();
+        bytes32 _lastValue = store.get(tokenAddresses.innerSet.values, bytes32(_lastIdx));
+        uint _idx = uint(store.get(tokenAddresses.innerSet.indexes, bytes32(_token)));
+        if (_idx < _lastIdx) {
+            store.set(tokenAddresses.innerSet.indexes, _lastValue, bytes32(_idx));
+            store.set(tokenAddresses.innerSet.values, bytes32(_idx), _lastValue);
+        }
+        store.set(tokenAddresses.innerSet.indexes, bytes32(_token), bytes32(0));
+        store.set(tokenAddresses.innerSet.values, bytes32(_lastIdx), bytes32(0));
+        store.set(tokenAddresses.innerSet.count, _lastIdx - 1);
+    }
+
+    function _includesToken(address _token) private view returns (bool) {
+        return store.get(tokenAddresses.innerSet.indexes, bytes32(_token)) != 0;
+    }
+
+    function _countTokens() private view returns (uint) {
+        return store.get(tokenAddresses.innerSet.count);
+    }
+
+    function _replaceToken(address _from, address _to) private {
+        if (!_includesToken(_from)) {
+            return;
+        }
+        uint _idx = uint(store.get(tokenAddresses.innerSet.indexes, bytes32(_from)));
+        store.set(tokenAddresses.innerSet.values, bytes32(_idx), bytes32(_to));
+        store.set(tokenAddresses.innerSet.indexes, bytes32(_to), bytes32(_idx));
+        store.set(tokenAddresses.innerSet.indexes, bytes32(_from), bytes32(0));
+    }
+
+    function _getTokens() private view returns (address[] _tokens) {
+        _tokens = new address[](_countTokens());
+        for (uint _tokenIdx = 0; _tokenIdx < _tokens.length; ++_tokenIdx) {
+            _tokens[_tokenIdx] = _getTokenByIndex(_tokenIdx);
+        }
+    }
+
+    function _getTokenByIndex(uint _idx) private view returns (address) {
+        return address(store.get(tokenAddresses.innerSet.values, bytes32(_idx + 1)));
     }
 }
