@@ -290,6 +290,46 @@ contract AssetsManager is AssetsManagerInterface, TokenExtensionRegistry, BaseMa
         }
     }
 
+    function getOwnedAssetsFromPlatforms(address[] _platforms) public view returns (address[] _foundPlatforms, address[] _foundAssets) {
+        return _getOwnedAssetsFromPlatforms(_platforms, msg.sender);
+    }
+
+    function _getOwnedAssetsFromPlatforms(address[] _platforms, address _user) public view returns (address[] _associatedPlatforms, address[] _foundAssets) {
+        _associatedPlatforms = new address[](_platforms.length);
+        _foundAssets = new address[](_platforms.length);
+
+        uint _assetsPointer = 0;
+        for (uint _platformIdx = 0; _platformIdx < _platforms.length; ++_platformIdx) {
+            ChronoBankPlatformInterface _platform = ChronoBankPlatformInterface(_platforms[_platformIdx]);
+            
+            uint _assetsCount = _platform.symbolsCount();
+            for (uint _assetIdx = 0; _assetIdx < _assetsCount; ++_assetIdx) {
+                bytes32 _symbol = _platform.symbols(_assetIdx);
+                if (_platform.hasAssetRights(_user, _symbol)) {
+                    (_associatedPlatforms[_assetsPointer], _foundAssets[_assetsPointer]) = (address(_platform), _platform.proxies(_symbol));
+                    _assetsPointer += 1;
+                }
+            }
+        }
+    }
+
+    function getManagersForAsset(address _asset) public view returns (address[] _managers) {
+        ChronoBankAssetProxyInterface _assetProxy = ChronoBankAssetProxyInterface(_asset);
+        ChronoBankPlatform _platform = ChronoBankPlatform(_assetProxy.chronoBankPlatform());
+        bytes32 _symbol = _assetProxy.smbl();
+        uint _holdersCount = _platform.holdersCount();
+        _managers = new address[](_holdersCount);
+        
+        uint _managerPointer = 0;
+        for (uint _holderIdx = 1; _holderIdx <= _holdersCount; ++_holderIdx) {
+            address _holderAddress = _platform.holders(_holderIdx);
+            if (_platform.hasAssetRights(_holderAddress, _symbol)) {
+                _managers[_managerPointer] = _holderAddress;
+                _managerPointer += 1;
+            }
+        }
+    }
+
     /** Helper functions */
 
     /// @dev Binds some internal variables during token extension setup. PRIVATE

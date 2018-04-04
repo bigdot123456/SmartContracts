@@ -20,20 +20,6 @@ const reverter = new Reverter(web3)
 const timeMachine = new TimeMachine(web3)
 const utils = require('./helpers/utils');
 
-
-Array.prototype.unique = function() {
-    return this.filter(function (value, index, self) {
-        return self.indexOf(value) === index;
-    });
-}
-
-Array.prototype.removeZeros = function() {
-    return this.filter(function (value, index, self) {
-        return value != 0x0 && value != 0 && value.valueOf() != '0'
-    });
-}
-
-
 contract('Vote', function(accounts) {
     const admin = accounts[0];
     const owner = accounts[1]
