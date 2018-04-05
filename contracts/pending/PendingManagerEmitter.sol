@@ -5,11 +5,16 @@ import '../core/event/MultiEventsHistoryAdapter.sol';
 
 /// @title PendingManagerEmitter
 contract PendingManagerEmitter is MultiEventsHistoryAdapter {
+    event AddMultisigTx(address indexed self, address indexed owner, address sender, bytes32 indexed hash);
     event Confirmation(address indexed self, address indexed owner, bytes32 indexed hash);
     event Revoke(address indexed self, address indexed owner, bytes32 indexed hash);
     event Cancelled(address indexed self, bytes32 indexed hash);
     event Done(address indexed self, bytes32 indexed hash, bytes data, uint timestamp);
     event Error(address indexed self, uint errorCode);
+
+    function emitTxAdded(address _owner, address _sender, bytes32 _hash) public {
+        AddMultisigTx(_self(), _owner, _sender, _hash);
+    }
 
     function emitConfirmation(address _owner, bytes32 _hash) public {
         Confirmation(_self(), _owner, _hash);

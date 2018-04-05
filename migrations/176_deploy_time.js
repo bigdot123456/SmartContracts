@@ -21,7 +21,6 @@ module.exports = async (deployer, network) => {
 
           //await history.authorize(timePlatform.address);
           await timePlatform.setupEventsHistory(timePlatform.address);
-          console.log(await timePlatform.eventsHistory());
 
           await timePlatform.issueAsset(TIME_SYMBOL, 71011281080000, TIME_NAME, TIME_DESCRIPTION, BASE_UNIT, IS_NOT_REISSUABLE);
 

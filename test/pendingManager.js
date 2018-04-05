@@ -8,13 +8,14 @@ const MultiEventsHistory = artifacts.require('./MultiEventsHistory.sol')
 const PendingManager = artifacts.require("./PendingManager.sol")
 
 contract('Pending Manager', function(accounts) {
-    let owner = accounts[0]
-    let owner1 = accounts[1]
-    let owner2 = accounts[2]
-    let owner3 = accounts[3]
-    let owner4 = accounts[4]
-    let owner5 = accounts[5]
-    let nonOwner = accounts[6]
+    const cbeUser = accounts[0]
+    const owner = cbeUser
+    const owner1 = accounts[1]
+    const owner2 = accounts[2]
+    const owner3 = accounts[3]
+    const owner4 = accounts[4]
+    const owner5 = accounts[5]
+    const nonOwner = accounts[6]
     let conf_sign
     let conf_sign2
 
@@ -29,7 +30,7 @@ contract('Pending Manager', function(accounts) {
         }
     })
 
-    context("with one CBE key", async () => {
+    context("with one CBE key", () => {
 
         it('should receive the right ContractsManager contract address after init() call', async () => {
             assert.equal(await Setup.shareable.contractsManager.call(), Setup.contractsManager.address)
@@ -50,10 +51,13 @@ contract('Pending Manager', function(accounts) {
         it("doesn't allows non CBE key to add another CBE key.", async () =>  {
             await Setup.userManager.addCBE(owner1, 0x0, { from: owner1 })
             assert.isNotOk(await Setup.userManager.isAuthorized.call(owner1))
+            await Setup.shareable.cleanUnconfirmedTx()
         })
 
         it("shouldn't allow setRequired signatures 2.", async () =>  {
             await Setup.userManager.setRequired(2, { from: nonOwner })
+
+            await Setup.shareable.cleanUnconfirmedTx()
             assert.equal(await Setup.userManager.required.call(), 0)
         })
 
@@ -76,7 +80,7 @@ contract('Pending Manager', function(accounts) {
             assert.equal(updatedRequired, required)
         })
 
-        context("multisig for the same method with salt (required CBE == 2)", async () => {
+        context("multisig for the same method with salt (required CBE == 2)", () => {
             const tempCBE = accounts[accounts.length - 1]
             let hash1
             let hash2
@@ -154,7 +158,7 @@ contract('Pending Manager', function(accounts) {
         })
     })
 
-    context("with two CBE keys", async () => {
+    context("with two CBE keys", () => {
 
         it("shows owner as a CBE key.", async () =>  {
             assert.isOk(await Setup.chronoMint.isAuthorized.call(owner))
@@ -240,7 +244,7 @@ contract('Pending Manager', function(accounts) {
 
     })
 
-    context("with three CBE keys", async () => {
+    context("with three CBE keys", () => {
 
         it("allows 2 votes for the new key to grant authorization.", async () => {
             await glogger.makeSlice("propose pending for adding CBE, required == 3, then confirm", async (slice) => {
@@ -286,7 +290,7 @@ contract('Pending Manager', function(accounts) {
 
     })
 
-    context("with four CBE keys", async () => {
+    context("with four CBE keys", () => {
 
         it("allows 3 votes for the new key to grant authorization.", async () => {
             await glogger.makeSlice("propose pending for adding CBE, required == 4, then confirm", async (slice) => {
@@ -337,7 +341,7 @@ contract('Pending Manager', function(accounts) {
         })
     })
 
-    context("with five CBE keys", async () => {
+    context("with five CBE keys", () => {
         it("collects 4 vote to addCBE and granting auth.", async () => {
             await glogger.makeSlice("propose pending for adding CBE, required == 5, then confirm", async (slice) => {
                 let addCbeTx = await Setup.userManager.addCBE(owner5, 0x0, { from: owner2 })

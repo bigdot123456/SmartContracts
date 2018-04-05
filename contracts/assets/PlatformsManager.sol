@@ -7,6 +7,7 @@ import "../core/platform/ChronoBankAssetOwnershipManager.sol";
 import "./PlatformsManagerEmitter.sol";
 import "./AssetsManagerInterface.sol";
 import "../core/platform/ChronoBankPlatform.sol";
+import "../core/event/MultiEventsHistory.sol";
 
 
 contract PlatformsFactory {
@@ -104,14 +105,22 @@ contract PlatformsManager is FeatureFeeAdapter, BaseManager, PlatformsManagerEmi
     /// @param _platform platform address
     /// @return resultCode result code of an operation.
     /// ERROR_PLATFORMS_ATTACHING_PLATFORM_ALREADY_EXISTS possible in case the platform is already attached
-    function attachPlatform(address _platform) onlyPlatformOwner(_platform) public returns (uint resultCode) {
+    function attachPlatform(address _platform) public returns (uint resultCode) {
         if (store.includes(platforms, _platform)) {
             return _emitError(ERROR_PLATFORMS_ATTACHING_PLATFORM_ALREADY_EXISTS);
         }
 
-        store.add(platforms, _platform);
+        resultCode = multisig();
+        if (OK != resultCode) {
+            return _emitError(resultCode);
+        }
 
-        _emitPlatformAttached(_platform, msg.sender);
+        store.add(platforms, _platform);
+        MultiEventsHistory(getEventsHistory()).authorize(_platform);
+
+        _emitPlatformAttached(_platform);
+        //TODO: @ahiatsevich: emitAssetsAttached / register in ERC20Manager?
+        //TODO: @ahiatsevich: emitOwnersAttaged?
 
         return OK;
     }
@@ -126,6 +135,7 @@ contract PlatformsManager is FeatureFeeAdapter, BaseManager, PlatformsManagerEmi
         }
 
         store.remove(platforms, _platform);
+        MultiEventsHistory(getEventsHistory()).reject(_platform);
 
         _emitPlatformDetached(_platform, msg.sender);
         return OK;
@@ -176,8 +186,8 @@ contract PlatformsManager is FeatureFeeAdapter, BaseManager, PlatformsManagerEmi
         return _errorCode;
     }
 
-    function _emitPlatformAttached(address _platform, address _by) private {
-        PlatformsManagerEmitter(getEventsHistory()).emitPlatformAttached(_platform, _by);
+    function _emitPlatformAttached(address _platform) private {
+        PlatformsManagerEmitter(getEventsHistory()).emitPlatformAttached(_platform);
     }
 
     function _emitPlatformDetached(address _platform, address _by) private {

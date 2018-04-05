@@ -84,7 +84,11 @@ contract PendingManager is PendingManagerEmitter, BaseManager {
     ///     "_ownersDone": "list of bitmasks with owners who already confirmed",
     ///     "_timestamp": "list of timestamps"
     /// }
-    function getTxs() public view returns (bytes32[] _hashes, uint[] _yetNeeded, uint[] _ownersDone, uint[] _timestamp) {
+    function getTxs()
+    public
+    view
+    returns (bytes32[] _hashes, uint[] _yetNeeded, uint[] _ownersDone, uint[] _timestamp)
+    {
         uint _txHashesCount = pendingsCount();
         if (_txHashesCount == 0) {
             return;
@@ -115,7 +119,11 @@ contract PendingManager is PendingManagerEmitter, BaseManager {
     ///     "_ownersDone": bitmask with owners who already confirmed",
     ///     "_timestamp": "timestamp"
     /// }
-    function getTx(bytes32 _hash) public view returns (bytes _data, uint _yetNeeded, uint _ownersDone, uint _timestamp) {
+    function getTx(bytes32 _hash)
+    public
+    view
+    returns (bytes _data, uint _yetNeeded, uint _ownersDone, uint _timestamp)
+    {
         Transaction storage _tx = txBodies[_hash];
         (_data, _yetNeeded, _ownersDone, _timestamp) = (_tx.data, _tx.yetNeeded, _tx.ownersDone, _tx.timestamp);
     }
@@ -141,14 +149,13 @@ contract PendingManager is PendingManagerEmitter, BaseManager {
     /// @return `true` if confirmed, `false` otherwise of such transaction is not in pending queue
     function hasConfirmed(bytes32 _hash, address _owner) public view returns (bool) {
         // determine the bit to set for this owner
-        address userManager = getUserManager();
-        uint ownerIndexBit = 2 ** UserManagerInterface(userManager).getMemberId(_owner);
+        uint ownerIndexBit = 2 ** getUserManager().getMemberId(_owner);
         return (txBodies[_hash].ownersDone & ownerIndexBit) != 0;
     }
 
     /// @notice Gets an address of UserManager currenty used by this contract
-    function getUserManager() public view returns (address) {
-        return lookupManager("UserManager");
+    function getUserManager() public view returns (UserManagerInterface) {
+        return UserManagerInterface(lookupManager("UserManager"));
     }
 
     /// @notice Add a transaction that should be confirmed by authorized users and only then be performed.
@@ -161,7 +168,6 @@ contract PendingManager is PendingManagerEmitter, BaseManager {
     /// @return errorCode result code of an operation. When yetNeeded <= 1 returns OK, otherwise MULTISIG_ADDED (in case of success)
     function addTx(bytes32 _hash, bytes _data, address _to, address _sender)
     onlyTrusted()
-    onlyAuthorizedContract(_sender)
     public
     returns (uint errorCode)
     {
@@ -178,14 +184,19 @@ contract PendingManager is PendingManagerEmitter, BaseManager {
             return _emitError(ERROR_PENDING_DUPLICATE_TX);
         }
 
-        address userManager = getUserManager();
         uint _idx = txHashesCount + 1;
-        txBodies[_hash] = Transaction(UserManagerInterface(userManager).required(), 0, now, _to, _data);
+        txBodies[_hash] = Transaction(getUserManager().required(), 0, now, _to, _data);
         index2hashMapping[_idx] = _hash;
         hash2indexMapping[_hash] = _idx;
         txHashesCount = _idx;
 
-        errorCode = conf(_hash, _sender);
+        if (isAuthorized(_sender)) {
+            errorCode = conf(_hash, _sender);
+        } else {
+            _emitTxAdded(_sender, msg.sender, _hash);
+            errorCode = MULTISIG_ADDED;
+        }
+
         return _checkAndEmitError(errorCode);
     }
 
@@ -202,27 +213,40 @@ contract PendingManager is PendingManagerEmitter, BaseManager {
     /// Allowed only for authorized addresses
     /// @param _hash key of tx
     /// @return errorCode result code of an operation
-    function revoke(bytes32 _hash) external onlyAuthorized returns (uint errorCode) {
-        address userManager = getUserManager();
-        uint ownerIndexBit = 2 ** UserManagerInterface(userManager).getMemberId(msg.sender);
+    function revoke(bytes32 _hash)
+    external
+    onlyAuthorized
+    returns (uint)
+    {
         Transaction storage _tx = txBodies[_hash];
+
+        if (_tx.ownersDone == 0) {
+            return deleteTx(_hash);
+        }
+
+        UserManagerInterface userManager = getUserManager();
+        uint ownerIndexBit = 2 ** userManager.getMemberId(msg.sender);
+
         uint _ownersDone = _tx.ownersDone;
         if ((_ownersDone & ownerIndexBit) == 0) {
-            errorCode = _emitError(ERROR_PENDING_NOT_FOUND);
-            return errorCode;
+            return _emitError(ERROR_PENDING_NOT_FOUND);
         }
 
-        uint _yetNeeded = _tx.yetNeeded + 1;
-        _tx.yetNeeded = _yetNeeded;
+        _tx.yetNeeded = _tx.yetNeeded.add(1);
         _tx.ownersDone = _ownersDone.sub(ownerIndexBit);
         _emitRevoke(msg.sender, _hash);
-        if (_yetNeeded == UserManagerInterface(userManager).required()) {
-            deleteTx(_hash);
-            _emitCancelled(_hash);
+
+        // if no confirmations - delete the tx
+        // it is not safe to use yetNeeded == userManager.required()
+        // since `required` could be changed
+        if (_tx.ownersDone == 0) {
+            require(deleteTx(_hash) == OK);
         }
 
-        errorCode = OK;
+        return OK;
     }
+
+
 
     /// @notice Do not accept any Ether
     function () public payable {
@@ -252,14 +276,13 @@ contract PendingManager is PendingManagerEmitter, BaseManager {
             revert(); // ERROR_PENDING_CANNOT_CONFIRM
         }
 
-        deleteTx(_hash);
+        require(deleteTx(_hash) == OK);
         return OK;
     }
 
     function confirmAndCheck(bytes32 _hash, address _sender) internal onlyAuthorizedContract(_sender) returns (uint) {
         // determine the bit to set for this owner
-        address userManager = getUserManager();
-        uint ownerIndexBit = 2 ** UserManagerInterface(userManager).getMemberId(_sender);
+        uint ownerIndexBit = 2 ** getUserManager().getMemberId(_sender);
         // make sure we (the message sender) haven't confirmed this operation previously
         Transaction storage _tx = txBodies[_hash];
         uint _ownersDone = _tx.ownersDone;
@@ -283,7 +306,7 @@ contract PendingManager is PendingManagerEmitter, BaseManager {
         }
     }
 
-    function deleteTx(bytes32 _hash) internal {
+    function deleteTx(bytes32 _hash) internal returns (uint) {
         uint _idx = hash2indexMapping[_hash];
         uint _lastHashIdx = txHashesCount;
         bytes32 _lastHash = index2hashMapping[_lastHashIdx];
@@ -300,6 +323,14 @@ contract PendingManager is PendingManagerEmitter, BaseManager {
 
         delete txBodies[_hash];
         txHashesCount = _lastHashIdx.sub(1);
+
+        _emitCancelled(_hash);
+
+        return OK;
+    }
+
+    function _emitTxAdded(address owner, address sender, bytes32 hash) internal {
+        PendingManager(getEventsHistory()).emitTxAdded(owner, sender, hash);
     }
 
     function _emitConfirmation(address owner, bytes32 hash) internal {

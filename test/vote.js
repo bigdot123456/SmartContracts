@@ -28,6 +28,7 @@ contract('Vote', function(accounts) {
     const SYMBOL = 'TIME'
     const totalTimeTokens = 100000000
     const timeTokensBalance = 50
+    const ACTIVE_POLLS_MAX = 20
 
     let timeTokensToWithdraw75Balance = 75
     let timeTokensToWithdraw45Balance = 45
@@ -57,7 +58,13 @@ contract('Vote', function(accounts) {
             try {
                 await poll.activatePoll({ from: admin })
             } catch (e) {
-                console.log(e);
+                const numberOfActivePolls = (await votingManager.getActivePollsCount.call()).toNumber()
+                if (numberOfActivePolls == ACTIVE_POLLS_MAX) {
+                    utils.ensureException(e)
+                }
+                else {
+                    throw e
+                }
             }
 
             polls.push(poll)
@@ -135,7 +142,6 @@ contract('Vote', function(accounts) {
         context("single voter (owner)", function () {
 
             it("should be able to create poll", async () => {
-                console.log(await Setup.timeHolder.depositBalance.call(owner, { from: owner }));
                 voteLimit = await votingManager.getVoteLimit.call()
                 assert.notEqual(voteLimit.toNumber(), 0)
                 let currentTime = await clock.time.call()

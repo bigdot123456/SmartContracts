@@ -39,20 +39,24 @@ contract('User Manager', function(accounts) {
       });
     });
 
-    it("doesn't allows non CBE key to add another CBE key.", function() {
-      return Setup.userManager.addCBE(owner1,0x0,{from:owner1}).then(function() {
-        return Setup.userManager.isAuthorized.call(owner1).then(function(r){
-          assert.isNotOk(r);
-        });
-      });
+    it("doesn't allows non CBE key to add another CBE key.", async () => {
+        assert.equal(await Setup.shareable.pendingsCount(), 0);
+
+        let tx = await Setup.userManager.addCBE(owner1, 0x0, {from:owner1});
+        assert.isFalse(await Setup.userManager.isAuthorized.call(owner1));
+
+        assert.equal(await Setup.shareable.pendingsCount(), 1);
+
+        const event = (await eventsHelper.findEvent([Setup.shareable], tx, "AddMultisigTx"))[0]
+        assert.isDefined(event);
+
+        await Setup.shareable.revoke(event.args.hash);
+        assert.equal(await Setup.shareable.pendingsCount(), 0);
     });
 
-    it("shouldn't allow setRequired signatures 2.", function() {
-      return Setup.userManager.setRequired(2).then(function() {
-        return Setup.userManager.required.call({from: owner}).then(function(r) {
-          assert.equal(r, 0);
-        });
-      });
+    it("shouldn't allow setRequired signatures 2.", async () => {
+        await Setup.userManager.setRequired(2);
+        assert.equal(await Setup.userManager.required.call({from: owner}), 0);
     });
 
     it("allows one CBE key to add another CBE key.", function() {
@@ -93,10 +97,8 @@ contract('User Manager', function(accounts) {
       });
     });
 
-    it("pending operation counter should be 0", function() {
-      return Setup.shareable.pendingsCount.call({from: owner}).then(function(r) {
-        assert.equal(r, 0);
-      });
+    it("pending operation counter should be 0", async () => {
+      assert.equal(await Setup.shareable.pendingsCount.call({from: owner}), 0);
     });
 
     it("allows to propose pending operation", function() {

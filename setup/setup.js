@@ -158,6 +158,16 @@ var setup = function (callback) {
       //crowdsaleManager
     ] = instances
   }).then(() => {
+    shareable.cleanUnconfirmedTx = async (from = accounts[0]) => {
+      let [ hashes,, ownersDone, ] = await shareable.getTxs();
+      // console.log(`### from CBE ${from} hashes ${JSON.stringify(hashes)}; ownersDone ${JSON.stringify(ownersDone)}`);
+      for (var _hashIdx = 0; _hashIdx < hashes.length; _hashIdx++) {   
+          if (ownersDone[_hashIdx].toNumber() === 0) {
+            await shareable.revoke(hashes[_hashIdx], { from: from, });
+          }
+      }
+    }
+
     module.exports.storage = storage
     module.exports.accounts = accounts
     module.exports.assetsManager = assetsManager
