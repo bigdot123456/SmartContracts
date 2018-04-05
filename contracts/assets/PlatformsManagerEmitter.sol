@@ -1,50 +1,44 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.21;
 
-import '../core/event/MultiEventsHistoryAdapter.sol';
 
-/**
-* @title Emitter with support of events history for PlatformsManager
-*/
+import "../core/event/MultiEventsHistoryAdapter.sol";
+
+
+/// @title Emitter with support of events history for PlatformsManager
+///
+/// Contains all the original event emitting function definitions and events.
+/// In case of new events needed later, additional emitters can be developed.
+/// All the functions is meant to be called using delegatecall.
 contract PlatformsManagerEmitter is MultiEventsHistoryAdapter {
 
-    /**
-    * @dev Event for attaching a platform to the system
-    */
+    /// @dev Event for attaching a platform to the system
     event PlatformAttached(address indexed self, address platform, address indexed by);
 
-    /**
-    * @dev Event for detaching a platform from the system
-    */
+    /// @dev Event for detaching a platform from the system
     event PlatformDetached(address indexed self, address platform, address indexed by);
 
-    /**
-    * @dev Event for creating a platform
-    */
+    /// @dev Event for creating a platform
     event PlatformRequested(address indexed self, address platform, address tokenExtension, address indexed by);
 
-    /**
-    * @dev Event for errors
-    */
+    /// @dev Event for errors
     event Error(address indexed self, uint errorCode);
 
 
-    /**
-    * Emitting events
-    */
+    /* Emitting events */
 
     function emitPlatformAttached(address _platform, address _by) public {
-        PlatformAttached(_self(), _platform, _by);
+        emit PlatformAttached(_self(), _platform, _by);
     }
 
     function emitPlatformDetached( address _platform, address _by) public {
-        PlatformDetached(_self(), _platform, _by);
+        emit PlatformDetached(_self(), _platform, _by);
     }
 
     function emitPlatformRequested( address _platform, address _tokenExtension, address _by) public {
-        PlatformRequested(_self(), _platform, _tokenExtension, _by);
+        emit PlatformRequested(_self(), _platform, _tokenExtension, _by);
     }
 
     function emitError(uint _errorCode) public {
-        Error(_self(), _errorCode);
+        emit Error(_self(), _errorCode);
     }
 }

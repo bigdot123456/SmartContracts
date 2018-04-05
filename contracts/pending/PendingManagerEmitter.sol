@@ -1,10 +1,12 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.21;
 
-import '../core/event/MultiEventsHistoryAdapter.sol';
+
+import "../core/event/MultiEventsHistoryAdapter.sol";
 
 
 /// @title PendingManagerEmitter
 contract PendingManagerEmitter is MultiEventsHistoryAdapter {
+    
     event AddMultisigTx(address indexed self, address indexed owner, address sender, bytes32 indexed hash);
     event Confirmation(address indexed self, address indexed owner, bytes32 indexed hash);
     event Revoke(address indexed self, address indexed owner, bytes32 indexed hash);
@@ -13,26 +15,26 @@ contract PendingManagerEmitter is MultiEventsHistoryAdapter {
     event Error(address indexed self, uint errorCode);
 
     function emitTxAdded(address _owner, address _sender, bytes32 _hash) public {
-        AddMultisigTx(_self(), _owner, _sender, _hash);
+        emit AddMultisigTx(_self(), _owner, _sender, _hash);
     }
 
     function emitConfirmation(address _owner, bytes32 _hash) public {
-        Confirmation(_self(), _owner, _hash);
+        emit Confirmation(_self(), _owner, _hash);
     }
 
     function emitRevoke(address _owner, bytes32 _hash) public {
-        Revoke(_self(), _owner, _hash);
+        emit Revoke(_self(), _owner, _hash);
     }
 
     function emitCancelled(bytes32 _hash) public {
-        Cancelled(_self(), _hash);
+        emit Cancelled(_self(), _hash);
     }
 
     function emitDone(bytes32 _hash, bytes _data, uint _timestamp) public {
-        Done(_self(), _hash, _data, _timestamp);
+        emit Done(_self(), _hash, _data, _timestamp);
     }
 
     function emitError(uint _errorCode) public {
-        Error(_self(), _errorCode);
+        emit Error(_self(), _errorCode);
     }
 }

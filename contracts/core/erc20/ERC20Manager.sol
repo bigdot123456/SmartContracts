@@ -1,5 +1,6 @@
 pragma solidity ^0.4.21;
 
+
 import "../common/BaseManager.sol";
 import "../event/MultiEventsHistory.sol";
 import {ERC20Interface as Asset} from "./ERC20Interface.sol";
@@ -10,6 +11,7 @@ import "../storage/SetStorageInterface_v_1_1.sol";
 contract ERC20TokenVerifier {
     function verify(address token) public view returns (bool);
 }
+
 
 /// @title ERC20Manager
 ///
@@ -48,14 +50,14 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     }
 
     /// @notice Init the contract
-    function init(address _contractsManager) public onlyContractOwner returns (uint) {
+    function init(address _contractsManager) onlyContractOwner public returns (uint) {
         BaseManager.init(_contractsManager, "ERC20Manager");
 
         return OK;
     }
 
     /// @notice Set ERC20 token verifier
-    function setTokenVerifier(address _tokenVerifier) public onlyContractOwner {
+    function setTokenVerifier(address _tokenVerifier) onlyContractOwner public {
         store.set(tokenVerifier, _tokenVerifier);
     }
 
@@ -67,7 +69,7 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     /// @param _decimals Number of decimals, divisibility of new token.
     /// @param _ipfsHash IPFS hash of token icon.
     /// @param _swarmHash Swarm hash of token icon.
-    function addToken(
+    function addToken( 
         address _token,
         bytes32 _name,
         bytes32 _symbol,
@@ -121,8 +123,8 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
         uint8 _decimals,
         bytes32 _ipfsHash,
         bytes32 _swarmHash)
-    public
     onlyAuthorized
+    public
     returns (uint)
     {
         if (!isTokenExists(_token)) {
@@ -204,8 +206,8 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     /// @notice Allows CBE to remove an existing token from the registry.
     /// @param _token Address of existing token.
     function removeTokenByAddress(address _token)
-    public
     onlyAuthorized
+    public
     returns (uint)
     {
         if (!isTokenExists(_token)) {
@@ -218,8 +220,8 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     /// @notice Allows CBE to remove an existing token from the registry.
     /// @param _symbol Symbol of existing token.
     function removeTokenBySymbol(bytes32 _symbol)
-    public
     onlyAuthorized
+    public
     returns (uint)
     {
         if (!isTokenSymbolExists(_symbol)) {
@@ -231,7 +233,7 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
 
     /// @notice Returns token's address by given id
     function getAddressById(uint _id)
-    public
+    public 
     view
     returns (address)
     {
@@ -289,7 +291,7 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
         return SetStorageInterface_v_1_1.count(store, tokenAddresses);
     }
 
-    /// @dev Returns an array containing all token addresses.
+    /// @notice Returns an array containing all token addresses.
     /// @return Array of token addresses.
     function getTokenAddresses()
     public

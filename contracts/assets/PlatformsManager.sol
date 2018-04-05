@@ -1,4 +1,5 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.21;
+
 
 import "../core/common/BaseManager.sol";
 import "../timeholder/FeatureFeeAdapter.sol";
@@ -78,7 +79,7 @@ contract PlatformsManager is FeatureFeeAdapter, BaseManager, PlatformsManagerEmi
         return store.includes(platforms, _platform);
     }
 
-    /// @notice Returns number of registered platforms
+    /// @notice Returns a number of registered platforms
     function getPlatformsCount() public view returns (uint) {
         return store.count(platforms);
     }

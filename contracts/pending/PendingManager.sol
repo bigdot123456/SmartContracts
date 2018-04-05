@@ -1,10 +1,12 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.21;
+
 
 import "../core/user/UserManagerInterface.sol";
 import "../core/common/BaseManager.sol";
 import "../core/lib/SafeMath.sol";
 import "./PendingManagerEmitter.sol";
-import '../core/event/MultiEventsHistory.sol';
+import "../core/event/MultiEventsHistory.sol";
+
 
 /// @title PendingManager
 ///
@@ -355,7 +357,7 @@ contract PendingManager is PendingManagerEmitter, BaseManager {
         return error;
     }
 
-    function _checkAndEmitError(uint error) internal returns (uint)  {
+    function _checkAndEmitError(uint error) internal returns (uint) {
         if (error != OK && error != MULTISIG_ADDED) {
             return _emitError(error);
         }

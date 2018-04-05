@@ -1,4 +1,5 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.21;
+
 
 import "../core/common/BaseManager.sol";
 import "../core/common/Once.sol";

@@ -1,8 +1,16 @@
 pragma solidity ^0.4.21;
 
-import '../event/MultiEventsHistoryAdapter.sol';
 
+import "../event/MultiEventsHistoryAdapter.sol";
+
+
+/// @title ERC20 Manager emitter contract
+///
+/// Contains all the original event emitting function definitions and events.
+/// In case of new events needed later, additional emitters can be developed.
+/// All the functions is meant to be called using delegatecall.
 contract ERC20ManagerEmitter is MultiEventsHistoryAdapter {
+    
     event LogAddToken (
         address indexed self,
         address token,

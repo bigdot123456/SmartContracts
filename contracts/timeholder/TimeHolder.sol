@@ -1,4 +1,5 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.21;
+
 
 import "./TimeHolderEmitter.sol";
 import "../core/common/BaseManager.sol";
@@ -26,12 +27,17 @@ contract TimeHolder is BaseManager, TimeHolderEmitter {
 
     /** Storage keys */
 
+    /// @dev Contains addresses of tokens that are used as shares
     StorageInterface.AddressesSet sharesTokenStorage;
+    /// @dev Mapping of (token address => limit value) for storing deposit limits
     StorageInterface.AddressUIntMapping limitsStorage;
-
+    /// @dev Mapping of (token address => list of listeners) for holding list of listeners for each share token
     StorageInterface.AddressOrderedSetMapping listeners;
+    /// @dev Address of TimeHolder wallet
     StorageInterface.Address walletStorage;
+    /// @dev Address of fee destination
     StorageInterface.Address feeWalletStorage;
+    /// @dev Address of ERC20DepositStorage contract
     StorageInterface.Address erc20DepositStorage;
 
     /// @dev Guards invokations only for FeatureManager
@@ -113,17 +119,6 @@ contract TimeHolder is BaseManager, TimeHolderEmitter {
     returns (uint _balance)
     {
         return getDepositStorage().depositBalance(_token, _depositor);
-    }
-
-    /// @dev Gets pair of depositStorage and default token set up for a deposits
-    ///
-    /// @return {
-    ///     "_depositStorage": "deposit storage contract",
-    ///     "_token": "default shares contract",
-    /// }
-    function getDepositStorage() private view returns (ERC20DepositStorage _depositStorage) {
-        _depositStorage = ERC20DepositStorage(store.get(erc20DepositStorage));
-
     }
 
     /// @notice Adds ERC20-compatible token symbols and put them in the whitelist to be used then as
@@ -424,6 +419,16 @@ contract TimeHolder is BaseManager, TimeHolderEmitter {
 
     function lookupERC20Service() internal view returns (ERC20Service) {
         return ERC20Service(lookupManager("ERC20Manager"));
+    }
+
+    /// @dev Gets pair of depositStorage and default token set up for a deposits
+    ///
+    /// @return {
+    ///     "_depositStorage": "deposit storage contract",
+    ///     "_token": "default shares contract",
+    /// }
+    function getDepositStorage() private view returns (ERC20DepositStorage _depositStorage) {
+        _depositStorage = ERC20DepositStorage(store.get(erc20DepositStorage));
     }
 
     /** Event emitting */
