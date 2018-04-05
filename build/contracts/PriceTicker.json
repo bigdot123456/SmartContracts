@@ -2,7 +2,7 @@
   "contractName": "PriceTicker",
   "abi": [
     {
-      "constant": false,
+      "constant": true,
       "inputs": [
         {
           "name": "fsym",
@@ -13,19 +13,38 @@
           "type": "bytes32"
         }
       ],
-      "name": "requestPrice",
+      "name": "price",
       "outputs": [
-        {
-          "name": "",
-          "type": "bytes32"
-        },
         {
           "name": "",
           "type": "uint256"
         }
       ],
-      "payable": true,
-      "stateMutability": "payable",
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "fsym",
+          "type": "bytes32"
+        },
+        {
+          "name": "tsym",
+          "type": "bytes32"
+        }
+      ],
+      "name": "isPriceAvailable",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -66,7 +85,7 @@
       "type": "event"
     },
     {
-      "constant": true,
+      "constant": false,
       "inputs": [
         {
           "name": "fsym",
@@ -77,38 +96,19 @@
           "type": "bytes32"
         }
       ],
-      "name": "isPriceAvailable",
+      "name": "requestPrice",
       "outputs": [
         {
           "name": "",
-          "type": "bool"
-        }
-      ],
-      "payable": false,
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "constant": true,
-      "inputs": [
-        {
-          "name": "fsym",
           "type": "bytes32"
         },
-        {
-          "name": "tsym",
-          "type": "bytes32"
-        }
-      ],
-      "name": "price",
-      "outputs": [
         {
           "name": "",
           "type": "uint256"
         }
       ],
-      "payable": false,
-      "stateMutability": "view",
+      "payable": true,
+      "stateMutability": "payable",
       "type": "function"
     }
   ],
@@ -117,22 +117,22 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\n/**\n*  PriceFetcher Interface. Defines how a price could be fetched\n*/\ncontract PriceProvider {\n    uint constant OK = 1;\n\n    event ExchangePriceUpdated(address initiator, bytes32 indexed fsym, bytes32 indexed tsym, uint indexed updateTime, uint exchangePrice, uint rateDecimals);\n\n    /**\n    *  Check if the price of a `fsym` currency against 'tsym' currency is availbale.\n    *\n    *  @dev Note:\n    *      1. must return `true` for equivalent symbols;\n    *      2. `Ether` and `ETH` are equivalent.\n    *\n    *  @param fsym From Symbol\n    *  @param tsym To Symbol\n    *\n    *  @return true if the price is an available.\n    */\n    function isPriceAvailable(bytes32 fsym, bytes32 tsym) public view returns (bool);\n\n    /**\n    *  Get the price of a `fsym` currency against 'tsym' currency.\n    *  Will throw if price is an unavailable;\n    *\n    *  @dev Note:\n    *        1. must return 1 ** 18 if `fsym` equivalent for `tsym`,\n    *           since price is always availbale to the same currency symbols;\n    *        2. `Ether` and `ETH` are equivalent.\n    *\n    *  @param fsym From Symbol\n    *  @param tsym To Symbol\n    *\n    *  @return a price (its decimals == 18)\n    */\n    function price(bytes32 fsym, bytes32 tsym) public view returns (uint);\n}\n\n\n/**\n*  PriceTicker Interface.\n*/\ncontract PriceTicker is PriceProvider {\n    uint constant PRICE_TICKER_OK_UPDATING = 24002;\n    uint constant PRICE_TICKER_INSUFFICIENT_BALANCE = 24003;\n    uint constant PRICE_TICKER_INVALID_INVOCATION = 24004;\n\n    /**\n    *  Request asynchronously the price of a `fsym` currency against 'tsym' currency.\n    *\n    *  Note:\n    *      1. Caller must implement PriceTickerCallback.\n    *      2. Result will be returned via callback `receivePrice`.\n    *      3. ETH symbol is used for getting price for Ether.\n    *\n    *  Since price of equivalent symbols is always 1, do not use async method\n    *  for getting price of equivalent symbols.\n    *\n    *  @param fsym From Symbol\n    *  @param tsym To Symbol\n    *\n    *  @return oraclize query id\n    */\n    function requestPrice(bytes32 fsym, bytes32 tsym) public payable returns (bytes32, uint);\n}\n",
-  "sourcePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/priceticker/PriceTicker.sol",
+  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/priceticker/PriceTicker.sol",
   "ast": {
-    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/priceticker/PriceTicker.sol",
+    "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/priceticker/PriceTicker.sol",
     "exportedSymbols": {
       "PriceProvider": [
-        30537
+        31524
       ],
       "PriceTicker": [
-        30560
+        31547
       ]
     },
-    "id": 30561,
+    "id": 31548,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 30501,
+        "id": 31488,
         "literals": [
           "solidity",
           "^",
@@ -140,7 +140,7 @@
           ".11"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:100"
+        "src": "0:24:101"
       },
       {
         "baseContracts": [],
@@ -148,20 +148,20 @@
         "contractKind": "contract",
         "documentation": " PriceFetcher Interface. Defines how a price could be fetched",
         "fullyImplemented": false,
-        "id": 30537,
+        "id": 31524,
         "linearizedBaseContracts": [
-          30537
+          31524
         ],
         "name": "PriceProvider",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 30504,
+            "id": 31491,
             "name": "OK",
             "nodeType": "VariableDeclaration",
-            "scope": 30537,
-            "src": "126:20:100",
+            "scope": 31524,
+            "src": "126:20:101",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -169,10 +169,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 30502,
+              "id": 31489,
               "name": "uint",
               "nodeType": "ElementaryTypeName",
-              "src": "126:4:100",
+              "src": "126:4:101",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -181,14 +181,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "31",
-              "id": 30503,
+              "id": 31490,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "145:1:100",
+              "src": "145:1:101",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_1_by_1",
@@ -200,21 +200,22 @@
           },
           {
             "anonymous": false,
-            "id": 30518,
+            "documentation": null,
+            "id": 31505,
             "name": "ExchangePriceUpdated",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 30517,
+              "id": 31504,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30506,
+                  "id": 31493,
                   "indexed": false,
                   "name": "initiator",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30518,
-                  "src": "180:17:100",
+                  "scope": 31505,
+                  "src": "180:17:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -222,10 +223,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 30505,
+                    "id": 31492,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "180:7:100",
+                    "src": "180:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -236,12 +237,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 30508,
+                  "id": 31495,
                   "indexed": true,
                   "name": "fsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30518,
-                  "src": "199:20:100",
+                  "scope": 31505,
+                  "src": "199:20:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -249,10 +250,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30507,
+                    "id": 31494,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "199:7:100",
+                    "src": "199:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -263,12 +264,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 30510,
+                  "id": 31497,
                   "indexed": true,
                   "name": "tsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30518,
-                  "src": "221:20:100",
+                  "scope": 31505,
+                  "src": "221:20:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -276,10 +277,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30509,
+                    "id": 31496,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "221:7:100",
+                    "src": "221:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -290,12 +291,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 30512,
+                  "id": 31499,
                   "indexed": true,
                   "name": "updateTime",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30518,
-                  "src": "243:23:100",
+                  "scope": 31505,
+                  "src": "243:23:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -303,10 +304,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 30511,
+                    "id": 31498,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "243:4:100",
+                    "src": "243:4:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -317,12 +318,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 30514,
+                  "id": 31501,
                   "indexed": false,
                   "name": "exchangePrice",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30518,
-                  "src": "268:18:100",
+                  "scope": 31505,
+                  "src": "268:18:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -330,10 +331,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 30513,
+                    "id": 31500,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "268:4:100",
+                    "src": "268:4:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -344,12 +345,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 30516,
+                  "id": 31503,
                   "indexed": false,
                   "name": "rateDecimals",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30518,
-                  "src": "288:17:100",
+                  "scope": 31505,
+                  "src": "288:17:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -357,10 +358,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 30515,
+                    "id": 31502,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "288:4:100",
+                    "src": "288:4:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -370,13 +371,14 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "179:127:100"
+              "src": "179:127:101"
             },
-            "src": "153:154:100"
+            "src": "153:154:101"
           },
           {
             "body": null,
-            "id": 30527,
+            "documentation": " Check if the price of a `fsym` currency against 'tsym' currency is availbale.\n    *  @dev Note:\n     1. must return `true` for equivalent symbols;\n     2. `Ether` and `ETH` are equivalent.\n    *  @param fsym From Symbol\n @param tsym To Symbol\n    *  @return true if the price is an available.",
+            "id": 31514,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -384,16 +386,16 @@
             "name": "isPriceAvailable",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 30523,
+              "id": 31510,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30520,
+                  "id": 31507,
                   "name": "fsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30527,
-                  "src": "690:12:100",
+                  "scope": 31514,
+                  "src": "690:12:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -401,10 +403,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30519,
+                    "id": 31506,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "690:7:100",
+                    "src": "690:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -415,11 +417,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 30522,
+                  "id": 31509,
                   "name": "tsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30527,
-                  "src": "704:12:100",
+                  "scope": 31514,
+                  "src": "704:12:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -427,10 +429,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30521,
+                    "id": 31508,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "704:7:100",
+                    "src": "704:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -440,20 +442,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "689:28:100"
+              "src": "689:28:101"
             },
             "payable": false,
             "returnParameters": {
-              "id": 30526,
+              "id": 31513,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30525,
+                  "id": 31512,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30527,
-                  "src": "739:4:100",
+                  "scope": 31514,
+                  "src": "739:4:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -461,10 +463,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 30524,
+                    "id": 31511,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "739:4:100",
+                    "src": "739:4:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -474,17 +476,18 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "738:6:100"
+              "src": "738:6:101"
             },
-            "scope": 30537,
-            "src": "664:81:100",
+            "scope": 31524,
+            "src": "664:81:101",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": null,
-            "id": 30536,
+            "documentation": " Get the price of a `fsym` currency against 'tsym' currency.\n Will throw if price is an unavailable;\n    *  @dev Note:\n       1. must return 1 ** 18 if `fsym` equivalent for `tsym`,\n          since price is always availbale to the same currency symbols;\n       2. `Ether` and `ETH` are equivalent.\n    *  @param fsym From Symbol\n @param tsym To Symbol\n    *  @return a price (its decimals == 18)",
+            "id": 31523,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -492,16 +495,16 @@
             "name": "price",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 30532,
+              "id": 31519,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30529,
+                  "id": 31516,
                   "name": "fsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30536,
-                  "src": "1231:12:100",
+                  "scope": 31523,
+                  "src": "1231:12:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -509,10 +512,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30528,
+                    "id": 31515,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1231:7:100",
+                    "src": "1231:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -523,11 +526,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 30531,
+                  "id": 31518,
                   "name": "tsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30536,
-                  "src": "1245:12:100",
+                  "scope": 31523,
+                  "src": "1245:12:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -535,10 +538,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30530,
+                    "id": 31517,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1245:7:100",
+                    "src": "1245:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -548,20 +551,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1230:28:100"
+              "src": "1230:28:101"
             },
             "payable": false,
             "returnParameters": {
-              "id": 30535,
+              "id": 31522,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30534,
+                  "id": 31521,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30536,
-                  "src": "1280:4:100",
+                  "scope": 31523,
+                  "src": "1280:4:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -569,10 +572,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 30533,
+                    "id": 31520,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1280:4:100",
+                    "src": "1280:4:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -582,17 +585,17 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1279:6:100"
+              "src": "1279:6:101"
             },
-            "scope": 30537,
-            "src": "1216:70:100",
+            "scope": 31524,
+            "src": "1216:70:101",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 30561,
-        "src": "97:1191:100"
+        "scope": 31548,
+        "src": "97:1191:101"
       },
       {
         "baseContracts": [
@@ -600,42 +603,42 @@
             "arguments": [],
             "baseName": {
               "contractScope": null,
-              "id": 30538,
+              "id": 31525,
               "name": "PriceProvider",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 30537,
-              "src": "1348:13:100",
+              "referencedDeclaration": 31524,
+              "src": "1348:13:101",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_PriceProvider_$30537",
+                "typeIdentifier": "t_contract$_PriceProvider_$31524",
                 "typeString": "contract PriceProvider"
               }
             },
-            "id": 30539,
+            "id": 31526,
             "nodeType": "InheritanceSpecifier",
-            "src": "1348:13:100"
+            "src": "1348:13:101"
           }
         ],
         "contractDependencies": [
-          30537
+          31524
         ],
         "contractKind": "contract",
         "documentation": " PriceTicker Interface.",
         "fullyImplemented": false,
-        "id": 30560,
+        "id": 31547,
         "linearizedBaseContracts": [
-          30560,
-          30537
+          31547,
+          31524
         ],
         "name": "PriceTicker",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 30542,
+            "id": 31529,
             "name": "PRICE_TICKER_OK_UPDATING",
             "nodeType": "VariableDeclaration",
-            "scope": 30560,
-            "src": "1368:46:100",
+            "scope": 31547,
+            "src": "1368:46:101",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -643,10 +646,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 30540,
+              "id": 31527,
               "name": "uint",
               "nodeType": "ElementaryTypeName",
-              "src": "1368:4:100",
+              "src": "1368:4:101",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -655,14 +658,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3234303032",
-              "id": 30541,
+              "id": 31528,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "1409:5:100",
+              "src": "1409:5:101",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_24002_by_1",
@@ -674,11 +677,11 @@
           },
           {
             "constant": true,
-            "id": 30545,
+            "id": 31532,
             "name": "PRICE_TICKER_INSUFFICIENT_BALANCE",
             "nodeType": "VariableDeclaration",
-            "scope": 30560,
-            "src": "1420:55:100",
+            "scope": 31547,
+            "src": "1420:55:101",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -686,10 +689,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 30543,
+              "id": 31530,
               "name": "uint",
               "nodeType": "ElementaryTypeName",
-              "src": "1420:4:100",
+              "src": "1420:4:101",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -698,14 +701,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3234303033",
-              "id": 30544,
+              "id": 31531,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "1470:5:100",
+              "src": "1470:5:101",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_24003_by_1",
@@ -717,11 +720,11 @@
           },
           {
             "constant": true,
-            "id": 30548,
+            "id": 31535,
             "name": "PRICE_TICKER_INVALID_INVOCATION",
             "nodeType": "VariableDeclaration",
-            "scope": 30560,
-            "src": "1481:53:100",
+            "scope": 31547,
+            "src": "1481:53:101",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -729,10 +732,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 30546,
+              "id": 31533,
               "name": "uint",
               "nodeType": "ElementaryTypeName",
-              "src": "1481:4:100",
+              "src": "1481:4:101",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -741,14 +744,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3234303034",
-              "id": 30547,
+              "id": 31534,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "1529:5:100",
+              "src": "1529:5:101",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_24004_by_1",
@@ -760,7 +763,8 @@
           },
           {
             "body": null,
-            "id": 30559,
+            "documentation": " Request asynchronously the price of a `fsym` currency against 'tsym' currency.\n    *  Note:\n     1. Caller must implement PriceTickerCallback.\n     2. Result will be returned via callback `receivePrice`.\n     3. ETH symbol is used for getting price for Ether.\n    *  Since price of equivalent symbols is always 1, do not use async method\n for getting price of equivalent symbols.\n    *  @param fsym From Symbol\n @param tsym To Symbol\n    *  @return oraclize query id",
+            "id": 31546,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -768,16 +772,16 @@
             "name": "requestPrice",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 30553,
+              "id": 31540,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30550,
+                  "id": 31537,
                   "name": "fsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30559,
-                  "src": "2106:12:100",
+                  "scope": 31546,
+                  "src": "2106:12:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -785,10 +789,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30549,
+                    "id": 31536,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2106:7:100",
+                    "src": "2106:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -799,11 +803,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 30552,
+                  "id": 31539,
                   "name": "tsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30559,
-                  "src": "2120:12:100",
+                  "scope": 31546,
+                  "src": "2120:12:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -811,10 +815,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30551,
+                    "id": 31538,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2120:7:100",
+                    "src": "2120:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -824,20 +828,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "2105:28:100"
+              "src": "2105:28:101"
             },
             "payable": true,
             "returnParameters": {
-              "id": 30558,
+              "id": 31545,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30555,
+                  "id": 31542,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30559,
-                  "src": "2158:7:100",
+                  "scope": 31546,
+                  "src": "2158:7:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -845,10 +849,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30554,
+                    "id": 31541,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2158:7:100",
+                    "src": "2158:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -859,11 +863,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 30557,
+                  "id": 31544,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30559,
-                  "src": "2167:4:100",
+                  "scope": 31546,
+                  "src": "2167:4:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -871,10 +875,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 30556,
+                    "id": 31543,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2167:4:100",
+                    "src": "2167:4:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -884,36 +888,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "2157:15:100"
+              "src": "2157:15:101"
             },
-            "scope": 30560,
-            "src": "2084:89:100",
+            "scope": 31547,
+            "src": "2084:89:101",
             "stateMutability": "payable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 30561,
-        "src": "1324:851:100"
+        "scope": 31548,
+        "src": "1324:851:101"
       }
     ],
-    "src": "0:2176:100"
+    "src": "0:2176:101"
   },
   "legacyAST": {
-    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/priceticker/PriceTicker.sol",
+    "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/priceticker/PriceTicker.sol",
     "exportedSymbols": {
       "PriceProvider": [
-        30537
+        31524
       ],
       "PriceTicker": [
-        30560
+        31547
       ]
     },
-    "id": 30561,
+    "id": 31548,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 30501,
+        "id": 31488,
         "literals": [
           "solidity",
           "^",
@@ -921,7 +925,7 @@
           ".11"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:100"
+        "src": "0:24:101"
       },
       {
         "baseContracts": [],
@@ -929,20 +933,20 @@
         "contractKind": "contract",
         "documentation": " PriceFetcher Interface. Defines how a price could be fetched",
         "fullyImplemented": false,
-        "id": 30537,
+        "id": 31524,
         "linearizedBaseContracts": [
-          30537
+          31524
         ],
         "name": "PriceProvider",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 30504,
+            "id": 31491,
             "name": "OK",
             "nodeType": "VariableDeclaration",
-            "scope": 30537,
-            "src": "126:20:100",
+            "scope": 31524,
+            "src": "126:20:101",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -950,10 +954,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 30502,
+              "id": 31489,
               "name": "uint",
               "nodeType": "ElementaryTypeName",
-              "src": "126:4:100",
+              "src": "126:4:101",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -962,14 +966,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "31",
-              "id": 30503,
+              "id": 31490,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "145:1:100",
+              "src": "145:1:101",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_1_by_1",
@@ -981,21 +985,22 @@
           },
           {
             "anonymous": false,
-            "id": 30518,
+            "documentation": null,
+            "id": 31505,
             "name": "ExchangePriceUpdated",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 30517,
+              "id": 31504,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30506,
+                  "id": 31493,
                   "indexed": false,
                   "name": "initiator",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30518,
-                  "src": "180:17:100",
+                  "scope": 31505,
+                  "src": "180:17:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1003,10 +1008,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 30505,
+                    "id": 31492,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "180:7:100",
+                    "src": "180:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1017,12 +1022,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 30508,
+                  "id": 31495,
                   "indexed": true,
                   "name": "fsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30518,
-                  "src": "199:20:100",
+                  "scope": 31505,
+                  "src": "199:20:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1030,10 +1035,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30507,
+                    "id": 31494,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "199:7:100",
+                    "src": "199:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1044,12 +1049,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 30510,
+                  "id": 31497,
                   "indexed": true,
                   "name": "tsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30518,
-                  "src": "221:20:100",
+                  "scope": 31505,
+                  "src": "221:20:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1057,10 +1062,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30509,
+                    "id": 31496,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "221:7:100",
+                    "src": "221:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1071,12 +1076,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 30512,
+                  "id": 31499,
                   "indexed": true,
                   "name": "updateTime",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30518,
-                  "src": "243:23:100",
+                  "scope": 31505,
+                  "src": "243:23:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1084,10 +1089,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 30511,
+                    "id": 31498,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "243:4:100",
+                    "src": "243:4:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1098,12 +1103,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 30514,
+                  "id": 31501,
                   "indexed": false,
                   "name": "exchangePrice",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30518,
-                  "src": "268:18:100",
+                  "scope": 31505,
+                  "src": "268:18:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1111,10 +1116,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 30513,
+                    "id": 31500,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "268:4:100",
+                    "src": "268:4:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1125,12 +1130,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 30516,
+                  "id": 31503,
                   "indexed": false,
                   "name": "rateDecimals",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30518,
-                  "src": "288:17:100",
+                  "scope": 31505,
+                  "src": "288:17:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1138,10 +1143,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 30515,
+                    "id": 31502,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "288:4:100",
+                    "src": "288:4:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1151,13 +1156,14 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "179:127:100"
+              "src": "179:127:101"
             },
-            "src": "153:154:100"
+            "src": "153:154:101"
           },
           {
             "body": null,
-            "id": 30527,
+            "documentation": " Check if the price of a `fsym` currency against 'tsym' currency is availbale.\n    *  @dev Note:\n     1. must return `true` for equivalent symbols;\n     2. `Ether` and `ETH` are equivalent.\n    *  @param fsym From Symbol\n @param tsym To Symbol\n    *  @return true if the price is an available.",
+            "id": 31514,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -1165,16 +1171,16 @@
             "name": "isPriceAvailable",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 30523,
+              "id": 31510,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30520,
+                  "id": 31507,
                   "name": "fsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30527,
-                  "src": "690:12:100",
+                  "scope": 31514,
+                  "src": "690:12:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1182,10 +1188,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30519,
+                    "id": 31506,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "690:7:100",
+                    "src": "690:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1196,11 +1202,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 30522,
+                  "id": 31509,
                   "name": "tsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30527,
-                  "src": "704:12:100",
+                  "scope": 31514,
+                  "src": "704:12:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1208,10 +1214,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30521,
+                    "id": 31508,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "704:7:100",
+                    "src": "704:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1221,20 +1227,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "689:28:100"
+              "src": "689:28:101"
             },
             "payable": false,
             "returnParameters": {
-              "id": 30526,
+              "id": 31513,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30525,
+                  "id": 31512,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30527,
-                  "src": "739:4:100",
+                  "scope": 31514,
+                  "src": "739:4:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1242,10 +1248,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 30524,
+                    "id": 31511,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "739:4:100",
+                    "src": "739:4:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -1255,17 +1261,18 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "738:6:100"
+              "src": "738:6:101"
             },
-            "scope": 30537,
-            "src": "664:81:100",
+            "scope": 31524,
+            "src": "664:81:101",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": null,
-            "id": 30536,
+            "documentation": " Get the price of a `fsym` currency against 'tsym' currency.\n Will throw if price is an unavailable;\n    *  @dev Note:\n       1. must return 1 ** 18 if `fsym` equivalent for `tsym`,\n          since price is always availbale to the same currency symbols;\n       2. `Ether` and `ETH` are equivalent.\n    *  @param fsym From Symbol\n @param tsym To Symbol\n    *  @return a price (its decimals == 18)",
+            "id": 31523,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -1273,16 +1280,16 @@
             "name": "price",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 30532,
+              "id": 31519,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30529,
+                  "id": 31516,
                   "name": "fsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30536,
-                  "src": "1231:12:100",
+                  "scope": 31523,
+                  "src": "1231:12:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1290,10 +1297,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30528,
+                    "id": 31515,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1231:7:100",
+                    "src": "1231:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1304,11 +1311,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 30531,
+                  "id": 31518,
                   "name": "tsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30536,
-                  "src": "1245:12:100",
+                  "scope": 31523,
+                  "src": "1245:12:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1316,10 +1323,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30530,
+                    "id": 31517,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1245:7:100",
+                    "src": "1245:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1329,20 +1336,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1230:28:100"
+              "src": "1230:28:101"
             },
             "payable": false,
             "returnParameters": {
-              "id": 30535,
+              "id": 31522,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30534,
+                  "id": 31521,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30536,
-                  "src": "1280:4:100",
+                  "scope": 31523,
+                  "src": "1280:4:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1350,10 +1357,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 30533,
+                    "id": 31520,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1280:4:100",
+                    "src": "1280:4:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1363,17 +1370,17 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1279:6:100"
+              "src": "1279:6:101"
             },
-            "scope": 30537,
-            "src": "1216:70:100",
+            "scope": 31524,
+            "src": "1216:70:101",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 30561,
-        "src": "97:1191:100"
+        "scope": 31548,
+        "src": "97:1191:101"
       },
       {
         "baseContracts": [
@@ -1381,42 +1388,42 @@
             "arguments": [],
             "baseName": {
               "contractScope": null,
-              "id": 30538,
+              "id": 31525,
               "name": "PriceProvider",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 30537,
-              "src": "1348:13:100",
+              "referencedDeclaration": 31524,
+              "src": "1348:13:101",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_PriceProvider_$30537",
+                "typeIdentifier": "t_contract$_PriceProvider_$31524",
                 "typeString": "contract PriceProvider"
               }
             },
-            "id": 30539,
+            "id": 31526,
             "nodeType": "InheritanceSpecifier",
-            "src": "1348:13:100"
+            "src": "1348:13:101"
           }
         ],
         "contractDependencies": [
-          30537
+          31524
         ],
         "contractKind": "contract",
         "documentation": " PriceTicker Interface.",
         "fullyImplemented": false,
-        "id": 30560,
+        "id": 31547,
         "linearizedBaseContracts": [
-          30560,
-          30537
+          31547,
+          31524
         ],
         "name": "PriceTicker",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 30542,
+            "id": 31529,
             "name": "PRICE_TICKER_OK_UPDATING",
             "nodeType": "VariableDeclaration",
-            "scope": 30560,
-            "src": "1368:46:100",
+            "scope": 31547,
+            "src": "1368:46:101",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -1424,10 +1431,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 30540,
+              "id": 31527,
               "name": "uint",
               "nodeType": "ElementaryTypeName",
-              "src": "1368:4:100",
+              "src": "1368:4:101",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -1436,14 +1443,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3234303032",
-              "id": 30541,
+              "id": 31528,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "1409:5:100",
+              "src": "1409:5:101",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_24002_by_1",
@@ -1455,11 +1462,11 @@
           },
           {
             "constant": true,
-            "id": 30545,
+            "id": 31532,
             "name": "PRICE_TICKER_INSUFFICIENT_BALANCE",
             "nodeType": "VariableDeclaration",
-            "scope": 30560,
-            "src": "1420:55:100",
+            "scope": 31547,
+            "src": "1420:55:101",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -1467,10 +1474,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 30543,
+              "id": 31530,
               "name": "uint",
               "nodeType": "ElementaryTypeName",
-              "src": "1420:4:100",
+              "src": "1420:4:101",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -1479,14 +1486,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3234303033",
-              "id": 30544,
+              "id": 31531,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "1470:5:100",
+              "src": "1470:5:101",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_24003_by_1",
@@ -1498,11 +1505,11 @@
           },
           {
             "constant": true,
-            "id": 30548,
+            "id": 31535,
             "name": "PRICE_TICKER_INVALID_INVOCATION",
             "nodeType": "VariableDeclaration",
-            "scope": 30560,
-            "src": "1481:53:100",
+            "scope": 31547,
+            "src": "1481:53:101",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -1510,10 +1517,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 30546,
+              "id": 31533,
               "name": "uint",
               "nodeType": "ElementaryTypeName",
-              "src": "1481:4:100",
+              "src": "1481:4:101",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -1522,14 +1529,14 @@
             "value": {
               "argumentTypes": null,
               "hexValue": "3234303034",
-              "id": 30547,
+              "id": 31534,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "kind": "number",
               "lValueRequested": false,
               "nodeType": "Literal",
-              "src": "1529:5:100",
+              "src": "1529:5:101",
               "subdenomination": null,
               "typeDescriptions": {
                 "typeIdentifier": "t_rational_24004_by_1",
@@ -1541,7 +1548,8 @@
           },
           {
             "body": null,
-            "id": 30559,
+            "documentation": " Request asynchronously the price of a `fsym` currency against 'tsym' currency.\n    *  Note:\n     1. Caller must implement PriceTickerCallback.\n     2. Result will be returned via callback `receivePrice`.\n     3. ETH symbol is used for getting price for Ether.\n    *  Since price of equivalent symbols is always 1, do not use async method\n for getting price of equivalent symbols.\n    *  @param fsym From Symbol\n @param tsym To Symbol\n    *  @return oraclize query id",
+            "id": 31546,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -1549,16 +1557,16 @@
             "name": "requestPrice",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 30553,
+              "id": 31540,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30550,
+                  "id": 31537,
                   "name": "fsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30559,
-                  "src": "2106:12:100",
+                  "scope": 31546,
+                  "src": "2106:12:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1566,10 +1574,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30549,
+                    "id": 31536,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2106:7:100",
+                    "src": "2106:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1580,11 +1588,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 30552,
+                  "id": 31539,
                   "name": "tsym",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30559,
-                  "src": "2120:12:100",
+                  "scope": 31546,
+                  "src": "2120:12:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1592,10 +1600,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30551,
+                    "id": 31538,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2120:7:100",
+                    "src": "2120:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1605,20 +1613,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "2105:28:100"
+              "src": "2105:28:101"
             },
             "payable": true,
             "returnParameters": {
-              "id": 30558,
+              "id": 31545,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 30555,
+                  "id": 31542,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30559,
-                  "src": "2158:7:100",
+                  "scope": 31546,
+                  "src": "2158:7:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1626,10 +1634,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 30554,
+                    "id": 31541,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2158:7:100",
+                    "src": "2158:7:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1640,11 +1648,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 30557,
+                  "id": 31544,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 30559,
-                  "src": "2167:4:100",
+                  "scope": 31546,
+                  "src": "2167:4:101",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1652,10 +1660,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 30556,
+                    "id": 31543,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2167:4:100",
+                    "src": "2167:4:101",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1665,26 +1673,26 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "2157:15:100"
+              "src": "2157:15:101"
             },
-            "scope": 30560,
-            "src": "2084:89:100",
+            "scope": 31547,
+            "src": "2084:89:101",
             "stateMutability": "payable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 30561,
-        "src": "1324:851:100"
+        "scope": 31548,
+        "src": "1324:851:101"
       }
     ],
-    "src": "0:2176:100"
+    "src": "0:2176:101"
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.19+commit.c4cbbb05.Emscripten.clang"
+    "version": "0.4.21+commit.dfe3193c.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-04-02T14:47:31.314Z"
+  "updatedAt": "2018-04-05T14:52:03.959Z"
 }

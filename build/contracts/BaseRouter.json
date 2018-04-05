@@ -12,19 +12,19 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\n/**\n* @title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.\n*/\ncontract BaseRouter {\n\n    function() payable public {\n        uint r;\n        address _backend = backend();\n\n        // Make the call\n        assembly {\n            calldatacopy(mload(0x40), 0, calldatasize)\n            r := delegatecall(sub(gas, 700), _backend, mload(0x40), calldatasize, mload(0x40), 32) // WARNING: 32 - size of the return value\n        }\n\n        // Throw if the call failed\n        if (r != 1) revert();\n\n        // Pass on the return value\n        assembly {\n            return(mload(0x40), 32) // WARNING: 32 - size of the return value\n        }\n    }\n\n    /**\n    * @dev Returns destination address for future calls\n    *\n    * @return destination address\n    */\n    function backend() internal constant returns (address);\n}\n",
-  "sourcePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
+  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
   "ast": {
-    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
+    "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
     "exportedSymbols": {
       "BaseRouter": [
-        2156
+        2407
       ]
     },
-    "id": 2157,
+    "id": 2408,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2129,
+        "id": 2380,
         "literals": [
           "solidity",
           "^",
@@ -40,16 +40,16 @@
         "contractKind": "contract",
         "documentation": "@title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.",
         "fullyImplemented": false,
-        "id": 2156,
+        "id": 2407,
         "linearizedBaseContracts": [
-          2156
+          2407
         ],
         "name": "BaseRouter",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 2149,
+              "id": 2400,
               "nodeType": "Block",
               "src": "203:523:15",
               "statements": [
@@ -58,10 +58,10 @@
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2133,
+                      "id": 2384,
                       "name": "r",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2150,
+                      "scope": 2401,
                       "src": "213:6:15",
                       "stateVariable": false,
                       "storageLocation": "default",
@@ -70,7 +70,7 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 2132,
+                        "id": 2383,
                         "name": "uint",
                         "nodeType": "ElementaryTypeName",
                         "src": "213:4:15",
@@ -83,22 +83,22 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2134,
+                  "id": 2385,
                   "initialValue": null,
                   "nodeType": "VariableDeclarationStatement",
                   "src": "213:6:15"
                 },
                 {
                   "assignments": [
-                    2136
+                    2387
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2136,
+                      "id": 2387,
                       "name": "_backend",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2150,
+                      "scope": 2401,
                       "src": "229:16:15",
                       "stateVariable": false,
                       "storageLocation": "default",
@@ -107,7 +107,7 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 2135,
+                        "id": 2386,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
                         "src": "229:7:15",
@@ -120,24 +120,24 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2139,
+                  "id": 2390,
                   "initialValue": {
                     "argumentTypes": null,
                     "arguments": [],
                     "expression": {
                       "argumentTypes": [],
-                      "id": 2137,
+                      "id": 2388,
                       "name": "backend",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2155,
+                      "referencedDeclaration": 2406,
                       "src": "248:7:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                         "typeString": "function () view returns (address)"
                       }
                     },
-                    "id": 2138,
+                    "id": 2389,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -158,7 +158,7 @@
                   "externalReferences": [
                     {
                       "r": {
-                        "declaration": 2133,
+                        "declaration": 2384,
                         "isOffset": false,
                         "isSlot": false,
                         "src": "371:1:15",
@@ -167,7 +167,7 @@
                     },
                     {
                       "_backend": {
-                        "declaration": 2136,
+                        "declaration": 2387,
                         "isOffset": false,
                         "isSlot": false,
                         "src": "404:8:15",
@@ -175,9 +175,9 @@
                       }
                     }
                   ],
-                  "id": 2140,
+                  "id": 2391,
                   "nodeType": "InlineAssembly",
-                  "operations": "{\n    calldatacopy(mload(0x40), 0, calldatasize)\n    r := delegatecall(sub(gas, 700), _backend, mload(0x40), calldatasize, mload(0x40), 32)\n}",
+                  "operations": "{\n    calldatacopy(mload(0x40), 0, calldatasize())\n    r := delegatecall(sub(gas(), 700), _backend, mload(0x40), calldatasize(), mload(0x40), 32)\n}",
                   "src": "293:264:15"
                 },
                 {
@@ -187,18 +187,18 @@
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     },
-                    "id": 2143,
+                    "id": 2394,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 2141,
+                      "id": 2392,
                       "name": "r",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2133,
+                      "referencedDeclaration": 2384,
                       "src": "559:1:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -210,7 +210,7 @@
                     "rightExpression": {
                       "argumentTypes": null,
                       "hexValue": "31",
-                      "id": 2142,
+                      "id": 2393,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -232,7 +232,7 @@
                     }
                   },
                   "falseBody": null,
-                  "id": 2147,
+                  "id": 2398,
                   "nodeType": "IfStatement",
                   "src": "555:20:15",
                   "trueBody": {
@@ -241,18 +241,18 @@
                       "arguments": [],
                       "expression": {
                         "argumentTypes": [],
-                        "id": 2144,
+                        "id": 2395,
                         "name": "revert",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40325,
+                        "referencedDeclaration": 41313,
                         "src": "567:6:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_revert_pure$__$returns$__$",
                           "typeString": "function () pure"
                         }
                       },
-                      "id": 2145,
+                      "id": 2396,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -266,21 +266,22 @@
                         "typeString": "tuple()"
                       }
                     },
-                    "id": 2146,
+                    "id": 2397,
                     "nodeType": "ExpressionStatement",
                     "src": "567:8:15"
                   }
                 },
                 {
                   "externalReferences": [],
-                  "id": 2148,
+                  "id": 2399,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    return(mload(0x40), 32)\n}",
                   "src": "622:104:15"
                 }
               ]
             },
-            "id": 2150,
+            "documentation": null,
+            "id": 2401,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -288,19 +289,19 @@
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2130,
+              "id": 2381,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "185:2:15"
             },
             "payable": true,
             "returnParameters": {
-              "id": 2131,
+              "id": 2382,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "203:0:15"
             },
-            "scope": 2156,
+            "scope": 2407,
             "src": "177:549:15",
             "stateMutability": "payable",
             "superFunction": null,
@@ -308,7 +309,8 @@
           },
           {
             "body": null,
-            "id": 2155,
+            "documentation": "@dev Returns destination address for future calls\n    * @return destination address",
+            "id": 2406,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -316,22 +318,22 @@
             "name": "backend",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2151,
+              "id": 2402,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "859:2:15"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2154,
+              "id": 2405,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2153,
+                  "id": 2404,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2155,
+                  "scope": 2406,
                   "src": "889:7:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -340,7 +342,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2152,
+                    "id": 2403,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "889:7:15",
@@ -355,31 +357,31 @@
               ],
               "src": "888:9:15"
             },
-            "scope": 2156,
+            "scope": 2407,
             "src": "843:55:15",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "internal"
           }
         ],
-        "scope": 2157,
+        "scope": 2408,
         "src": "150:750:15"
       }
     ],
     "src": "0:901:15"
   },
   "legacyAST": {
-    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
+    "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
     "exportedSymbols": {
       "BaseRouter": [
-        2156
+        2407
       ]
     },
-    "id": 2157,
+    "id": 2408,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2129,
+        "id": 2380,
         "literals": [
           "solidity",
           "^",
@@ -395,16 +397,16 @@
         "contractKind": "contract",
         "documentation": "@title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.",
         "fullyImplemented": false,
-        "id": 2156,
+        "id": 2407,
         "linearizedBaseContracts": [
-          2156
+          2407
         ],
         "name": "BaseRouter",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 2149,
+              "id": 2400,
               "nodeType": "Block",
               "src": "203:523:15",
               "statements": [
@@ -413,10 +415,10 @@
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2133,
+                      "id": 2384,
                       "name": "r",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2150,
+                      "scope": 2401,
                       "src": "213:6:15",
                       "stateVariable": false,
                       "storageLocation": "default",
@@ -425,7 +427,7 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 2132,
+                        "id": 2383,
                         "name": "uint",
                         "nodeType": "ElementaryTypeName",
                         "src": "213:4:15",
@@ -438,22 +440,22 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2134,
+                  "id": 2385,
                   "initialValue": null,
                   "nodeType": "VariableDeclarationStatement",
                   "src": "213:6:15"
                 },
                 {
                   "assignments": [
-                    2136
+                    2387
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2136,
+                      "id": 2387,
                       "name": "_backend",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2150,
+                      "scope": 2401,
                       "src": "229:16:15",
                       "stateVariable": false,
                       "storageLocation": "default",
@@ -462,7 +464,7 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 2135,
+                        "id": 2386,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
                         "src": "229:7:15",
@@ -475,24 +477,24 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2139,
+                  "id": 2390,
                   "initialValue": {
                     "argumentTypes": null,
                     "arguments": [],
                     "expression": {
                       "argumentTypes": [],
-                      "id": 2137,
+                      "id": 2388,
                       "name": "backend",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2155,
+                      "referencedDeclaration": 2406,
                       "src": "248:7:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                         "typeString": "function () view returns (address)"
                       }
                     },
-                    "id": 2138,
+                    "id": 2389,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -513,7 +515,7 @@
                   "externalReferences": [
                     {
                       "r": {
-                        "declaration": 2133,
+                        "declaration": 2384,
                         "isOffset": false,
                         "isSlot": false,
                         "src": "371:1:15",
@@ -522,7 +524,7 @@
                     },
                     {
                       "_backend": {
-                        "declaration": 2136,
+                        "declaration": 2387,
                         "isOffset": false,
                         "isSlot": false,
                         "src": "404:8:15",
@@ -530,9 +532,9 @@
                       }
                     }
                   ],
-                  "id": 2140,
+                  "id": 2391,
                   "nodeType": "InlineAssembly",
-                  "operations": "{\n    calldatacopy(mload(0x40), 0, calldatasize)\n    r := delegatecall(sub(gas, 700), _backend, mload(0x40), calldatasize, mload(0x40), 32)\n}",
+                  "operations": "{\n    calldatacopy(mload(0x40), 0, calldatasize())\n    r := delegatecall(sub(gas(), 700), _backend, mload(0x40), calldatasize(), mload(0x40), 32)\n}",
                   "src": "293:264:15"
                 },
                 {
@@ -542,18 +544,18 @@
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     },
-                    "id": 2143,
+                    "id": 2394,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 2141,
+                      "id": 2392,
                       "name": "r",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2133,
+                      "referencedDeclaration": 2384,
                       "src": "559:1:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -565,7 +567,7 @@
                     "rightExpression": {
                       "argumentTypes": null,
                       "hexValue": "31",
-                      "id": 2142,
+                      "id": 2393,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -587,7 +589,7 @@
                     }
                   },
                   "falseBody": null,
-                  "id": 2147,
+                  "id": 2398,
                   "nodeType": "IfStatement",
                   "src": "555:20:15",
                   "trueBody": {
@@ -596,18 +598,18 @@
                       "arguments": [],
                       "expression": {
                         "argumentTypes": [],
-                        "id": 2144,
+                        "id": 2395,
                         "name": "revert",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40325,
+                        "referencedDeclaration": 41313,
                         "src": "567:6:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_revert_pure$__$returns$__$",
                           "typeString": "function () pure"
                         }
                       },
-                      "id": 2145,
+                      "id": 2396,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -621,21 +623,22 @@
                         "typeString": "tuple()"
                       }
                     },
-                    "id": 2146,
+                    "id": 2397,
                     "nodeType": "ExpressionStatement",
                     "src": "567:8:15"
                   }
                 },
                 {
                   "externalReferences": [],
-                  "id": 2148,
+                  "id": 2399,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    return(mload(0x40), 32)\n}",
                   "src": "622:104:15"
                 }
               ]
             },
-            "id": 2150,
+            "documentation": null,
+            "id": 2401,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -643,19 +646,19 @@
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2130,
+              "id": 2381,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "185:2:15"
             },
             "payable": true,
             "returnParameters": {
-              "id": 2131,
+              "id": 2382,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "203:0:15"
             },
-            "scope": 2156,
+            "scope": 2407,
             "src": "177:549:15",
             "stateMutability": "payable",
             "superFunction": null,
@@ -663,7 +666,8 @@
           },
           {
             "body": null,
-            "id": 2155,
+            "documentation": "@dev Returns destination address for future calls\n    * @return destination address",
+            "id": 2406,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -671,22 +675,22 @@
             "name": "backend",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2151,
+              "id": 2402,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "859:2:15"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2154,
+              "id": 2405,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2153,
+                  "id": 2404,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2155,
+                  "scope": 2406,
                   "src": "889:7:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -695,7 +699,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2152,
+                    "id": 2403,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "889:7:15",
@@ -710,14 +714,14 @@
               ],
               "src": "888:9:15"
             },
-            "scope": 2156,
+            "scope": 2407,
             "src": "843:55:15",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "internal"
           }
         ],
-        "scope": 2157,
+        "scope": 2408,
         "src": "150:750:15"
       }
     ],
@@ -725,9 +729,9 @@
   },
   "compiler": {
     "name": "solc",
-    "version": "0.4.19+commit.c4cbbb05.Emscripten.clang"
+    "version": "0.4.21+commit.dfe3193c.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-04-02T14:47:30.872Z"
+  "updatedAt": "2018-04-05T14:52:03.466Z"
 }
