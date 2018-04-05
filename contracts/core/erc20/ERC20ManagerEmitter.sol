@@ -1,4 +1,4 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.21;
 
 import '../event/MultiEventsHistoryAdapter.sol';
 
@@ -49,7 +49,7 @@ contract ERC20ManagerEmitter is MultiEventsHistoryAdapter {
         bytes32 swarmHash)
     public
     {
-        LogAddToken(_self(), token, name, symbol, url, decimals, ipfsHash, swarmHash);
+        emit LogAddToken(_self(), token, name, symbol, url, decimals, ipfsHash, swarmHash);
     }
 
     function emitLogTokenChange (
@@ -63,7 +63,7 @@ contract ERC20ManagerEmitter is MultiEventsHistoryAdapter {
         bytes32 swarmHash)
     public
     {
-        LogTokenChange(_self(), oldToken, token, name, symbol, url, decimals, ipfsHash, swarmHash);
+        emit LogTokenChange(_self(), oldToken, token, name, symbol, url, decimals, ipfsHash, swarmHash);
     }
 
     function emitLogRemoveToken (
@@ -76,11 +76,11 @@ contract ERC20ManagerEmitter is MultiEventsHistoryAdapter {
         bytes32 swarmHash)
     public
     {
-        LogRemoveToken(_self(), token, name, symbol, url, decimals, ipfsHash, swarmHash);
+        emit LogRemoveToken(_self(), token, name, symbol, url, decimals, ipfsHash, swarmHash);
     }
 
     function emitError(uint error) public
     {
-        Error(_self(), error);
+        emit Error(_self(), error);
     }
 }

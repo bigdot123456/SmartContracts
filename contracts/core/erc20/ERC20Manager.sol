@@ -1,9 +1,10 @@
-pragma solidity ^0.4.11;
+pragma solidity ^0.4.21;
 
 import "../common/BaseManager.sol";
 import "../event/MultiEventsHistory.sol";
 import {ERC20Interface as Asset} from "./ERC20Interface.sol";
 import "./ERC20ManagerEmitter.sol";
+import "../storage/SetStorageInterface_v_1_1.sol";
 
 
 contract ERC20TokenVerifier {
@@ -35,15 +36,15 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
 
     /// @notice Constructor
     function ERC20Manager(Storage _store, bytes32 _crate) BaseManager(_store, _crate) public {
-        tokenAddresses.init('tokenAddresses');
-        tokenBySymbol.init('tokeBySymbol');
-        name.init('name');
-        symbol.init('symbol');
-        url.init('url');
-        ipfsHash.init('ipfsHash');
-        swarmHash.init('swarmHash');
-        decimals.init('decimals');
-        tokenVerifier.init('tokenVerifier');
+        SetStorageInterface_v_1_1.init(tokenAddresses, "tokenAddresses");
+        tokenBySymbol.init("tokeBySymbol");
+        name.init("name");
+        symbol.init("symbol");
+        url.init("url");
+        ipfsHash.init("ipfsHash");
+        swarmHash.init("swarmHash");
+        decimals.init("decimals");
+        tokenVerifier.init("tokenVerifier");
     }
 
     /// @notice Init the contract
@@ -89,7 +90,7 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
             return _emitError(ERROR_ERCMANAGER_INVALID_INVOCATION);
         }
 
-        _addToken(_token);
+        SetStorageInterface_v_1_1.add(store, tokenAddresses, _token);
         store.set(tokenBySymbol, _symbol, _token);
         store.set(name, _token, _name);
         store.set(symbol, _token, _symbol);
@@ -133,61 +134,66 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
         }
 
         bool changed;
-        if(_symbol != store.get(symbol,_token)) {
-            if (store.get(tokenBySymbol,_symbol) == address(0)) {
-                store.set(tokenBySymbol,store.get(symbol,_token),address(0));
-                if(_token != _newToken) {
-                    store.set(tokenBySymbol,_symbol,_newToken);
-                    store.set(symbol,_newToken,_symbol);
+        if (_symbol != store.get(symbol, _token)) {
+            if (store.get(tokenBySymbol, _symbol) == 0x0) {
+                store.set(tokenBySymbol, store.get(symbol, _token), 0x0);
+
+                if (_token != _newToken) {
+                    store.set(tokenBySymbol, _symbol, _newToken);
+                    store.set(symbol, _newToken, _symbol);
                 } else {
-                    store.set(tokenBySymbol,_symbol,_token);
-                    store.set(symbol,_token,_symbol);
+                    store.set(tokenBySymbol,_symbol, _token);
+                    store.set(symbol, _token, _symbol);
                 }
                 changed = true;
             } else {
                 return _emitError(ERROR_ERCMANAGER_TOKEN_UNCHANGED);
             }
         }
-        if(_token != _newToken) {
+
+        if (_token != _newToken) {
             Asset(_newToken).totalSupply();
-            _replaceToken(_token, _newToken);
+            SetStorageInterface_v_1_1.set(store, tokenAddresses, _token, _newToken);
 
             if(!changed) {
-                store.set(tokenBySymbol,_symbol,_newToken);
-                store.set(symbol,_newToken,_symbol);
+                store.set(tokenBySymbol, _symbol, _newToken);
+                store.set(symbol, _newToken, _symbol);
             }
-            store.set(name,_newToken,_name);
-            store.set(url,_newToken,_url);
-            store.set(decimals,_newToken,_decimals);
-            store.set(ipfsHash,_newToken,_ipfsHash);
-            store.set(swarmHash,_newToken,_swarmHash);
+            store.set(name, _newToken, _name);
+            store.set(url, _newToken, _url);
+            store.set(decimals, _newToken, _decimals);
+            store.set(ipfsHash, _newToken, _ipfsHash);
+            store.set(swarmHash, _newToken, _swarmHash);
             _token = _newToken;
             changed = true;
         }
 
-        if(store.get(name,_token) != _name) {
-            store.set(name,_token,_name);
+        if (store.get(name, _token) != _name) {
+            store.set(name, _token, _name);
             changed = true;
         }
 
-        if(store.get(decimals,_token) != _decimals) {
-            store.set(decimals,_token,_decimals);
+        if (store.get(decimals, _token) != _decimals) {
+            store.set(decimals, _token, _decimals);
             changed = true;
         }
-        if(store.get(url,_token) != _url) {
-            store.set(url,_token,_url);
-            changed = true;
-        }
-        if(store.get(ipfsHash,_token) != _ipfsHash) {
-            store.set(ipfsHash,_token,_ipfsHash);
-            changed = true;
-        }
-        if(store.get(swarmHash,_token) != _swarmHash) {
-            store.set(swarmHash,_token,_swarmHash);
+        
+        if (store.get(url, _token) != _url) {
+            store.set(url, _token, _url);
             changed = true;
         }
 
-        if(changed) {
+        if (store.get(ipfsHash, _token) != _ipfsHash) {
+            store.set(ipfsHash, _token, _ipfsHash);
+            changed = true;
+        }
+
+        if (store.get(swarmHash, _token) != _swarmHash) {
+            store.set(swarmHash, _token, _swarmHash);
+            changed = true;
+        }
+
+        if (changed) {
             _emitLogTokenChange(_token, _newToken, _name, _symbol, _url, _decimals, _ipfsHash, _swarmHash);
             return OK;
         }
@@ -229,7 +235,7 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     view
     returns (address)
     {
-        return _getTokenByIndex(_id);
+        return SetStorageInterface_v_1_1.get(store, tokenAddresses, _id);
     }
 
     /// @notice Provides a registered token's address when given the token symbol.
@@ -280,7 +286,7 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     view
     returns (uint)
     {
-        return _countTokens();
+        return SetStorageInterface_v_1_1.count(store, tokenAddresses);
     }
 
     /// @dev Returns an array containing all token addresses.
@@ -288,8 +294,11 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     function getTokenAddresses()
     public
     view
-    returns (address[]) {
-        return _getTokens();
+    returns (address[] _tokenAddresses) {
+        _tokenAddresses = new address[](tokensCount());
+        for (uint _tokenIdx = 0; _tokenIdx < _tokenAddresses.length; ++_tokenIdx) {
+            _tokenAddresses[_tokenIdx] = getAddressById(_tokenIdx);
+        }
     }
 
     /// @notice Provides details of a given tokens
@@ -332,7 +341,7 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     /// @notice Provides a registered token's metadata, looked up by symbol.
     /// @param _symbol Symbol of registered token.
     /// @return Token metadata.
-    function getTokenBySymbol(bytes32 __symbol)
+    function getTokenBySymbol(bytes32 _smbl)
     public
     view
     returns (
@@ -345,17 +354,17 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
       bytes32 _swarmHash
     )
     {
-        if (!isTokenSymbolExists(__symbol)) {
+        if (!isTokenSymbolExists(_smbl)) {
             return;
         }
 
-        address _token = store.get(tokenBySymbol, __symbol);
+        address _token = store.get(tokenBySymbol, _smbl);
         return getTokenMetaData(_token);
     }
 
     /// @notice Tells whether a given token exists or not
     function isTokenExists(address _token) public view returns (bool) {
-        return _includesToken(_token);
+        return SetStorageInterface_v_1_1.includes(store, tokenAddresses, _token);
     }
 
     /// @notice Tells whether a given token exists or not
@@ -365,12 +374,12 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
 
     /// @notice Tells whether a given token valid or not
     function isTokenValid(address _token) public view returns (bool) {
-      if (store.get(tokenVerifier) != 0x0) {
-          ERC20TokenVerifier verifier = ERC20TokenVerifier(store.get(tokenVerifier));
-          return verifier.verify(_token);
-      }
+        if (store.get(tokenVerifier) != 0x0) {
+            ERC20TokenVerifier verifier = ERC20TokenVerifier(store.get(tokenVerifier));
+            return verifier.verify(_token);
+        }
 
-      return true;
+        return true;
     }
 
     /// @notice Allows owner to remove an existing token from the registry.
@@ -381,17 +390,17 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     {
         _emitLogRemoveToken(
             _token,
-            store.get(name,_token),
-            store.get(symbol,_token),
-            store.get(url,_token),
-            uint8(store.get(decimals,_token)),
-            store.get(ipfsHash,_token),
-            store.get(swarmHash,_token)
+            store.get(name, _token),
+            store.get(symbol, _token),
+            store.get(url, _token),
+            uint8(store.get(decimals, _token)),
+            store.get(ipfsHash, _token),
+            store.get(swarmHash, _token)
         );
 
         store.set(tokenBySymbol, store.get(symbol,_token), address(0));
 
-        _removeToken(_token);
+        SetStorageInterface_v_1_1.remove(store, tokenAddresses, _token);
         // TODO: ahiatsevich clean up url, decimals, ipfsHash, swarmHash
 
         return OK;
@@ -441,65 +450,8 @@ contract ERC20Manager is ERC20ManagerEmitter, BaseManager {
     }
 
     /// Emits error log via events history contract
-    function _emitError(uint e) private returns (uint)   {
+    function _emitError(uint e) private returns (uint) {
         ERC20Manager(getEventsHistory()).emitError(e);
         return e;
-    }
-
-    function _addToken(address _token) private {
-        if (_includesToken(_token)) {
-            return;
-        }
-
-        uint _lastIdx = _countTokens() + 1;
-        store.set(tokenAddresses.innerSet.values, bytes32(_lastIdx), bytes32(_token));
-        store.set(tokenAddresses.innerSet.indexes, bytes32(_token), bytes32(_lastIdx));
-        store.set(tokenAddresses.innerSet.count, _lastIdx);
-    }
-
-    function _removeToken(address _token) private {
-        if (!_includesToken(_token)) {
-            return;
-        }
-
-        uint _lastIdx = _countTokens();
-        bytes32 _lastValue = store.get(tokenAddresses.innerSet.values, bytes32(_lastIdx));
-        uint _idx = uint(store.get(tokenAddresses.innerSet.indexes, bytes32(_token)));
-        if (_idx < _lastIdx) {
-            store.set(tokenAddresses.innerSet.indexes, _lastValue, bytes32(_idx));
-            store.set(tokenAddresses.innerSet.values, bytes32(_idx), _lastValue);
-        }
-        store.set(tokenAddresses.innerSet.indexes, bytes32(_token), bytes32(0));
-        store.set(tokenAddresses.innerSet.values, bytes32(_lastIdx), bytes32(0));
-        store.set(tokenAddresses.innerSet.count, _lastIdx - 1);
-    }
-
-    function _includesToken(address _token) private view returns (bool) {
-        return store.get(tokenAddresses.innerSet.indexes, bytes32(_token)) != 0;
-    }
-
-    function _countTokens() private view returns (uint) {
-        return store.get(tokenAddresses.innerSet.count);
-    }
-
-    function _replaceToken(address _from, address _to) private {
-        if (!_includesToken(_from)) {
-            return;
-        }
-        uint _idx = uint(store.get(tokenAddresses.innerSet.indexes, bytes32(_from)));
-        store.set(tokenAddresses.innerSet.values, bytes32(_idx), bytes32(_to));
-        store.set(tokenAddresses.innerSet.indexes, bytes32(_to), bytes32(_idx));
-        store.set(tokenAddresses.innerSet.indexes, bytes32(_from), bytes32(0));
-    }
-
-    function _getTokens() private view returns (address[] _tokens) {
-        _tokens = new address[](_countTokens());
-        for (uint _tokenIdx = 0; _tokenIdx < _tokens.length; ++_tokenIdx) {
-            _tokens[_tokenIdx] = _getTokenByIndex(_tokenIdx);
-        }
-    }
-
-    function _getTokenByIndex(uint _idx) private view returns (address) {
-        return address(store.get(tokenAddresses.innerSet.values, bytes32(_idx + 1)));
     }
 }
