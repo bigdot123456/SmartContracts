@@ -12,19 +12,19 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.4.11;\n\n/**\n* @title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.\n*/\ncontract BaseRouter {\n\n    function() payable public {\n        uint r;\n        address _backend = backend();\n\n        // Make the call\n        assembly {\n            calldatacopy(mload(0x40), 0, calldatasize)\n            r := delegatecall(sub(gas, 700), _backend, mload(0x40), calldatasize, mload(0x40), 32) // WARNING: 32 - size of the return value\n        }\n\n        // Throw if the call failed\n        if (r != 1) revert();\n\n        // Pass on the return value\n        assembly {\n            return(mload(0x40), 32) // WARNING: 32 - size of the return value\n        }\n    }\n\n    /**\n    * @dev Returns destination address for future calls\n    *\n    * @return destination address\n    */\n    function backend() internal constant returns (address);\n}\n",
-  "sourcePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
+  "sourcePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
   "ast": {
-    "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
+    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
     "exportedSymbols": {
       "BaseRouter": [
-        2407
+        2420
       ]
     },
-    "id": 2408,
+    "id": 2421,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2380,
+        "id": 2393,
         "literals": [
           "solidity",
           "^",
@@ -40,16 +40,16 @@
         "contractKind": "contract",
         "documentation": "@title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.",
         "fullyImplemented": false,
-        "id": 2407,
+        "id": 2420,
         "linearizedBaseContracts": [
-          2407
+          2420
         ],
         "name": "BaseRouter",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 2400,
+              "id": 2413,
               "nodeType": "Block",
               "src": "203:523:15",
               "statements": [
@@ -58,10 +58,10 @@
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2384,
+                      "id": 2397,
                       "name": "r",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2401,
+                      "scope": 2414,
                       "src": "213:6:15",
                       "stateVariable": false,
                       "storageLocation": "default",
@@ -70,7 +70,7 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 2383,
+                        "id": 2396,
                         "name": "uint",
                         "nodeType": "ElementaryTypeName",
                         "src": "213:4:15",
@@ -83,22 +83,22 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2385,
+                  "id": 2398,
                   "initialValue": null,
                   "nodeType": "VariableDeclarationStatement",
                   "src": "213:6:15"
                 },
                 {
                   "assignments": [
-                    2387
+                    2400
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2387,
+                      "id": 2400,
                       "name": "_backend",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2401,
+                      "scope": 2414,
                       "src": "229:16:15",
                       "stateVariable": false,
                       "storageLocation": "default",
@@ -107,7 +107,7 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 2386,
+                        "id": 2399,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
                         "src": "229:7:15",
@@ -120,24 +120,24 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2390,
+                  "id": 2403,
                   "initialValue": {
                     "argumentTypes": null,
                     "arguments": [],
                     "expression": {
                       "argumentTypes": [],
-                      "id": 2388,
+                      "id": 2401,
                       "name": "backend",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2406,
+                      "referencedDeclaration": 2419,
                       "src": "248:7:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                         "typeString": "function () view returns (address)"
                       }
                     },
-                    "id": 2389,
+                    "id": 2402,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -158,7 +158,7 @@
                   "externalReferences": [
                     {
                       "r": {
-                        "declaration": 2384,
+                        "declaration": 2397,
                         "isOffset": false,
                         "isSlot": false,
                         "src": "371:1:15",
@@ -167,7 +167,7 @@
                     },
                     {
                       "_backend": {
-                        "declaration": 2387,
+                        "declaration": 2400,
                         "isOffset": false,
                         "isSlot": false,
                         "src": "404:8:15",
@@ -175,7 +175,7 @@
                       }
                     }
                   ],
-                  "id": 2391,
+                  "id": 2404,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    calldatacopy(mload(0x40), 0, calldatasize())\n    r := delegatecall(sub(gas(), 700), _backend, mload(0x40), calldatasize(), mload(0x40), 32)\n}",
                   "src": "293:264:15"
@@ -187,18 +187,18 @@
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     },
-                    "id": 2394,
+                    "id": 2407,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 2392,
+                      "id": 2405,
                       "name": "r",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2384,
+                      "referencedDeclaration": 2397,
                       "src": "559:1:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -210,7 +210,7 @@
                     "rightExpression": {
                       "argumentTypes": null,
                       "hexValue": "31",
-                      "id": 2393,
+                      "id": 2406,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -232,7 +232,7 @@
                     }
                   },
                   "falseBody": null,
-                  "id": 2398,
+                  "id": 2411,
                   "nodeType": "IfStatement",
                   "src": "555:20:15",
                   "trueBody": {
@@ -241,18 +241,18 @@
                       "arguments": [],
                       "expression": {
                         "argumentTypes": [],
-                        "id": 2395,
+                        "id": 2408,
                         "name": "revert",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 41313,
+                        "referencedDeclaration": 38672,
                         "src": "567:6:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_revert_pure$__$returns$__$",
                           "typeString": "function () pure"
                         }
                       },
-                      "id": 2396,
+                      "id": 2409,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -266,14 +266,14 @@
                         "typeString": "tuple()"
                       }
                     },
-                    "id": 2397,
+                    "id": 2410,
                     "nodeType": "ExpressionStatement",
                     "src": "567:8:15"
                   }
                 },
                 {
                   "externalReferences": [],
-                  "id": 2399,
+                  "id": 2412,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    return(mload(0x40), 32)\n}",
                   "src": "622:104:15"
@@ -281,7 +281,7 @@
               ]
             },
             "documentation": null,
-            "id": 2401,
+            "id": 2414,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -289,19 +289,19 @@
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2381,
+              "id": 2394,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "185:2:15"
             },
             "payable": true,
             "returnParameters": {
-              "id": 2382,
+              "id": 2395,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "203:0:15"
             },
-            "scope": 2407,
+            "scope": 2420,
             "src": "177:549:15",
             "stateMutability": "payable",
             "superFunction": null,
@@ -310,7 +310,7 @@
           {
             "body": null,
             "documentation": "@dev Returns destination address for future calls\n    * @return destination address",
-            "id": 2406,
+            "id": 2419,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -318,22 +318,22 @@
             "name": "backend",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2402,
+              "id": 2415,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "859:2:15"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2405,
+              "id": 2418,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2404,
+                  "id": 2417,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2406,
+                  "scope": 2419,
                   "src": "889:7:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -342,7 +342,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2403,
+                    "id": 2416,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "889:7:15",
@@ -357,31 +357,31 @@
               ],
               "src": "888:9:15"
             },
-            "scope": 2407,
+            "scope": 2420,
             "src": "843:55:15",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "internal"
           }
         ],
-        "scope": 2408,
+        "scope": 2421,
         "src": "150:750:15"
       }
     ],
     "src": "0:901:15"
   },
   "legacyAST": {
-    "absolutePath": "/Users/ahiatsevich/Development/chronobank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
+    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
     "exportedSymbols": {
       "BaseRouter": [
-        2407
+        2420
       ]
     },
-    "id": 2408,
+    "id": 2421,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2380,
+        "id": 2393,
         "literals": [
           "solidity",
           "^",
@@ -397,16 +397,16 @@
         "contractKind": "contract",
         "documentation": "@title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.",
         "fullyImplemented": false,
-        "id": 2407,
+        "id": 2420,
         "linearizedBaseContracts": [
-          2407
+          2420
         ],
         "name": "BaseRouter",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 2400,
+              "id": 2413,
               "nodeType": "Block",
               "src": "203:523:15",
               "statements": [
@@ -415,10 +415,10 @@
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2384,
+                      "id": 2397,
                       "name": "r",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2401,
+                      "scope": 2414,
                       "src": "213:6:15",
                       "stateVariable": false,
                       "storageLocation": "default",
@@ -427,7 +427,7 @@
                         "typeString": "uint256"
                       },
                       "typeName": {
-                        "id": 2383,
+                        "id": 2396,
                         "name": "uint",
                         "nodeType": "ElementaryTypeName",
                         "src": "213:4:15",
@@ -440,22 +440,22 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2385,
+                  "id": 2398,
                   "initialValue": null,
                   "nodeType": "VariableDeclarationStatement",
                   "src": "213:6:15"
                 },
                 {
                   "assignments": [
-                    2387
+                    2400
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 2387,
+                      "id": 2400,
                       "name": "_backend",
                       "nodeType": "VariableDeclaration",
-                      "scope": 2401,
+                      "scope": 2414,
                       "src": "229:16:15",
                       "stateVariable": false,
                       "storageLocation": "default",
@@ -464,7 +464,7 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 2386,
+                        "id": 2399,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
                         "src": "229:7:15",
@@ -477,24 +477,24 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 2390,
+                  "id": 2403,
                   "initialValue": {
                     "argumentTypes": null,
                     "arguments": [],
                     "expression": {
                       "argumentTypes": [],
-                      "id": 2388,
+                      "id": 2401,
                       "name": "backend",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2406,
+                      "referencedDeclaration": 2419,
                       "src": "248:7:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                         "typeString": "function () view returns (address)"
                       }
                     },
-                    "id": 2389,
+                    "id": 2402,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -515,7 +515,7 @@
                   "externalReferences": [
                     {
                       "r": {
-                        "declaration": 2384,
+                        "declaration": 2397,
                         "isOffset": false,
                         "isSlot": false,
                         "src": "371:1:15",
@@ -524,7 +524,7 @@
                     },
                     {
                       "_backend": {
-                        "declaration": 2387,
+                        "declaration": 2400,
                         "isOffset": false,
                         "isSlot": false,
                         "src": "404:8:15",
@@ -532,7 +532,7 @@
                       }
                     }
                   ],
-                  "id": 2391,
+                  "id": 2404,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    calldatacopy(mload(0x40), 0, calldatasize())\n    r := delegatecall(sub(gas(), 700), _backend, mload(0x40), calldatasize(), mload(0x40), 32)\n}",
                   "src": "293:264:15"
@@ -544,18 +544,18 @@
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     },
-                    "id": 2394,
+                    "id": 2407,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "argumentTypes": null,
-                      "id": 2392,
+                      "id": 2405,
                       "name": "r",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2384,
+                      "referencedDeclaration": 2397,
                       "src": "559:1:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -567,7 +567,7 @@
                     "rightExpression": {
                       "argumentTypes": null,
                       "hexValue": "31",
-                      "id": 2393,
+                      "id": 2406,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -589,7 +589,7 @@
                     }
                   },
                   "falseBody": null,
-                  "id": 2398,
+                  "id": 2411,
                   "nodeType": "IfStatement",
                   "src": "555:20:15",
                   "trueBody": {
@@ -598,18 +598,18 @@
                       "arguments": [],
                       "expression": {
                         "argumentTypes": [],
-                        "id": 2395,
+                        "id": 2408,
                         "name": "revert",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 41313,
+                        "referencedDeclaration": 38672,
                         "src": "567:6:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_revert_pure$__$returns$__$",
                           "typeString": "function () pure"
                         }
                       },
-                      "id": 2396,
+                      "id": 2409,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -623,14 +623,14 @@
                         "typeString": "tuple()"
                       }
                     },
-                    "id": 2397,
+                    "id": 2410,
                     "nodeType": "ExpressionStatement",
                     "src": "567:8:15"
                   }
                 },
                 {
                   "externalReferences": [],
-                  "id": 2399,
+                  "id": 2412,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    return(mload(0x40), 32)\n}",
                   "src": "622:104:15"
@@ -638,7 +638,7 @@
               ]
             },
             "documentation": null,
-            "id": 2401,
+            "id": 2414,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -646,19 +646,19 @@
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2381,
+              "id": 2394,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "185:2:15"
             },
             "payable": true,
             "returnParameters": {
-              "id": 2382,
+              "id": 2395,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "203:0:15"
             },
-            "scope": 2407,
+            "scope": 2420,
             "src": "177:549:15",
             "stateMutability": "payable",
             "superFunction": null,
@@ -667,7 +667,7 @@
           {
             "body": null,
             "documentation": "@dev Returns destination address for future calls\n    * @return destination address",
-            "id": 2406,
+            "id": 2419,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -675,22 +675,22 @@
             "name": "backend",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2402,
+              "id": 2415,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "859:2:15"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2405,
+              "id": 2418,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2404,
+                  "id": 2417,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2406,
+                  "scope": 2419,
                   "src": "889:7:15",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -699,7 +699,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2403,
+                    "id": 2416,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "889:7:15",
@@ -714,14 +714,14 @@
               ],
               "src": "888:9:15"
             },
-            "scope": 2407,
+            "scope": 2420,
             "src": "843:55:15",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "internal"
           }
         ],
-        "scope": 2408,
+        "scope": 2421,
         "src": "150:750:15"
       }
     ],
@@ -733,5 +733,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-04-05T14:52:03.466Z"
+  "updatedAt": "2018-04-06T09:20:58.252Z"
 }
