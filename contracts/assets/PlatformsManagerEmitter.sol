@@ -10,7 +10,7 @@ contract PlatformsManagerEmitter is MultiEventsHistoryAdapter {
     /**
     * @dev Event for attaching a platform to the system
     */
-    event PlatformAttached(address indexed self, address platform);
+    event PlatformAttached(address indexed self, address platform, address indexed by);
 
     /**
     * @dev Event for detaching a platform from the system
@@ -32,8 +32,8 @@ contract PlatformsManagerEmitter is MultiEventsHistoryAdapter {
     * Emitting events
     */
 
-    function emitPlatformAttached( address _platform) public {
-        PlatformAttached(_self(), _platform);
+    function emitPlatformAttached(address _platform, address _by) public {
+        PlatformAttached(_self(), _platform, _by);
     }
 
     function emitPlatformDetached( address _platform, address _by) public {

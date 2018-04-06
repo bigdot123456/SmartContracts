@@ -92,6 +92,7 @@ contract PlatformsManager is FeatureFeeAdapter, BaseManager, PlatformsManagerEmi
         if (_start >= _totalPlatformsCount || _size == 0) {
             return _platforms;
         }
+        
         _platforms = new address[](_size);
 
         uint _lastIdx = (_start + _size >= _totalPlatformsCount) ? _totalPlatformsCount : _start + _size;
@@ -118,7 +119,7 @@ contract PlatformsManager is FeatureFeeAdapter, BaseManager, PlatformsManagerEmi
         store.add(platforms, _platform);
         MultiEventsHistory(getEventsHistory()).authorize(_platform);
 
-        _emitPlatformAttached(_platform);
+        _emitPlatformAttached(_platform, OwnedContract(_platform).contractOwner());
         //TODO: @ahiatsevich: emitAssetsAttached / register in ERC20Manager?
         //TODO: @ahiatsevich: emitOwnersAttaged?
 
@@ -186,8 +187,8 @@ contract PlatformsManager is FeatureFeeAdapter, BaseManager, PlatformsManagerEmi
         return _errorCode;
     }
 
-    function _emitPlatformAttached(address _platform) private {
-        PlatformsManagerEmitter(getEventsHistory()).emitPlatformAttached(_platform);
+    function _emitPlatformAttached(address _platform, address _by) private {
+        PlatformsManagerEmitter(getEventsHistory()).emitPlatformAttached(_platform, _by);
     }
 
     function _emitPlatformDetached(address _platform, address _by) private {
