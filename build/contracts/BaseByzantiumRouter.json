@@ -11,20 +11,20 @@
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.4.11;\n\n\n/// @title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.\ncontract BaseByzantiumRouter {\n\n    function() payable public {\n        address _backend = backend();\n\n        assembly {\n            let calldataMemoryOffset := mload(0x40)\n            mstore(0x40, add(calldataMemoryOffset, calldatasize))\n            calldatacopy(calldataMemoryOffset, 0x0, calldatasize)\n            let r := delegatecall(sub(gas, 10000), _backend, calldataMemoryOffset, calldatasize, 0, 0)\n\n            let returndataMemoryOffset := mload(0x40)\n            mstore(0x40, add(returndataMemoryOffset, returndatasize))\n            returndatacopy(returndataMemoryOffset, 0x0, returndatasize)\n\n            switch r\n            case 1 {\n                return(returndataMemoryOffset, returndatasize)\n            }\n            default {\n                revert(0, 0)\n            }\n        }\n    }\n\n    /// @notice Returns destination address for future calls\n    /// @dev abstract definition. should be implemented in sibling contracts\n    /// @return destination address\n    function backend() internal constant returns (address);\n}\n",
-  "sourcePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/common/BaseByzantiumRouter.sol",
+  "source": "/**\n * Copyright 2017–2018, LaborX PTY\n * Licensed under the AGPL Version 3 license.\n */\n\npragma solidity ^0.4.11;\n\n\n/// @title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.\ncontract BaseByzantiumRouter {\n\n    function() payable public {\n        address _backend = backend();\n\n        assembly {\n            let calldataMemoryOffset := mload(0x40)\n            mstore(0x40, add(calldataMemoryOffset, calldatasize))\n            calldatacopy(calldataMemoryOffset, 0x0, calldatasize)\n            let r := delegatecall(sub(gas, 10000), _backend, calldataMemoryOffset, calldatasize, 0, 0)\n\n            let returndataMemoryOffset := mload(0x40)\n            mstore(0x40, add(returndataMemoryOffset, returndatasize))\n            returndatacopy(returndataMemoryOffset, 0x0, returndatasize)\n\n            switch r\n            case 1 {\n                return(returndataMemoryOffset, returndatasize)\n            }\n            default {\n                revert(0, 0)\n            }\n        }\n    }\n\n    /// @notice Returns destination address for future calls\n    /// @dev abstract definition. should be implemented in sibling contracts\n    /// @return destination address\n    function backend() internal constant returns (address);\n}\n",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/common/BaseByzantiumRouter.sol",
   "ast": {
-    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/common/BaseByzantiumRouter.sol",
+    "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/common/BaseByzantiumRouter.sol",
     "exportedSymbols": {
       "BaseByzantiumRouter": [
-        3816
+        1913
       ]
     },
-    "id": 3817,
+    "id": 1914,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 3800,
+        "id": 1897,
         "literals": [
           "solidity",
           "^",
@@ -32,7 +32,7 @@
           ".11"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:19"
+        "src": "92:24:7"
       },
       {
         "baseContracts": [],
@@ -40,31 +40,31 @@
         "contractKind": "contract",
         "documentation": "@title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.",
         "fullyImplemented": false,
-        "id": 3816,
+        "id": 1913,
         "linearizedBaseContracts": [
-          3816
+          1913
         ],
         "name": "BaseByzantiumRouter",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 3809,
+              "id": 1906,
               "nodeType": "Block",
-              "src": "208:744:19",
+              "src": "300:744:7",
               "statements": [
                 {
                   "assignments": [
-                    3804
+                    1901
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 3804,
+                      "id": 1901,
                       "name": "_backend",
                       "nodeType": "VariableDeclaration",
-                      "scope": 3810,
-                      "src": "218:16:19",
+                      "scope": 1907,
+                      "src": "310:16:7",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -72,10 +72,10 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 3803,
+                        "id": 1900,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
-                        "src": "218:7:19",
+                        "src": "310:7:7",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -85,24 +85,24 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 3807,
+                  "id": 1904,
                   "initialValue": {
                     "argumentTypes": null,
                     "arguments": [],
                     "expression": {
                       "argumentTypes": [],
-                      "id": 3805,
+                      "id": 1902,
                       "name": "backend",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3815,
-                      "src": "237:7:19",
+                      "referencedDeclaration": 1912,
+                      "src": "329:7:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                         "typeString": "function () view returns (address)"
                       }
                     },
-                    "id": 3806,
+                    "id": 1903,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -110,36 +110,36 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "237:9:19",
+                    "src": "329:9:7",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "218:28:19"
+                  "src": "310:28:7"
                 },
                 {
                   "externalReferences": [
                     {
                       "_backend": {
-                        "declaration": 3804,
+                        "declaration": 1901,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "503:8:19",
+                        "src": "595:8:7",
                         "valueSize": 1
                       }
                     }
                   ],
-                  "id": 3808,
+                  "id": 1905,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    let calldataMemoryOffset := mload(0x40)\n    mstore(0x40, add(calldataMemoryOffset, calldatasize()))\n    calldatacopy(calldataMemoryOffset, 0x0, calldatasize())\n    let r := delegatecall(sub(gas(), 10000), _backend, calldataMemoryOffset, calldatasize(), 0, 0)\n    let returndataMemoryOffset := mload(0x40)\n    mstore(0x40, add(returndataMemoryOffset, returndatasize()))\n    returndatacopy(returndataMemoryOffset, 0x0, returndatasize())\n    switch r\n    case 1 {\n        return(returndataMemoryOffset, returndatasize())\n    }\n    default {\n        revert(0, 0)\n    }\n}",
-                  "src": "257:695:19"
+                  "src": "349:695:7"
                 }
               ]
             },
             "documentation": null,
-            "id": 3810,
+            "id": 1907,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -147,20 +147,20 @@
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3801,
+              "id": 1898,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "190:2:19"
+              "src": "282:2:7"
             },
             "payable": true,
             "returnParameters": {
-              "id": 3802,
+              "id": 1899,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "208:0:19"
+              "src": "300:0:7"
             },
-            "scope": 3816,
-            "src": "182:770:19",
+            "scope": 1913,
+            "src": "274:770:7",
             "stateMutability": "payable",
             "superFunction": null,
             "visibility": "public"
@@ -168,7 +168,7 @@
           {
             "body": null,
             "documentation": "@notice Returns destination address for future calls\n @dev abstract definition. should be implemented in sibling contracts\n @return destination address",
-            "id": 3815,
+            "id": 1912,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -176,23 +176,23 @@
             "name": "backend",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3811,
+              "id": 1908,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1148:2:19"
+              "src": "1240:2:7"
             },
             "payable": false,
             "returnParameters": {
-              "id": 3814,
+              "id": 1911,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3813,
+                  "id": 1910,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3815,
-                  "src": "1178:7:19",
+                  "scope": 1912,
+                  "src": "1270:7:7",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -200,10 +200,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3812,
+                    "id": 1909,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1178:7:19",
+                    "src": "1270:7:7",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -213,33 +213,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1177:9:19"
+              "src": "1269:9:7"
             },
-            "scope": 3816,
-            "src": "1132:55:19",
+            "scope": 1913,
+            "src": "1224:55:7",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "internal"
           }
         ],
-        "scope": 3817,
-        "src": "146:1043:19"
+        "scope": 1914,
+        "src": "238:1043:7"
       }
     ],
-    "src": "0:1190:19"
+    "src": "92:1190:7"
   },
   "legacyAST": {
-    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/common/BaseByzantiumRouter.sol",
+    "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/common/BaseByzantiumRouter.sol",
     "exportedSymbols": {
       "BaseByzantiumRouter": [
-        3816
+        1913
       ]
     },
-    "id": 3817,
+    "id": 1914,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 3800,
+        "id": 1897,
         "literals": [
           "solidity",
           "^",
@@ -247,7 +247,7 @@
           ".11"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:19"
+        "src": "92:24:7"
       },
       {
         "baseContracts": [],
@@ -255,31 +255,31 @@
         "contractKind": "contract",
         "documentation": "@title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.",
         "fullyImplemented": false,
-        "id": 3816,
+        "id": 1913,
         "linearizedBaseContracts": [
-          3816
+          1913
         ],
         "name": "BaseByzantiumRouter",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 3809,
+              "id": 1906,
               "nodeType": "Block",
-              "src": "208:744:19",
+              "src": "300:744:7",
               "statements": [
                 {
                   "assignments": [
-                    3804
+                    1901
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 3804,
+                      "id": 1901,
                       "name": "_backend",
                       "nodeType": "VariableDeclaration",
-                      "scope": 3810,
-                      "src": "218:16:19",
+                      "scope": 1907,
+                      "src": "310:16:7",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -287,10 +287,10 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 3803,
+                        "id": 1900,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
-                        "src": "218:7:19",
+                        "src": "310:7:7",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -300,24 +300,24 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 3807,
+                  "id": 1904,
                   "initialValue": {
                     "argumentTypes": null,
                     "arguments": [],
                     "expression": {
                       "argumentTypes": [],
-                      "id": 3805,
+                      "id": 1902,
                       "name": "backend",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 3815,
-                      "src": "237:7:19",
+                      "referencedDeclaration": 1912,
+                      "src": "329:7:7",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                         "typeString": "function () view returns (address)"
                       }
                     },
-                    "id": 3806,
+                    "id": 1903,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -325,36 +325,36 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "237:9:19",
+                    "src": "329:9:7",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "218:28:19"
+                  "src": "310:28:7"
                 },
                 {
                   "externalReferences": [
                     {
                       "_backend": {
-                        "declaration": 3804,
+                        "declaration": 1901,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "503:8:19",
+                        "src": "595:8:7",
                         "valueSize": 1
                       }
                     }
                   ],
-                  "id": 3808,
+                  "id": 1905,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    let calldataMemoryOffset := mload(0x40)\n    mstore(0x40, add(calldataMemoryOffset, calldatasize()))\n    calldatacopy(calldataMemoryOffset, 0x0, calldatasize())\n    let r := delegatecall(sub(gas(), 10000), _backend, calldataMemoryOffset, calldatasize(), 0, 0)\n    let returndataMemoryOffset := mload(0x40)\n    mstore(0x40, add(returndataMemoryOffset, returndatasize()))\n    returndatacopy(returndataMemoryOffset, 0x0, returndatasize())\n    switch r\n    case 1 {\n        return(returndataMemoryOffset, returndatasize())\n    }\n    default {\n        revert(0, 0)\n    }\n}",
-                  "src": "257:695:19"
+                  "src": "349:695:7"
                 }
               ]
             },
             "documentation": null,
-            "id": 3810,
+            "id": 1907,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -362,20 +362,20 @@
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3801,
+              "id": 1898,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "190:2:19"
+              "src": "282:2:7"
             },
             "payable": true,
             "returnParameters": {
-              "id": 3802,
+              "id": 1899,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "208:0:19"
+              "src": "300:0:7"
             },
-            "scope": 3816,
-            "src": "182:770:19",
+            "scope": 1913,
+            "src": "274:770:7",
             "stateMutability": "payable",
             "superFunction": null,
             "visibility": "public"
@@ -383,7 +383,7 @@
           {
             "body": null,
             "documentation": "@notice Returns destination address for future calls\n @dev abstract definition. should be implemented in sibling contracts\n @return destination address",
-            "id": 3815,
+            "id": 1912,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -391,23 +391,23 @@
             "name": "backend",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 3811,
+              "id": 1908,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1148:2:19"
+              "src": "1240:2:7"
             },
             "payable": false,
             "returnParameters": {
-              "id": 3814,
+              "id": 1911,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 3813,
+                  "id": 1910,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 3815,
-                  "src": "1178:7:19",
+                  "scope": 1912,
+                  "src": "1270:7:7",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -415,10 +415,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 3812,
+                    "id": 1909,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1178:7:19",
+                    "src": "1270:7:7",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -428,20 +428,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1177:9:19"
+              "src": "1269:9:7"
             },
-            "scope": 3816,
-            "src": "1132:55:19",
+            "scope": 1913,
+            "src": "1224:55:7",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "internal"
           }
         ],
-        "scope": 3817,
-        "src": "146:1043:19"
+        "scope": 1914,
+        "src": "238:1043:7"
       }
     ],
-    "src": "0:1190:19"
+    "src": "92:1190:7"
   },
   "compiler": {
     "name": "solc",
@@ -449,5 +449,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-04-06T09:20:58.320Z"
+  "updatedAt": "2018-04-11T08:13:18.731Z"
 }

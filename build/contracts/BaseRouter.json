@@ -11,10 +11,10 @@
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.4.11;\n\n/**\n* @title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.\n*/\ncontract BaseRouter {\n\n    function() payable public {\n        uint r;\n        address _backend = backend();\n\n        // Make the call\n        assembly {\n            calldatacopy(mload(0x40), 0, calldatasize)\n            r := delegatecall(sub(gas, 700), _backend, mload(0x40), calldatasize, mload(0x40), 32) // WARNING: 32 - size of the return value\n        }\n\n        // Throw if the call failed\n        if (r != 1) revert();\n\n        // Pass on the return value\n        assembly {\n            return(mload(0x40), 32) // WARNING: 32 - size of the return value\n        }\n    }\n\n    /**\n    * @dev Returns destination address for future calls\n    *\n    * @return destination address\n    */\n    function backend() internal constant returns (address);\n}\n",
-  "sourcePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
+  "source": "/**\n * Copyright 2017–2018, LaborX PTY\n * Licensed under the AGPL Version 3 license.\n */\n\npragma solidity ^0.4.11;\n\n/**\n* @title Routing contract that is able to provide a way for delegating invocations with dynamic destination address.\n*/\ncontract BaseRouter {\n\n    function() payable public {\n        uint r;\n        address _backend = backend();\n\n        // Make the call\n        assembly {\n            calldatacopy(mload(0x40), 0, calldatasize)\n            r := delegatecall(sub(gas, 700), _backend, mload(0x40), calldatasize, mload(0x40), 32) // WARNING: 32 - size of the return value\n        }\n\n        // Throw if the call failed\n        if (r != 1) revert();\n\n        // Pass on the return value\n        assembly {\n            return(mload(0x40), 32) // WARNING: 32 - size of the return value\n        }\n    }\n\n    /**\n    * @dev Returns destination address for future calls\n    *\n    * @return destination address\n    */\n    function backend() internal constant returns (address);\n}\n",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
   "ast": {
-    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
+    "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
     "exportedSymbols": {
       "BaseRouter": [
         2420
@@ -32,7 +32,7 @@
           ".11"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:15"
+        "src": "92:24:15"
       },
       {
         "baseContracts": [],
@@ -51,7 +51,7 @@
             "body": {
               "id": 2413,
               "nodeType": "Block",
-              "src": "203:523:15",
+              "src": "295:523:15",
               "statements": [
                 {
                   "assignments": [],
@@ -62,7 +62,7 @@
                       "name": "r",
                       "nodeType": "VariableDeclaration",
                       "scope": 2414,
-                      "src": "213:6:15",
+                      "src": "305:6:15",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -73,7 +73,7 @@
                         "id": 2396,
                         "name": "uint",
                         "nodeType": "ElementaryTypeName",
-                        "src": "213:4:15",
+                        "src": "305:4:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -86,7 +86,7 @@
                   "id": 2398,
                   "initialValue": null,
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "213:6:15"
+                  "src": "305:6:15"
                 },
                 {
                   "assignments": [
@@ -99,7 +99,7 @@
                       "name": "_backend",
                       "nodeType": "VariableDeclaration",
                       "scope": 2414,
-                      "src": "229:16:15",
+                      "src": "321:16:15",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -110,7 +110,7 @@
                         "id": 2399,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
-                        "src": "229:7:15",
+                        "src": "321:7:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -131,7 +131,7 @@
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
                       "referencedDeclaration": 2419,
-                      "src": "248:7:15",
+                      "src": "340:7:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                         "typeString": "function () view returns (address)"
@@ -145,14 +145,14 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "248:9:15",
+                    "src": "340:9:15",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "229:28:15"
+                  "src": "321:28:15"
                 },
                 {
                   "externalReferences": [
@@ -161,7 +161,7 @@
                         "declaration": 2397,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "371:1:15",
+                        "src": "463:1:15",
                         "valueSize": 1
                       }
                     },
@@ -170,7 +170,7 @@
                         "declaration": 2400,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "404:8:15",
+                        "src": "496:8:15",
                         "valueSize": 1
                       }
                     }
@@ -178,7 +178,7 @@
                   "id": 2404,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    calldatacopy(mload(0x40), 0, calldatasize())\n    r := delegatecall(sub(gas(), 700), _backend, mload(0x40), calldatasize(), mload(0x40), 32)\n}",
-                  "src": "293:264:15"
+                  "src": "385:264:15"
                 },
                 {
                   "condition": {
@@ -199,7 +199,7 @@
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
                       "referencedDeclaration": 2397,
-                      "src": "559:1:15",
+                      "src": "651:1:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -217,7 +217,7 @@
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "564:1:15",
+                      "src": "656:1:15",
                       "subdenomination": null,
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_1_by_1",
@@ -225,7 +225,7 @@
                       },
                       "value": "1"
                     },
-                    "src": "559:6:15",
+                    "src": "651:6:15",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -234,7 +234,7 @@
                   "falseBody": null,
                   "id": 2411,
                   "nodeType": "IfStatement",
-                  "src": "555:20:15",
+                  "src": "647:20:15",
                   "trueBody": {
                     "expression": {
                       "argumentTypes": null,
@@ -245,8 +245,8 @@
                         "name": "revert",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 38672,
-                        "src": "567:6:15",
+                        "referencedDeclaration": 38179,
+                        "src": "659:6:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_revert_pure$__$returns$__$",
                           "typeString": "function () pure"
@@ -260,7 +260,7 @@
                       "lValueRequested": false,
                       "names": [],
                       "nodeType": "FunctionCall",
-                      "src": "567:8:15",
+                      "src": "659:8:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_tuple$__$",
                         "typeString": "tuple()"
@@ -268,7 +268,7 @@
                     },
                     "id": 2410,
                     "nodeType": "ExpressionStatement",
-                    "src": "567:8:15"
+                    "src": "659:8:15"
                   }
                 },
                 {
@@ -276,7 +276,7 @@
                   "id": 2412,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    return(mload(0x40), 32)\n}",
-                  "src": "622:104:15"
+                  "src": "714:104:15"
                 }
               ]
             },
@@ -292,17 +292,17 @@
               "id": 2394,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "185:2:15"
+              "src": "277:2:15"
             },
             "payable": true,
             "returnParameters": {
               "id": 2395,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "203:0:15"
+              "src": "295:0:15"
             },
             "scope": 2420,
-            "src": "177:549:15",
+            "src": "269:549:15",
             "stateMutability": "payable",
             "superFunction": null,
             "visibility": "public"
@@ -321,7 +321,7 @@
               "id": 2415,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "859:2:15"
+              "src": "951:2:15"
             },
             "payable": false,
             "returnParameters": {
@@ -334,7 +334,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 2419,
-                  "src": "889:7:15",
+                  "src": "981:7:15",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -345,7 +345,7 @@
                     "id": 2416,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "889:7:15",
+                    "src": "981:7:15",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -355,23 +355,23 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "888:9:15"
+              "src": "980:9:15"
             },
             "scope": 2420,
-            "src": "843:55:15",
+            "src": "935:55:15",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "internal"
           }
         ],
         "scope": 2421,
-        "src": "150:750:15"
+        "src": "242:750:15"
       }
     ],
-    "src": "0:901:15"
+    "src": "92:901:15"
   },
   "legacyAST": {
-    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
+    "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/extensions/BaseRouter.sol",
     "exportedSymbols": {
       "BaseRouter": [
         2420
@@ -389,7 +389,7 @@
           ".11"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:15"
+        "src": "92:24:15"
       },
       {
         "baseContracts": [],
@@ -408,7 +408,7 @@
             "body": {
               "id": 2413,
               "nodeType": "Block",
-              "src": "203:523:15",
+              "src": "295:523:15",
               "statements": [
                 {
                   "assignments": [],
@@ -419,7 +419,7 @@
                       "name": "r",
                       "nodeType": "VariableDeclaration",
                       "scope": 2414,
-                      "src": "213:6:15",
+                      "src": "305:6:15",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -430,7 +430,7 @@
                         "id": 2396,
                         "name": "uint",
                         "nodeType": "ElementaryTypeName",
-                        "src": "213:4:15",
+                        "src": "305:4:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -443,7 +443,7 @@
                   "id": 2398,
                   "initialValue": null,
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "213:6:15"
+                  "src": "305:6:15"
                 },
                 {
                   "assignments": [
@@ -456,7 +456,7 @@
                       "name": "_backend",
                       "nodeType": "VariableDeclaration",
                       "scope": 2414,
-                      "src": "229:16:15",
+                      "src": "321:16:15",
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
@@ -467,7 +467,7 @@
                         "id": 2399,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
-                        "src": "229:7:15",
+                        "src": "321:7:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -488,7 +488,7 @@
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
                       "referencedDeclaration": 2419,
-                      "src": "248:7:15",
+                      "src": "340:7:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                         "typeString": "function () view returns (address)"
@@ -502,14 +502,14 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "248:9:15",
+                    "src": "340:9:15",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
                   "nodeType": "VariableDeclarationStatement",
-                  "src": "229:28:15"
+                  "src": "321:28:15"
                 },
                 {
                   "externalReferences": [
@@ -518,7 +518,7 @@
                         "declaration": 2397,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "371:1:15",
+                        "src": "463:1:15",
                         "valueSize": 1
                       }
                     },
@@ -527,7 +527,7 @@
                         "declaration": 2400,
                         "isOffset": false,
                         "isSlot": false,
-                        "src": "404:8:15",
+                        "src": "496:8:15",
                         "valueSize": 1
                       }
                     }
@@ -535,7 +535,7 @@
                   "id": 2404,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    calldatacopy(mload(0x40), 0, calldatasize())\n    r := delegatecall(sub(gas(), 700), _backend, mload(0x40), calldatasize(), mload(0x40), 32)\n}",
-                  "src": "293:264:15"
+                  "src": "385:264:15"
                 },
                 {
                   "condition": {
@@ -556,7 +556,7 @@
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
                       "referencedDeclaration": 2397,
-                      "src": "559:1:15",
+                      "src": "651:1:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -574,7 +574,7 @@
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "564:1:15",
+                      "src": "656:1:15",
                       "subdenomination": null,
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_1_by_1",
@@ -582,7 +582,7 @@
                       },
                       "value": "1"
                     },
-                    "src": "559:6:15",
+                    "src": "651:6:15",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -591,7 +591,7 @@
                   "falseBody": null,
                   "id": 2411,
                   "nodeType": "IfStatement",
-                  "src": "555:20:15",
+                  "src": "647:20:15",
                   "trueBody": {
                     "expression": {
                       "argumentTypes": null,
@@ -602,8 +602,8 @@
                         "name": "revert",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 38672,
-                        "src": "567:6:15",
+                        "referencedDeclaration": 38179,
+                        "src": "659:6:15",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_revert_pure$__$returns$__$",
                           "typeString": "function () pure"
@@ -617,7 +617,7 @@
                       "lValueRequested": false,
                       "names": [],
                       "nodeType": "FunctionCall",
-                      "src": "567:8:15",
+                      "src": "659:8:15",
                       "typeDescriptions": {
                         "typeIdentifier": "t_tuple$__$",
                         "typeString": "tuple()"
@@ -625,7 +625,7 @@
                     },
                     "id": 2410,
                     "nodeType": "ExpressionStatement",
-                    "src": "567:8:15"
+                    "src": "659:8:15"
                   }
                 },
                 {
@@ -633,7 +633,7 @@
                   "id": 2412,
                   "nodeType": "InlineAssembly",
                   "operations": "{\n    return(mload(0x40), 32)\n}",
-                  "src": "622:104:15"
+                  "src": "714:104:15"
                 }
               ]
             },
@@ -649,17 +649,17 @@
               "id": 2394,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "185:2:15"
+              "src": "277:2:15"
             },
             "payable": true,
             "returnParameters": {
               "id": 2395,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "203:0:15"
+              "src": "295:0:15"
             },
             "scope": 2420,
-            "src": "177:549:15",
+            "src": "269:549:15",
             "stateMutability": "payable",
             "superFunction": null,
             "visibility": "public"
@@ -678,7 +678,7 @@
               "id": 2415,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "859:2:15"
+              "src": "951:2:15"
             },
             "payable": false,
             "returnParameters": {
@@ -691,7 +691,7 @@
                   "name": "",
                   "nodeType": "VariableDeclaration",
                   "scope": 2419,
-                  "src": "889:7:15",
+                  "src": "981:7:15",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -702,7 +702,7 @@
                     "id": 2416,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "889:7:15",
+                    "src": "981:7:15",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -712,20 +712,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "888:9:15"
+              "src": "980:9:15"
             },
             "scope": 2420,
-            "src": "843:55:15",
+            "src": "935:55:15",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "internal"
           }
         ],
         "scope": 2421,
-        "src": "150:750:15"
+        "src": "242:750:15"
       }
     ],
-    "src": "0:901:15"
+    "src": "92:901:15"
   },
   "compiler": {
     "name": "solc",
@@ -733,5 +733,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-04-06T09:20:58.252Z"
+  "updatedAt": "2018-04-11T07:40:05.097Z"
 }

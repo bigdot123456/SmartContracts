@@ -164,20 +164,20 @@
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.4.11;\n\n\n/// @title Defines public interface for voting managers.\ncontract VotingManagerInterface {\n\n    /** Getters */\n\n    /// @notice Gets vote limit that was setup for a manager\n    function getVoteLimit() public view returns (uint);\n\n    /// @notice Gets a number of polls registered in a manager\n    function getPollsCount() public view returns (uint);\n\n    /// @notice Requests paginated results for a list of polls.\n    function getPollsPaginated(uint _startIndex, uint32 _pageSize) public view returns (address[] _votings);\n\n    /// @notice Gets a number of active polls. Could be restricted to some upper bounds.\n    function getActivePollsCount() public view returns (uint);\n\n    /// @notice Gets detailed info for a list of provided polls.\n    function getPollsDetails(address[] _polls) public view returns (\n        address[] _owner,\n        bytes32[] _detailsIpfsHash,\n        uint[] _votelimit,\n        uint[] _deadline,\n        bool[] _status,\n        bool[] _active,\n        uint[] _creation\n    );\n\n\n    /** Actions */\n\n    /// @notice Updates percents of total shares that should be locked (put) in a poll to say that poll is legally completed\n    function setVotesPercent(uint _percent) public returns (uint _resultCode);\n\n    /// @notice Creates a new poll and register it in a manager.\n    function createPoll(\n        uint _optionsCount,\n        bytes32 _detailsIpfsHash,\n        uint _votelimit,\n        uint _deadline\n    ) public returns (uint);\n}\n",
-  "sourcePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/vote/VotingManagerInterface.sol",
+  "source": "/**\n * Copyright 2017–2018, LaborX PTY\n * Licensed under the AGPL Version 3 license.\n */\n\npragma solidity ^0.4.11;\n\n\n/// @title Defines public interface for voting managers.\ncontract VotingManagerInterface {\n\n    /** Getters */\n\n    /// @notice Gets vote limit that was setup for a manager\n    function getVoteLimit() public view returns (uint);\n\n    /// @notice Gets a number of polls registered in a manager\n    function getPollsCount() public view returns (uint);\n\n    /// @notice Requests paginated results for a list of polls.\n    function getPollsPaginated(uint _startIndex, uint32 _pageSize) public view returns (address[] _votings);\n\n    /// @notice Gets a number of active polls. Could be restricted to some upper bounds.\n    function getActivePollsCount() public view returns (uint);\n\n    /// @notice Gets detailed info for a list of provided polls.\n    function getPollsDetails(address[] _polls) public view returns (\n        address[] _owner,\n        bytes32[] _detailsIpfsHash,\n        uint[] _votelimit,\n        uint[] _deadline,\n        bool[] _status,\n        bool[] _active,\n        uint[] _creation\n    );\n\n\n    /** Actions */\n\n    /// @notice Updates percents of total shares that should be locked (put) in a poll to say that poll is legally completed\n    function setVotesPercent(uint _percent) public returns (uint _resultCode);\n\n    /// @notice Creates a new poll and register it in a manager.\n    function createPoll(\n        uint _optionsCount,\n        bytes32 _detailsIpfsHash,\n        uint _votelimit,\n        uint _deadline\n    ) public returns (uint);\n}\n",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/vote/VotingManagerInterface.sol",
   "ast": {
-    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/vote/VotingManagerInterface.sol",
+    "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/vote/VotingManagerInterface.sol",
     "exportedSymbols": {
       "VotingManagerInterface": [
-        35653
+        35160
       ]
     },
-    "id": 35654,
+    "id": 35161,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 35580,
+        "id": 35087,
         "literals": [
           "solidity",
           "^",
@@ -185,7 +185,7 @@
           ".11"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:116"
+        "src": "92:24:115"
       },
       {
         "baseContracts": [],
@@ -193,9 +193,9 @@
         "contractKind": "contract",
         "documentation": "@title Defines public interface for voting managers.",
         "fullyImplemented": false,
-        "id": 35653,
+        "id": 35160,
         "linearizedBaseContracts": [
-          35653
+          35160
         ],
         "name": "VotingManagerInterface",
         "nodeType": "ContractDefinition",
@@ -203,7 +203,7 @@
           {
             "body": null,
             "documentation": "@notice Gets vote limit that was setup for a manager",
-            "id": 35585,
+            "id": 35092,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -211,23 +211,23 @@
             "name": "getVoteLimit",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35581,
+              "id": 35088,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "225:2:116"
+              "src": "317:2:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35584,
+              "id": 35091,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35583,
+                  "id": 35090,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35585,
-                  "src": "249:4:116",
+                  "scope": 35092,
+                  "src": "341:4:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -235,10 +235,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35582,
+                    "id": 35089,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "249:4:116",
+                    "src": "341:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -248,10 +248,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "248:6:116"
+              "src": "340:6:115"
             },
-            "scope": 35653,
-            "src": "204:51:116",
+            "scope": 35160,
+            "src": "296:51:115",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
@@ -259,7 +259,7 @@
           {
             "body": null,
             "documentation": "@notice Gets a number of polls registered in a manager",
-            "id": 35590,
+            "id": 35097,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -267,23 +267,23 @@
             "name": "getPollsCount",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35586,
+              "id": 35093,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "346:2:116"
+              "src": "438:2:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35589,
+              "id": 35096,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35588,
+                  "id": 35095,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35590,
-                  "src": "370:4:116",
+                  "scope": 35097,
+                  "src": "462:4:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -291,10 +291,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35587,
+                    "id": 35094,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "370:4:116",
+                    "src": "462:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -304,10 +304,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "369:6:116"
+              "src": "461:6:115"
             },
-            "scope": 35653,
-            "src": "324:52:116",
+            "scope": 35160,
+            "src": "416:52:115",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
@@ -315,7 +315,7 @@
           {
             "body": null,
             "documentation": "@notice Requests paginated results for a list of polls.",
-            "id": 35600,
+            "id": 35107,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -323,16 +323,16 @@
             "name": "getPollsPaginated",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35595,
+              "id": 35102,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35592,
+                  "id": 35099,
                   "name": "_startIndex",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35600,
-                  "src": "473:16:116",
+                  "scope": 35107,
+                  "src": "565:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -340,10 +340,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35591,
+                    "id": 35098,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "473:4:116",
+                    "src": "565:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -354,11 +354,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35594,
+                  "id": 35101,
                   "name": "_pageSize",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35600,
-                  "src": "491:16:116",
+                  "scope": 35107,
+                  "src": "583:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -366,10 +366,10 @@
                     "typeString": "uint32"
                   },
                   "typeName": {
-                    "id": 35593,
+                    "id": 35100,
                     "name": "uint32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "491:6:116",
+                    "src": "583:6:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint32",
                       "typeString": "uint32"
@@ -379,20 +379,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "472:36:116"
+              "src": "564:36:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35599,
+              "id": 35106,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35598,
+                  "id": 35105,
                   "name": "_votings",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35600,
-                  "src": "530:18:116",
+                  "scope": 35107,
+                  "src": "622:18:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -401,19 +401,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35596,
+                      "id": 35103,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "530:7:116",
+                      "src": "622:7:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 35597,
+                    "id": 35104,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "530:9:116",
+                    "src": "622:9:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[] storage pointer"
@@ -423,10 +423,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "529:20:116"
+              "src": "621:20:115"
             },
-            "scope": 35653,
-            "src": "446:104:116",
+            "scope": 35160,
+            "src": "538:104:115",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
@@ -434,7 +434,7 @@
           {
             "body": null,
             "documentation": "@notice Gets a number of active polls. Could be restricted to some upper bounds.",
-            "id": 35605,
+            "id": 35112,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -442,23 +442,23 @@
             "name": "getActivePollsCount",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35601,
+              "id": 35108,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "673:2:116"
+              "src": "765:2:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35604,
+              "id": 35111,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35603,
+                  "id": 35110,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35605,
-                  "src": "697:4:116",
+                  "scope": 35112,
+                  "src": "789:4:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -466,10 +466,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35602,
+                    "id": 35109,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "697:4:116",
+                    "src": "789:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -479,10 +479,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "696:6:116"
+              "src": "788:6:115"
             },
-            "scope": 35653,
-            "src": "645:58:116",
+            "scope": 35160,
+            "src": "737:58:115",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
@@ -490,7 +490,7 @@
           {
             "body": null,
             "documentation": "@notice Gets detailed info for a list of provided polls.",
-            "id": 35632,
+            "id": 35139,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -498,16 +498,16 @@
             "name": "getPollsDetails",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35609,
+              "id": 35116,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35608,
+                  "id": 35115,
                   "name": "_polls",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "799:16:116",
+                  "scope": 35139,
+                  "src": "891:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -516,19 +516,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35606,
+                      "id": 35113,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "799:7:116",
+                      "src": "891:7:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 35607,
+                    "id": 35114,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "799:9:116",
+                    "src": "891:9:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[] storage pointer"
@@ -538,20 +538,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "798:18:116"
+              "src": "890:18:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35631,
+              "id": 35138,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35612,
+                  "id": 35119,
                   "name": "_owner",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "847:16:116",
+                  "scope": 35139,
+                  "src": "939:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -560,19 +560,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35610,
+                      "id": 35117,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "847:7:116",
+                      "src": "939:7:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 35611,
+                    "id": 35118,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "847:9:116",
+                    "src": "939:9:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[] storage pointer"
@@ -583,11 +583,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35615,
+                  "id": 35122,
                   "name": "_detailsIpfsHash",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "873:26:116",
+                  "scope": 35139,
+                  "src": "965:26:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -596,19 +596,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35613,
+                      "id": 35120,
                       "name": "bytes32",
                       "nodeType": "ElementaryTypeName",
-                      "src": "873:7:116",
+                      "src": "965:7:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_bytes32",
                         "typeString": "bytes32"
                       }
                     },
-                    "id": 35614,
+                    "id": 35121,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "873:9:116",
+                    "src": "965:9:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
                       "typeString": "bytes32[] storage pointer"
@@ -619,11 +619,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35618,
+                  "id": 35125,
                   "name": "_votelimit",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "909:17:116",
+                  "scope": 35139,
+                  "src": "1001:17:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -632,19 +632,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35616,
+                      "id": 35123,
                       "name": "uint",
                       "nodeType": "ElementaryTypeName",
-                      "src": "909:4:116",
+                      "src": "1001:4:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 35617,
+                    "id": 35124,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "909:6:116",
+                    "src": "1001:6:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
                       "typeString": "uint256[] storage pointer"
@@ -655,11 +655,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35621,
+                  "id": 35128,
                   "name": "_deadline",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "936:16:116",
+                  "scope": 35139,
+                  "src": "1028:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -668,19 +668,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35619,
+                      "id": 35126,
                       "name": "uint",
                       "nodeType": "ElementaryTypeName",
-                      "src": "936:4:116",
+                      "src": "1028:4:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 35620,
+                    "id": 35127,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "936:6:116",
+                    "src": "1028:6:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
                       "typeString": "uint256[] storage pointer"
@@ -691,11 +691,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35624,
+                  "id": 35131,
                   "name": "_status",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "962:14:116",
+                  "scope": 35139,
+                  "src": "1054:14:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -704,19 +704,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35622,
+                      "id": 35129,
                       "name": "bool",
                       "nodeType": "ElementaryTypeName",
-                      "src": "962:4:116",
+                      "src": "1054:4:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_bool",
                         "typeString": "bool"
                       }
                     },
-                    "id": 35623,
+                    "id": 35130,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "962:6:116",
+                    "src": "1054:6:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bool_$dyn_storage_ptr",
                       "typeString": "bool[] storage pointer"
@@ -727,11 +727,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35627,
+                  "id": 35134,
                   "name": "_active",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "986:14:116",
+                  "scope": 35139,
+                  "src": "1078:14:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -740,19 +740,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35625,
+                      "id": 35132,
                       "name": "bool",
                       "nodeType": "ElementaryTypeName",
-                      "src": "986:4:116",
+                      "src": "1078:4:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_bool",
                         "typeString": "bool"
                       }
                     },
-                    "id": 35626,
+                    "id": 35133,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "986:6:116",
+                    "src": "1078:6:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bool_$dyn_storage_ptr",
                       "typeString": "bool[] storage pointer"
@@ -763,11 +763,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35630,
+                  "id": 35137,
                   "name": "_creation",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "1010:16:116",
+                  "scope": 35139,
+                  "src": "1102:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -776,19 +776,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35628,
+                      "id": 35135,
                       "name": "uint",
                       "nodeType": "ElementaryTypeName",
-                      "src": "1010:4:116",
+                      "src": "1102:4:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 35629,
+                    "id": 35136,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "1010:6:116",
+                    "src": "1102:6:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
                       "typeString": "uint256[] storage pointer"
@@ -798,10 +798,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "837:195:116"
+              "src": "929:195:115"
             },
-            "scope": 35653,
-            "src": "774:259:116",
+            "scope": 35160,
+            "src": "866:259:115",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
@@ -809,7 +809,7 @@
           {
             "body": null,
             "documentation": "@notice Updates percents of total shares that should be locked (put) in a poll to say that poll is legally completed",
-            "id": 35639,
+            "id": 35146,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -817,16 +817,16 @@
             "name": "setVotesPercent",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35635,
+              "id": 35142,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35634,
+                  "id": 35141,
                   "name": "_percent",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35639,
-                  "src": "1210:13:116",
+                  "scope": 35146,
+                  "src": "1302:13:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -834,10 +834,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35633,
+                    "id": 35140,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1210:4:116",
+                    "src": "1302:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -847,20 +847,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1209:15:116"
+              "src": "1301:15:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35638,
+              "id": 35145,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35637,
+                  "id": 35144,
                   "name": "_resultCode",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35639,
-                  "src": "1241:16:116",
+                  "scope": 35146,
+                  "src": "1333:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -868,10 +868,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35636,
+                    "id": 35143,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1241:4:116",
+                    "src": "1333:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -881,10 +881,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1240:18:116"
+              "src": "1332:18:115"
             },
-            "scope": 35653,
-            "src": "1185:74:116",
+            "scope": 35160,
+            "src": "1277:74:115",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
@@ -892,7 +892,7 @@
           {
             "body": null,
             "documentation": "@notice Creates a new poll and register it in a manager.",
-            "id": 35652,
+            "id": 35159,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -900,16 +900,16 @@
             "name": "createPoll",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35648,
+              "id": 35155,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35641,
+                  "id": 35148,
                   "name": "_optionsCount",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35652,
-                  "src": "1359:18:116",
+                  "scope": 35159,
+                  "src": "1451:18:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -917,10 +917,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35640,
+                    "id": 35147,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1359:4:116",
+                    "src": "1451:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -931,11 +931,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35643,
+                  "id": 35150,
                   "name": "_detailsIpfsHash",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35652,
-                  "src": "1387:24:116",
+                  "scope": 35159,
+                  "src": "1479:24:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -943,10 +943,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 35642,
+                    "id": 35149,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1387:7:116",
+                    "src": "1479:7:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -957,11 +957,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35645,
+                  "id": 35152,
                   "name": "_votelimit",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35652,
-                  "src": "1421:15:116",
+                  "scope": 35159,
+                  "src": "1513:15:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -969,10 +969,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35644,
+                    "id": 35151,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1421:4:116",
+                    "src": "1513:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -983,11 +983,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35647,
+                  "id": 35154,
                   "name": "_deadline",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35652,
-                  "src": "1446:14:116",
+                  "scope": 35159,
+                  "src": "1538:14:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -995,10 +995,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35646,
+                    "id": 35153,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1446:4:116",
+                    "src": "1538:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1008,20 +1008,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1349:117:116"
+              "src": "1441:117:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35651,
+              "id": 35158,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35650,
+                  "id": 35157,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35652,
-                  "src": "1483:4:116",
+                  "scope": 35159,
+                  "src": "1575:4:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1029,10 +1029,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35649,
+                    "id": 35156,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1483:4:116",
+                    "src": "1575:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1042,33 +1042,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1482:6:116"
+              "src": "1574:6:115"
             },
-            "scope": 35653,
-            "src": "1330:159:116",
+            "scope": 35160,
+            "src": "1422:159:115",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 35654,
-        "src": "84:1407:116"
+        "scope": 35161,
+        "src": "176:1407:115"
       }
     ],
-    "src": "0:1492:116"
+    "src": "92:1492:115"
   },
   "legacyAST": {
-    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/vote/VotingManagerInterface.sol",
+    "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/vote/VotingManagerInterface.sol",
     "exportedSymbols": {
       "VotingManagerInterface": [
-        35653
+        35160
       ]
     },
-    "id": 35654,
+    "id": 35161,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 35580,
+        "id": 35087,
         "literals": [
           "solidity",
           "^",
@@ -1076,7 +1076,7 @@
           ".11"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:116"
+        "src": "92:24:115"
       },
       {
         "baseContracts": [],
@@ -1084,9 +1084,9 @@
         "contractKind": "contract",
         "documentation": "@title Defines public interface for voting managers.",
         "fullyImplemented": false,
-        "id": 35653,
+        "id": 35160,
         "linearizedBaseContracts": [
-          35653
+          35160
         ],
         "name": "VotingManagerInterface",
         "nodeType": "ContractDefinition",
@@ -1094,7 +1094,7 @@
           {
             "body": null,
             "documentation": "@notice Gets vote limit that was setup for a manager",
-            "id": 35585,
+            "id": 35092,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -1102,23 +1102,23 @@
             "name": "getVoteLimit",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35581,
+              "id": 35088,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "225:2:116"
+              "src": "317:2:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35584,
+              "id": 35091,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35583,
+                  "id": 35090,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35585,
-                  "src": "249:4:116",
+                  "scope": 35092,
+                  "src": "341:4:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1126,10 +1126,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35582,
+                    "id": 35089,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "249:4:116",
+                    "src": "341:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1139,10 +1139,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "248:6:116"
+              "src": "340:6:115"
             },
-            "scope": 35653,
-            "src": "204:51:116",
+            "scope": 35160,
+            "src": "296:51:115",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
@@ -1150,7 +1150,7 @@
           {
             "body": null,
             "documentation": "@notice Gets a number of polls registered in a manager",
-            "id": 35590,
+            "id": 35097,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -1158,23 +1158,23 @@
             "name": "getPollsCount",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35586,
+              "id": 35093,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "346:2:116"
+              "src": "438:2:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35589,
+              "id": 35096,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35588,
+                  "id": 35095,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35590,
-                  "src": "370:4:116",
+                  "scope": 35097,
+                  "src": "462:4:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1182,10 +1182,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35587,
+                    "id": 35094,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "370:4:116",
+                    "src": "462:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1195,10 +1195,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "369:6:116"
+              "src": "461:6:115"
             },
-            "scope": 35653,
-            "src": "324:52:116",
+            "scope": 35160,
+            "src": "416:52:115",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
@@ -1206,7 +1206,7 @@
           {
             "body": null,
             "documentation": "@notice Requests paginated results for a list of polls.",
-            "id": 35600,
+            "id": 35107,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -1214,16 +1214,16 @@
             "name": "getPollsPaginated",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35595,
+              "id": 35102,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35592,
+                  "id": 35099,
                   "name": "_startIndex",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35600,
-                  "src": "473:16:116",
+                  "scope": 35107,
+                  "src": "565:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1231,10 +1231,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35591,
+                    "id": 35098,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "473:4:116",
+                    "src": "565:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1245,11 +1245,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35594,
+                  "id": 35101,
                   "name": "_pageSize",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35600,
-                  "src": "491:16:116",
+                  "scope": 35107,
+                  "src": "583:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1257,10 +1257,10 @@
                     "typeString": "uint32"
                   },
                   "typeName": {
-                    "id": 35593,
+                    "id": 35100,
                     "name": "uint32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "491:6:116",
+                    "src": "583:6:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint32",
                       "typeString": "uint32"
@@ -1270,20 +1270,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "472:36:116"
+              "src": "564:36:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35599,
+              "id": 35106,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35598,
+                  "id": 35105,
                   "name": "_votings",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35600,
-                  "src": "530:18:116",
+                  "scope": 35107,
+                  "src": "622:18:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1292,19 +1292,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35596,
+                      "id": 35103,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "530:7:116",
+                      "src": "622:7:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 35597,
+                    "id": 35104,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "530:9:116",
+                    "src": "622:9:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[] storage pointer"
@@ -1314,10 +1314,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "529:20:116"
+              "src": "621:20:115"
             },
-            "scope": 35653,
-            "src": "446:104:116",
+            "scope": 35160,
+            "src": "538:104:115",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
@@ -1325,7 +1325,7 @@
           {
             "body": null,
             "documentation": "@notice Gets a number of active polls. Could be restricted to some upper bounds.",
-            "id": 35605,
+            "id": 35112,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -1333,23 +1333,23 @@
             "name": "getActivePollsCount",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35601,
+              "id": 35108,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "673:2:116"
+              "src": "765:2:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35604,
+              "id": 35111,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35603,
+                  "id": 35110,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35605,
-                  "src": "697:4:116",
+                  "scope": 35112,
+                  "src": "789:4:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1357,10 +1357,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35602,
+                    "id": 35109,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "697:4:116",
+                    "src": "789:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1370,10 +1370,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "696:6:116"
+              "src": "788:6:115"
             },
-            "scope": 35653,
-            "src": "645:58:116",
+            "scope": 35160,
+            "src": "737:58:115",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
@@ -1381,7 +1381,7 @@
           {
             "body": null,
             "documentation": "@notice Gets detailed info for a list of provided polls.",
-            "id": 35632,
+            "id": 35139,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
@@ -1389,16 +1389,16 @@
             "name": "getPollsDetails",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35609,
+              "id": 35116,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35608,
+                  "id": 35115,
                   "name": "_polls",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "799:16:116",
+                  "scope": 35139,
+                  "src": "891:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1407,19 +1407,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35606,
+                      "id": 35113,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "799:7:116",
+                      "src": "891:7:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 35607,
+                    "id": 35114,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "799:9:116",
+                    "src": "891:9:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[] storage pointer"
@@ -1429,20 +1429,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "798:18:116"
+              "src": "890:18:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35631,
+              "id": 35138,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35612,
+                  "id": 35119,
                   "name": "_owner",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "847:16:116",
+                  "scope": 35139,
+                  "src": "939:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1451,19 +1451,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35610,
+                      "id": 35117,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
-                      "src": "847:7:116",
+                      "src": "939:7:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
                         "typeString": "address"
                       }
                     },
-                    "id": 35611,
+                    "id": 35118,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "847:9:116",
+                    "src": "939:9:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_address_$dyn_storage_ptr",
                       "typeString": "address[] storage pointer"
@@ -1474,11 +1474,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35615,
+                  "id": 35122,
                   "name": "_detailsIpfsHash",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "873:26:116",
+                  "scope": 35139,
+                  "src": "965:26:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1487,19 +1487,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35613,
+                      "id": 35120,
                       "name": "bytes32",
                       "nodeType": "ElementaryTypeName",
-                      "src": "873:7:116",
+                      "src": "965:7:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_bytes32",
                         "typeString": "bytes32"
                       }
                     },
-                    "id": 35614,
+                    "id": 35121,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "873:9:116",
+                    "src": "965:9:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bytes32_$dyn_storage_ptr",
                       "typeString": "bytes32[] storage pointer"
@@ -1510,11 +1510,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35618,
+                  "id": 35125,
                   "name": "_votelimit",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "909:17:116",
+                  "scope": 35139,
+                  "src": "1001:17:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1523,19 +1523,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35616,
+                      "id": 35123,
                       "name": "uint",
                       "nodeType": "ElementaryTypeName",
-                      "src": "909:4:116",
+                      "src": "1001:4:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 35617,
+                    "id": 35124,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "909:6:116",
+                    "src": "1001:6:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
                       "typeString": "uint256[] storage pointer"
@@ -1546,11 +1546,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35621,
+                  "id": 35128,
                   "name": "_deadline",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "936:16:116",
+                  "scope": 35139,
+                  "src": "1028:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1559,19 +1559,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35619,
+                      "id": 35126,
                       "name": "uint",
                       "nodeType": "ElementaryTypeName",
-                      "src": "936:4:116",
+                      "src": "1028:4:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 35620,
+                    "id": 35127,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "936:6:116",
+                    "src": "1028:6:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
                       "typeString": "uint256[] storage pointer"
@@ -1582,11 +1582,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35624,
+                  "id": 35131,
                   "name": "_status",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "962:14:116",
+                  "scope": 35139,
+                  "src": "1054:14:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1595,19 +1595,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35622,
+                      "id": 35129,
                       "name": "bool",
                       "nodeType": "ElementaryTypeName",
-                      "src": "962:4:116",
+                      "src": "1054:4:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_bool",
                         "typeString": "bool"
                       }
                     },
-                    "id": 35623,
+                    "id": 35130,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "962:6:116",
+                    "src": "1054:6:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bool_$dyn_storage_ptr",
                       "typeString": "bool[] storage pointer"
@@ -1618,11 +1618,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35627,
+                  "id": 35134,
                   "name": "_active",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "986:14:116",
+                  "scope": 35139,
+                  "src": "1078:14:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1631,19 +1631,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35625,
+                      "id": 35132,
                       "name": "bool",
                       "nodeType": "ElementaryTypeName",
-                      "src": "986:4:116",
+                      "src": "1078:4:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_bool",
                         "typeString": "bool"
                       }
                     },
-                    "id": 35626,
+                    "id": 35133,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "986:6:116",
+                    "src": "1078:6:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_bool_$dyn_storage_ptr",
                       "typeString": "bool[] storage pointer"
@@ -1654,11 +1654,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35630,
+                  "id": 35137,
                   "name": "_creation",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35632,
-                  "src": "1010:16:116",
+                  "scope": 35139,
+                  "src": "1102:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1667,19 +1667,19 @@
                   },
                   "typeName": {
                     "baseType": {
-                      "id": 35628,
+                      "id": 35135,
                       "name": "uint",
                       "nodeType": "ElementaryTypeName",
-                      "src": "1010:4:116",
+                      "src": "1102:4:115",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       }
                     },
-                    "id": 35629,
+                    "id": 35136,
                     "length": null,
                     "nodeType": "ArrayTypeName",
-                    "src": "1010:6:116",
+                    "src": "1102:6:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
                       "typeString": "uint256[] storage pointer"
@@ -1689,10 +1689,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "837:195:116"
+              "src": "929:195:115"
             },
-            "scope": 35653,
-            "src": "774:259:116",
+            "scope": 35160,
+            "src": "866:259:115",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "public"
@@ -1700,7 +1700,7 @@
           {
             "body": null,
             "documentation": "@notice Updates percents of total shares that should be locked (put) in a poll to say that poll is legally completed",
-            "id": 35639,
+            "id": 35146,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -1708,16 +1708,16 @@
             "name": "setVotesPercent",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35635,
+              "id": 35142,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35634,
+                  "id": 35141,
                   "name": "_percent",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35639,
-                  "src": "1210:13:116",
+                  "scope": 35146,
+                  "src": "1302:13:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1725,10 +1725,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35633,
+                    "id": 35140,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1210:4:116",
+                    "src": "1302:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1738,20 +1738,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1209:15:116"
+              "src": "1301:15:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35638,
+              "id": 35145,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35637,
+                  "id": 35144,
                   "name": "_resultCode",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35639,
-                  "src": "1241:16:116",
+                  "scope": 35146,
+                  "src": "1333:16:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1759,10 +1759,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35636,
+                    "id": 35143,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1241:4:116",
+                    "src": "1333:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1772,10 +1772,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1240:18:116"
+              "src": "1332:18:115"
             },
-            "scope": 35653,
-            "src": "1185:74:116",
+            "scope": 35160,
+            "src": "1277:74:115",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
@@ -1783,7 +1783,7 @@
           {
             "body": null,
             "documentation": "@notice Creates a new poll and register it in a manager.",
-            "id": 35652,
+            "id": 35159,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -1791,16 +1791,16 @@
             "name": "createPoll",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 35648,
+              "id": 35155,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35641,
+                  "id": 35148,
                   "name": "_optionsCount",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35652,
-                  "src": "1359:18:116",
+                  "scope": 35159,
+                  "src": "1451:18:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1808,10 +1808,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35640,
+                    "id": 35147,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1359:4:116",
+                    "src": "1451:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1822,11 +1822,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35643,
+                  "id": 35150,
                   "name": "_detailsIpfsHash",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35652,
-                  "src": "1387:24:116",
+                  "scope": 35159,
+                  "src": "1479:24:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1834,10 +1834,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 35642,
+                    "id": 35149,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1387:7:116",
+                    "src": "1479:7:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1848,11 +1848,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35645,
+                  "id": 35152,
                   "name": "_votelimit",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35652,
-                  "src": "1421:15:116",
+                  "scope": 35159,
+                  "src": "1513:15:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1860,10 +1860,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35644,
+                    "id": 35151,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1421:4:116",
+                    "src": "1513:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1874,11 +1874,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 35647,
+                  "id": 35154,
                   "name": "_deadline",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35652,
-                  "src": "1446:14:116",
+                  "scope": 35159,
+                  "src": "1538:14:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1886,10 +1886,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35646,
+                    "id": 35153,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1446:4:116",
+                    "src": "1538:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1899,20 +1899,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1349:117:116"
+              "src": "1441:117:115"
             },
             "payable": false,
             "returnParameters": {
-              "id": 35651,
+              "id": 35158,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 35650,
+                  "id": 35157,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 35652,
-                  "src": "1483:4:116",
+                  "scope": 35159,
+                  "src": "1575:4:115",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1920,10 +1920,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 35649,
+                    "id": 35156,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1483:4:116",
+                    "src": "1575:4:115",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1933,20 +1933,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1482:6:116"
+              "src": "1574:6:115"
             },
-            "scope": 35653,
-            "src": "1330:159:116",
+            "scope": 35160,
+            "src": "1422:159:115",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 35654,
-        "src": "84:1407:116"
+        "scope": 35161,
+        "src": "176:1407:115"
       }
     ],
-    "src": "0:1492:116"
+    "src": "92:1492:115"
   },
   "compiler": {
     "name": "solc",
@@ -1954,5 +1954,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-04-06T09:20:58.902Z"
+  "updatedAt": "2018-04-11T07:40:05.947Z"
 }

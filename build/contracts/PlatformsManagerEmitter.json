@@ -162,41 +162,41 @@
       "type": "function"
     }
   ],
-  "bytecode": "0x6060604052341561000f57600080fd5b6102888061001e6000396000f3006060604052600436106100615763ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663237932cf811461006657806347ab61b41461008d5780634ddeb7d5146100b8578063df26ca08146100dd575b600080fd5b341561007157600080fd5b61008b600160a060020a03600435811690602435166100f3565b005b341561009857600080fd5b61008b600160a060020a036004358116906024358116906044351661014f565b34156100c357600080fd5b61008b600160a060020a03600435811690602435166101b5565b34156100e857600080fd5b61008b600435610211565b80600160a060020a0316610105610258565b600160a060020a03167f91fa8213ec3e06d6c6fc812bc9bdabb5cdeb5921d3ec76d0d710b744bb96b5d684604051600160a060020a03909116815260200160405180910390a35050565b80600160a060020a0316610161610258565b600160a060020a03167f675ebf44364662d6fd674a3ec79555047e602de0ed7429ee703618a9d5ce56618585604051600160a060020a039283168152911660208201526040908101905180910390a3505050565b80600160a060020a03166101c7610258565b600160a060020a03167fcdc5b8b215eb83fcaa86f308963042cd82160281b9800937b75f8a2a842e62ef84604051600160a060020a03909116815260200160405180910390a35050565b610219610258565b600160a060020a03167f9cf38cf2dbf9139f5c32639950507b10775fbbe0421f3e168bc2d1bb1ae3208c8260405190815260200160405180910390a250565b33905600a165627a7a72305820132866d415bc8aebc69d0fa74d853350b0623022e3b02cce3ae16ff2fb51c6f80029",
-  "deployedBytecode": "0x6060604052600436106100615763ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663237932cf811461006657806347ab61b41461008d5780634ddeb7d5146100b8578063df26ca08146100dd575b600080fd5b341561007157600080fd5b61008b600160a060020a03600435811690602435166100f3565b005b341561009857600080fd5b61008b600160a060020a036004358116906024358116906044351661014f565b34156100c357600080fd5b61008b600160a060020a03600435811690602435166101b5565b34156100e857600080fd5b61008b600435610211565b80600160a060020a0316610105610258565b600160a060020a03167f91fa8213ec3e06d6c6fc812bc9bdabb5cdeb5921d3ec76d0d710b744bb96b5d684604051600160a060020a03909116815260200160405180910390a35050565b80600160a060020a0316610161610258565b600160a060020a03167f675ebf44364662d6fd674a3ec79555047e602de0ed7429ee703618a9d5ce56618585604051600160a060020a039283168152911660208201526040908101905180910390a3505050565b80600160a060020a03166101c7610258565b600160a060020a03167fcdc5b8b215eb83fcaa86f308963042cd82160281b9800937b75f8a2a842e62ef84604051600160a060020a03909116815260200160405180910390a35050565b610219610258565b600160a060020a03167f9cf38cf2dbf9139f5c32639950507b10775fbbe0421f3e168bc2d1bb1ae3208c8260405190815260200160405180910390a250565b33905600a165627a7a72305820132866d415bc8aebc69d0fa74d853350b0623022e3b02cce3ae16ff2fb51c6f80029",
-  "sourceMap": "157:1232:9:-;;;;;;;;;;;;;;;;;",
-  "deployedSourceMap": "157:1232:9:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;989:128;;;;;;;;;;-1:-1:-1;;;;;989:128:9;;;;;;;;;;;;1123:172;;;;;;;;;;-1:-1:-1;;;;;1123:172:9;;;;;;;;;;;;;;;856:127;;;;;;;;;;-1:-1:-1;;;;;856:127:9;;;;;;;;;;1301:86;;;;;;;;;;;;;;989:128;1106:3;-1:-1:-1;;;;;1069:41:9;1086:7;:5;:7::i;:::-;-1:-1:-1;;;;;1069:41:9;;1095:9;1069:41;;-1:-1:-1;;;;;1069:41:9;;;;;;;;;;;;;;989:128;;:::o;1123:172::-;1284:3;-1:-1:-1;;;;;1229:59:9;1247:7;:5;:7::i;:::-;-1:-1:-1;;;;;1229:59:9;;1256:9;1267:15;1229:59;;-1:-1:-1;;;;;1229:59:9;;;;;;;;;;;;;;;;;;;;;;1123:172;;;:::o;856:127::-;972:3;-1:-1:-1;;;;;935:41:9;952:7;:5;:7::i;:::-;-1:-1:-1;;;;;935:41:9;;961:9;935:41;;-1:-1:-1;;;;;935:41:9;;;;;;;;;;;;;;856:127;;:::o;1301:86::-;1360:7;:5;:7::i;:::-;-1:-1:-1;;;;;1354:26:9;;1369:10;1354:26;;;;;;;;;;;;;;1301:86;:::o;234:87:36:-;304:10;234:87;:::o",
-  "source": "pragma solidity ^0.4.11;\n\nimport '../core/event/MultiEventsHistoryAdapter.sol';\n\n/**\n* @title Emitter with support of events history for PlatformsManager\n*/\ncontract PlatformsManagerEmitter is MultiEventsHistoryAdapter {\n\n    /**\n    * @dev Event for attaching a platform to the system\n    */\n    event PlatformAttached(address indexed self, address platform, address indexed by);\n\n    /**\n    * @dev Event for detaching a platform from the system\n    */\n    event PlatformDetached(address indexed self, address platform, address indexed by);\n\n    /**\n    * @dev Event for creating a platform\n    */\n    event PlatformRequested(address indexed self, address platform, address tokenExtension, address indexed by);\n\n    /**\n    * @dev Event for errors\n    */\n    event Error(address indexed self, uint errorCode);\n\n\n    /**\n    * Emitting events\n    */\n\n    function emitPlatformAttached(address _platform, address _by) public {\n        PlatformAttached(_self(), _platform, _by);\n    }\n\n    function emitPlatformDetached( address _platform, address _by) public {\n        PlatformDetached(_self(), _platform, _by);\n    }\n\n    function emitPlatformRequested( address _platform, address _tokenExtension, address _by) public {\n        PlatformRequested(_self(), _platform, _tokenExtension, _by);\n    }\n\n    function emitError(uint _errorCode) public {\n        Error(_self(), _errorCode);\n    }\n}\n",
-  "sourcePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/assets/PlatformsManagerEmitter.sol",
+  "bytecode": "0x6060604052341561000f57600080fd5b6102888061001e6000396000f3006060604052600436106100615763ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663237932cf811461006657806347ab61b41461008d5780634ddeb7d5146100b8578063df26ca08146100dd575b600080fd5b341561007157600080fd5b61008b600160a060020a03600435811690602435166100f3565b005b341561009857600080fd5b61008b600160a060020a036004358116906024358116906044351661014f565b34156100c357600080fd5b61008b600160a060020a03600435811690602435166101b5565b34156100e857600080fd5b61008b600435610211565b80600160a060020a0316610105610258565b600160a060020a03167f91fa8213ec3e06d6c6fc812bc9bdabb5cdeb5921d3ec76d0d710b744bb96b5d684604051600160a060020a03909116815260200160405180910390a35050565b80600160a060020a0316610161610258565b600160a060020a03167f675ebf44364662d6fd674a3ec79555047e602de0ed7429ee703618a9d5ce56618585604051600160a060020a039283168152911660208201526040908101905180910390a3505050565b80600160a060020a03166101c7610258565b600160a060020a03167fcdc5b8b215eb83fcaa86f308963042cd82160281b9800937b75f8a2a842e62ef84604051600160a060020a03909116815260200160405180910390a35050565b610219610258565b600160a060020a03167f9cf38cf2dbf9139f5c32639950507b10775fbbe0421f3e168bc2d1bb1ae3208c8260405190815260200160405180910390a250565b33905600a165627a7a7230582054b3203edbc82f9cac38994a96389c1c8e8acf3178421215209212b8407b6f9d0029",
+  "deployedBytecode": "0x6060604052600436106100615763ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663237932cf811461006657806347ab61b41461008d5780634ddeb7d5146100b8578063df26ca08146100dd575b600080fd5b341561007157600080fd5b61008b600160a060020a03600435811690602435166100f3565b005b341561009857600080fd5b61008b600160a060020a036004358116906024358116906044351661014f565b34156100c357600080fd5b61008b600160a060020a03600435811690602435166101b5565b34156100e857600080fd5b61008b600435610211565b80600160a060020a0316610105610258565b600160a060020a03167f91fa8213ec3e06d6c6fc812bc9bdabb5cdeb5921d3ec76d0d710b744bb96b5d684604051600160a060020a03909116815260200160405180910390a35050565b80600160a060020a0316610161610258565b600160a060020a03167f675ebf44364662d6fd674a3ec79555047e602de0ed7429ee703618a9d5ce56618585604051600160a060020a039283168152911660208201526040908101905180910390a3505050565b80600160a060020a03166101c7610258565b600160a060020a03167fcdc5b8b215eb83fcaa86f308963042cd82160281b9800937b75f8a2a842e62ef84604051600160a060020a03909116815260200160405180910390a35050565b610219610258565b600160a060020a03167f9cf38cf2dbf9139f5c32639950507b10775fbbe0421f3e168bc2d1bb1ae3208c8260405190815260200160405180910390a250565b33905600a165627a7a7230582054b3203edbc82f9cac38994a96389c1c8e8acf3178421215209212b8407b6f9d0029",
+  "sourceMap": "470:1189:4:-;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "470:1189:4:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1244:133;;;;;;;;;;-1:-1:-1;;;;;1244:133:4;;;;;;;;;;;;1383:177;;;;;;;;;;-1:-1:-1;;;;;1383:177:4;;;;;;;;;;;;;;;1106:132;;;;;;;;;;-1:-1:-1;;;;;1106:132:4;;;;;;;;;;1566:91;;;;;;;;;;;;;;1244:133;1366:3;-1:-1:-1;;;;;1329:41:4;1346:7;:5;:7::i;:::-;-1:-1:-1;;;;;1329:41:4;;1355:9;1329:41;;-1:-1:-1;;;;;1329:41:4;;;;;;;;;;;;;;1244:133;;:::o;1383:177::-;1549:3;-1:-1:-1;;;;;1494:59:4;1512:7;:5;:7::i;:::-;-1:-1:-1;;;;;1494:59:4;;1521:9;1532:15;1494:59;;-1:-1:-1;;;;;1494:59:4;;;;;;;;;;;;;;;;;;;;;;1383:177;;;:::o;1106:132::-;1227:3;-1:-1:-1;;;;;1190:41:4;1207:7;:5;:7::i;:::-;-1:-1:-1;;;;;1190:41:4;;1216:9;1190:41;;-1:-1:-1;;;;;1190:41:4;;;;;;;;;;;;;;1106:132;;:::o;1566:91::-;1630:7;:5;:7::i;:::-;-1:-1:-1;;;;;1624:26:4;;1639:10;1624:26;;;;;;;;;;;;;;1566:91;:::o;326:87:22:-;396:10;326:87;:::o",
+  "source": "/**\n * Copyright 2017–2018, LaborX PTY\n * Licensed under the AGPL Version 3 license.\n */\n\npragma solidity ^0.4.21;\n\n\nimport \"../core/event/MultiEventsHistoryAdapter.sol\";\n\n\n/// @title Emitter with support of events history for PlatformsManager\n///\n/// Contains all the original event emitting function definitions and events.\n/// In case of new events needed later, additional emitters can be developed.\n/// All the functions is meant to be called using delegatecall.\ncontract PlatformsManagerEmitter is MultiEventsHistoryAdapter {\n\n    /// @dev Event for attaching a platform to the system\n    event PlatformAttached(address indexed self, address platform, address indexed by);\n\n    /// @dev Event for detaching a platform from the system\n    event PlatformDetached(address indexed self, address platform, address indexed by);\n\n    /// @dev Event for creating a platform\n    event PlatformRequested(address indexed self, address platform, address tokenExtension, address indexed by);\n\n    /// @dev Event for errors\n    event Error(address indexed self, uint errorCode);\n\n\n    /* Emitting events */\n\n    function emitPlatformAttached(address _platform, address _by) public {\n        emit PlatformAttached(_self(), _platform, _by);\n    }\n\n    function emitPlatformDetached( address _platform, address _by) public {\n        emit PlatformDetached(_self(), _platform, _by);\n    }\n\n    function emitPlatformRequested( address _platform, address _tokenExtension, address _by) public {\n        emit PlatformRequested(_self(), _platform, _tokenExtension, _by);\n    }\n\n    function emitError(uint _errorCode) public {\n        emit Error(_self(), _errorCode);\n    }\n}\n",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/PlatformsManagerEmitter.sol",
   "ast": {
-    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/assets/PlatformsManagerEmitter.sol",
+    "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/PlatformsManagerEmitter.sol",
     "exportedSymbols": {
       "PlatformsManagerEmitter": [
-        2085
+        1785
       ]
     },
-    "id": 2086,
+    "id": 1786,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1989,
+        "id": 1689,
         "literals": [
           "solidity",
           "^",
           "0.4",
-          ".11"
+          ".21"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:9"
+        "src": "92:24:4"
       },
       {
-        "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/event/MultiEventsHistoryAdapter.sol",
+        "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/event/MultiEventsHistoryAdapter.sol",
         "file": "../core/event/MultiEventsHistoryAdapter.sol",
-        "id": 1990,
+        "id": 1690,
         "nodeType": "ImportDirective",
-        "scope": 2086,
-        "sourceUnit": 6543,
-        "src": "26:53:9",
+        "scope": 1786,
+        "sourceUnit": 4477,
+        "src": "119:53:4",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -206,31 +206,31 @@
             "arguments": [],
             "baseName": {
               "contractScope": null,
-              "id": 1991,
+              "id": 1691,
               "name": "MultiEventsHistoryAdapter",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 6542,
-              "src": "193:25:9",
+              "referencedDeclaration": 4476,
+              "src": "506:25:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_MultiEventsHistoryAdapter_$6542",
+                "typeIdentifier": "t_contract$_MultiEventsHistoryAdapter_$4476",
                 "typeString": "contract MultiEventsHistoryAdapter"
               }
             },
-            "id": 1992,
+            "id": 1692,
             "nodeType": "InheritanceSpecifier",
-            "src": "193:25:9"
+            "src": "506:25:4"
           }
         ],
         "contractDependencies": [
-          6542
+          4476
         ],
         "contractKind": "contract",
-        "documentation": "@title Emitter with support of events history for PlatformsManager",
+        "documentation": "@title Emitter with support of events history for PlatformsManager\n\n/// Contains all the original event emitting function definitions and events.\n In case of new events needed later, additional emitters can be developed.\n All the functions is meant to be called using delegatecall.",
         "fullyImplemented": true,
-        "id": 2085,
+        "id": 1785,
         "linearizedBaseContracts": [
-          2085,
-          6542
+          1785,
+          4476
         ],
         "name": "PlatformsManagerEmitter",
         "nodeType": "ContractDefinition",
@@ -238,21 +238,21 @@
           {
             "anonymous": false,
             "documentation": "@dev Event for attaching a platform to the system",
-            "id": 2000,
+            "id": 1700,
             "name": "PlatformAttached",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1999,
+              "id": 1699,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1994,
+                  "id": 1694,
                   "indexed": true,
                   "name": "self",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2000,
-                  "src": "320:20:9",
+                  "scope": 1700,
+                  "src": "620:20:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -260,10 +260,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1993,
+                    "id": 1693,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "320:7:9",
+                    "src": "620:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -274,12 +274,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 1996,
+                  "id": 1696,
                   "indexed": false,
                   "name": "platform",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2000,
-                  "src": "342:16:9",
+                  "scope": 1700,
+                  "src": "642:16:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -287,10 +287,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1995,
+                    "id": 1695,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "342:7:9",
+                    "src": "642:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -301,12 +301,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 1998,
+                  "id": 1698,
                   "indexed": true,
                   "name": "by",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2000,
-                  "src": "360:18:9",
+                  "scope": 1700,
+                  "src": "660:18:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -314,10 +314,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1997,
+                    "id": 1697,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "360:7:9",
+                    "src": "660:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -327,28 +327,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "319:60:9"
+              "src": "619:60:4"
             },
-            "src": "297:83:9"
+            "src": "597:83:4"
           },
           {
             "anonymous": false,
             "documentation": "@dev Event for detaching a platform from the system",
-            "id": 2008,
+            "id": 1708,
             "name": "PlatformDetached",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 2007,
+              "id": 1707,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2002,
+                  "id": 1702,
                   "indexed": true,
                   "name": "self",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2008,
-                  "src": "482:20:9",
+                  "scope": 1708,
+                  "src": "769:20:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -356,10 +356,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2001,
+                    "id": 1701,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "482:7:9",
+                    "src": "769:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -370,12 +370,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2004,
+                  "id": 1704,
                   "indexed": false,
                   "name": "platform",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2008,
-                  "src": "504:16:9",
+                  "scope": 1708,
+                  "src": "791:16:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -383,10 +383,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2003,
+                    "id": 1703,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "504:7:9",
+                    "src": "791:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -397,12 +397,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2006,
+                  "id": 1706,
                   "indexed": true,
                   "name": "by",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2008,
-                  "src": "522:18:9",
+                  "scope": 1708,
+                  "src": "809:18:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -410,10 +410,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2005,
+                    "id": 1705,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "522:7:9",
+                    "src": "809:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -423,28 +423,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "481:60:9"
+              "src": "768:60:4"
             },
-            "src": "459:83:9"
+            "src": "746:83:4"
           },
           {
             "anonymous": false,
             "documentation": "@dev Event for creating a platform",
-            "id": 2018,
+            "id": 1718,
             "name": "PlatformRequested",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 2017,
+              "id": 1717,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2010,
+                  "id": 1710,
                   "indexed": true,
                   "name": "self",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2018,
-                  "src": "628:20:9",
+                  "scope": 1718,
+                  "src": "902:20:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -452,10 +452,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2009,
+                    "id": 1709,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "628:7:9",
+                    "src": "902:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -466,12 +466,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2012,
+                  "id": 1712,
                   "indexed": false,
                   "name": "platform",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2018,
-                  "src": "650:16:9",
+                  "scope": 1718,
+                  "src": "924:16:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -479,10 +479,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2011,
+                    "id": 1711,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "650:7:9",
+                    "src": "924:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -493,12 +493,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2014,
+                  "id": 1714,
                   "indexed": false,
                   "name": "tokenExtension",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2018,
-                  "src": "668:22:9",
+                  "scope": 1718,
+                  "src": "942:22:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -506,10 +506,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2013,
+                    "id": 1713,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "668:7:9",
+                    "src": "942:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -520,12 +520,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2016,
+                  "id": 1716,
                   "indexed": true,
                   "name": "by",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2018,
-                  "src": "692:18:9",
+                  "scope": 1718,
+                  "src": "966:18:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -533,10 +533,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2015,
+                    "id": 1715,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "692:7:9",
+                    "src": "966:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -546,28 +546,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "627:84:9"
+              "src": "901:84:4"
             },
-            "src": "604:108:9"
+            "src": "878:108:4"
           },
           {
             "anonymous": false,
             "documentation": "@dev Event for errors",
-            "id": 2024,
+            "id": 1724,
             "name": "Error",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 2023,
+              "id": 1723,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2020,
+                  "id": 1720,
                   "indexed": true,
                   "name": "self",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2024,
-                  "src": "773:20:9",
+                  "scope": 1724,
+                  "src": "1034:20:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -575,10 +575,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2019,
+                    "id": 1719,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "773:7:9",
+                    "src": "1034:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -589,12 +589,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2022,
+                  "id": 1722,
                   "indexed": false,
                   "name": "errorCode",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2024,
-                  "src": "795:14:9",
+                  "scope": 1724,
+                  "src": "1056:14:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -602,10 +602,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2021,
+                    "id": 1721,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "795:4:9",
+                    "src": "1056:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -615,18 +615,18 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "772:38:9"
+              "src": "1033:38:4"
             },
-            "src": "761:50:9"
+            "src": "1022:50:4"
           },
           {
             "body": {
-              "id": 2038,
+              "id": 1738,
               "nodeType": "Block",
-              "src": "925:58:9",
+              "src": "1175:63:4",
               "statements": [
                 {
-                  "expression": {
+                  "eventCall": {
                     "argumentTypes": null,
                     "arguments": [
                       {
@@ -634,18 +634,18 @@
                         "arguments": [],
                         "expression": {
                           "argumentTypes": [],
-                          "id": 2032,
+                          "id": 1732,
                           "name": "_self",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 6541,
-                          "src": "952:5:9",
+                          "referencedDeclaration": 4475,
+                          "src": "1207:5:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                             "typeString": "function () view returns (address)"
                           }
                         },
-                        "id": 2033,
+                        "id": 1733,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -653,7 +653,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "952:7:9",
+                        "src": "1207:7:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -661,12 +661,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2034,
+                        "id": 1734,
                         "name": "_platform",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2026,
-                        "src": "961:9:9",
+                        "referencedDeclaration": 1726,
+                        "src": "1216:9:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -674,12 +674,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2035,
+                        "id": 1735,
                         "name": "_by",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2028,
-                        "src": "972:3:9",
+                        "referencedDeclaration": 1728,
+                        "src": "1227:3:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -701,18 +701,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 2031,
+                      "id": 1731,
                       "name": "PlatformAttached",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2000,
-                      "src": "935:16:9",
+                      "referencedDeclaration": 1700,
+                      "src": "1190:16:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_address_$returns$__$",
                         "typeString": "function (address,address,address)"
                       }
                     },
-                    "id": 2036,
+                    "id": 1736,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -720,20 +720,20 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "935:41:9",
+                    "src": "1190:41:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2037,
-                  "nodeType": "ExpressionStatement",
-                  "src": "935:41:9"
+                  "id": 1737,
+                  "nodeType": "EmitStatement",
+                  "src": "1185:46:4"
                 }
               ]
             },
-            "documentation": "Emitting events",
-            "id": 2039,
+            "documentation": null,
+            "id": 1739,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -741,16 +741,16 @@
             "name": "emitPlatformAttached",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2029,
+              "id": 1729,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2026,
+                  "id": 1726,
                   "name": "_platform",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2039,
-                  "src": "886:17:9",
+                  "scope": 1739,
+                  "src": "1136:17:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -758,10 +758,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2025,
+                    "id": 1725,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "886:7:9",
+                    "src": "1136:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -772,11 +772,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2028,
+                  "id": 1728,
                   "name": "_by",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2039,
-                  "src": "905:11:9",
+                  "scope": 1739,
+                  "src": "1155:11:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -784,10 +784,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2027,
+                    "id": 1727,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "905:7:9",
+                    "src": "1155:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -797,29 +797,29 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "885:32:9"
+              "src": "1135:32:4"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2030,
+              "id": 1730,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "925:0:9"
+              "src": "1175:0:4"
             },
-            "scope": 2085,
-            "src": "856:127:9",
+            "scope": 1785,
+            "src": "1106:132:4",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 2053,
+              "id": 1753,
               "nodeType": "Block",
-              "src": "1059:58:9",
+              "src": "1314:63:4",
               "statements": [
                 {
-                  "expression": {
+                  "eventCall": {
                     "argumentTypes": null,
                     "arguments": [
                       {
@@ -827,18 +827,18 @@
                         "arguments": [],
                         "expression": {
                           "argumentTypes": [],
-                          "id": 2047,
+                          "id": 1747,
                           "name": "_self",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 6541,
-                          "src": "1086:5:9",
+                          "referencedDeclaration": 4475,
+                          "src": "1346:5:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                             "typeString": "function () view returns (address)"
                           }
                         },
-                        "id": 2048,
+                        "id": 1748,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -846,7 +846,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "1086:7:9",
+                        "src": "1346:7:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -854,12 +854,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2049,
+                        "id": 1749,
                         "name": "_platform",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2041,
-                        "src": "1095:9:9",
+                        "referencedDeclaration": 1741,
+                        "src": "1355:9:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -867,12 +867,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2050,
+                        "id": 1750,
                         "name": "_by",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2043,
-                        "src": "1106:3:9",
+                        "referencedDeclaration": 1743,
+                        "src": "1366:3:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -894,18 +894,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 2046,
+                      "id": 1746,
                       "name": "PlatformDetached",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2008,
-                      "src": "1069:16:9",
+                      "referencedDeclaration": 1708,
+                      "src": "1329:16:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_address_$returns$__$",
                         "typeString": "function (address,address,address)"
                       }
                     },
-                    "id": 2051,
+                    "id": 1751,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -913,20 +913,20 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1069:41:9",
+                    "src": "1329:41:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2052,
-                  "nodeType": "ExpressionStatement",
-                  "src": "1069:41:9"
+                  "id": 1752,
+                  "nodeType": "EmitStatement",
+                  "src": "1324:46:4"
                 }
               ]
             },
             "documentation": null,
-            "id": 2054,
+            "id": 1754,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -934,16 +934,16 @@
             "name": "emitPlatformDetached",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2044,
+              "id": 1744,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2041,
+                  "id": 1741,
                   "name": "_platform",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2054,
-                  "src": "1020:17:9",
+                  "scope": 1754,
+                  "src": "1275:17:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -951,10 +951,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2040,
+                    "id": 1740,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1020:7:9",
+                    "src": "1275:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -965,11 +965,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2043,
+                  "id": 1743,
                   "name": "_by",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2054,
-                  "src": "1039:11:9",
+                  "scope": 1754,
+                  "src": "1294:11:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -977,10 +977,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2042,
+                    "id": 1742,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1039:7:9",
+                    "src": "1294:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -990,29 +990,29 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1018:33:9"
+              "src": "1273:33:4"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2045,
+              "id": 1745,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1059:0:9"
+              "src": "1314:0:4"
             },
-            "scope": 2085,
-            "src": "989:128:9",
+            "scope": 1785,
+            "src": "1244:133:4",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 2071,
+              "id": 1771,
               "nodeType": "Block",
-              "src": "1219:76:9",
+              "src": "1479:81:4",
               "statements": [
                 {
-                  "expression": {
+                  "eventCall": {
                     "argumentTypes": null,
                     "arguments": [
                       {
@@ -1020,18 +1020,18 @@
                         "arguments": [],
                         "expression": {
                           "argumentTypes": [],
-                          "id": 2064,
+                          "id": 1764,
                           "name": "_self",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 6541,
-                          "src": "1247:5:9",
+                          "referencedDeclaration": 4475,
+                          "src": "1512:5:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                             "typeString": "function () view returns (address)"
                           }
                         },
-                        "id": 2065,
+                        "id": 1765,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1039,7 +1039,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "1247:7:9",
+                        "src": "1512:7:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -1047,12 +1047,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2066,
+                        "id": 1766,
                         "name": "_platform",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2056,
-                        "src": "1256:9:9",
+                        "referencedDeclaration": 1756,
+                        "src": "1521:9:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -1060,12 +1060,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2067,
+                        "id": 1767,
                         "name": "_tokenExtension",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2058,
-                        "src": "1267:15:9",
+                        "referencedDeclaration": 1758,
+                        "src": "1532:15:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -1073,12 +1073,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2068,
+                        "id": 1768,
                         "name": "_by",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2060,
-                        "src": "1284:3:9",
+                        "referencedDeclaration": 1760,
+                        "src": "1549:3:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -1104,18 +1104,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 2063,
+                      "id": 1763,
                       "name": "PlatformRequested",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2018,
-                      "src": "1229:17:9",
+                      "referencedDeclaration": 1718,
+                      "src": "1494:17:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_address_$_t_address_$returns$__$",
                         "typeString": "function (address,address,address,address)"
                       }
                     },
-                    "id": 2069,
+                    "id": 1769,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1123,20 +1123,20 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1229:59:9",
+                    "src": "1494:59:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2070,
-                  "nodeType": "ExpressionStatement",
-                  "src": "1229:59:9"
+                  "id": 1770,
+                  "nodeType": "EmitStatement",
+                  "src": "1489:64:4"
                 }
               ]
             },
             "documentation": null,
-            "id": 2072,
+            "id": 1772,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -1144,16 +1144,16 @@
             "name": "emitPlatformRequested",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2061,
+              "id": 1761,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2056,
+                  "id": 1756,
                   "name": "_platform",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2072,
-                  "src": "1155:17:9",
+                  "scope": 1772,
+                  "src": "1415:17:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1161,10 +1161,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2055,
+                    "id": 1755,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1155:7:9",
+                    "src": "1415:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1175,11 +1175,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2058,
+                  "id": 1758,
                   "name": "_tokenExtension",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2072,
-                  "src": "1174:23:9",
+                  "scope": 1772,
+                  "src": "1434:23:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1187,10 +1187,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2057,
+                    "id": 1757,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1174:7:9",
+                    "src": "1434:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1201,11 +1201,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2060,
+                  "id": 1760,
                   "name": "_by",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2072,
-                  "src": "1199:11:9",
+                  "scope": 1772,
+                  "src": "1459:11:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1213,10 +1213,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2059,
+                    "id": 1759,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1199:7:9",
+                    "src": "1459:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1226,29 +1226,29 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1153:58:9"
+              "src": "1413:58:4"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2062,
+              "id": 1762,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1219:0:9"
+              "src": "1479:0:4"
             },
-            "scope": 2085,
-            "src": "1123:172:9",
+            "scope": 1785,
+            "src": "1383:177:4",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 2083,
+              "id": 1783,
               "nodeType": "Block",
-              "src": "1344:43:9",
+              "src": "1609:48:4",
               "statements": [
                 {
-                  "expression": {
+                  "eventCall": {
                     "argumentTypes": null,
                     "arguments": [
                       {
@@ -1256,18 +1256,18 @@
                         "arguments": [],
                         "expression": {
                           "argumentTypes": [],
-                          "id": 2078,
+                          "id": 1778,
                           "name": "_self",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 6541,
-                          "src": "1360:5:9",
+                          "referencedDeclaration": 4475,
+                          "src": "1630:5:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                             "typeString": "function () view returns (address)"
                           }
                         },
-                        "id": 2079,
+                        "id": 1779,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1275,7 +1275,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "1360:7:9",
+                        "src": "1630:7:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -1283,12 +1283,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2080,
+                        "id": 1780,
                         "name": "_errorCode",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2074,
-                        "src": "1369:10:9",
+                        "referencedDeclaration": 1774,
+                        "src": "1639:10:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -1306,18 +1306,18 @@
                           "typeString": "uint256"
                         }
                       ],
-                      "id": 2077,
+                      "id": 1777,
                       "name": "Error",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2024,
-                      "src": "1354:5:9",
+                      "referencedDeclaration": 1724,
+                      "src": "1624:5:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_uint256_$returns$__$",
                         "typeString": "function (address,uint256)"
                       }
                     },
-                    "id": 2081,
+                    "id": 1781,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1325,20 +1325,20 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1354:26:9",
+                    "src": "1624:26:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2082,
-                  "nodeType": "ExpressionStatement",
-                  "src": "1354:26:9"
+                  "id": 1782,
+                  "nodeType": "EmitStatement",
+                  "src": "1619:31:4"
                 }
               ]
             },
             "documentation": null,
-            "id": 2084,
+            "id": 1784,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -1346,16 +1346,16 @@
             "name": "emitError",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2075,
+              "id": 1775,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2074,
+                  "id": 1774,
                   "name": "_errorCode",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2084,
-                  "src": "1320:15:9",
+                  "scope": 1784,
+                  "src": "1585:15:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1363,10 +1363,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2073,
+                    "id": 1773,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1320:4:9",
+                    "src": "1585:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1376,57 +1376,57 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1319:17:9"
+              "src": "1584:17:4"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2076,
+              "id": 1776,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1344:0:9"
+              "src": "1609:0:4"
             },
-            "scope": 2085,
-            "src": "1301:86:9",
+            "scope": 1785,
+            "src": "1566:91:4",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 2086,
-        "src": "157:1232:9"
+        "scope": 1786,
+        "src": "470:1189:4"
       }
     ],
-    "src": "0:1390:9"
+    "src": "92:1568:4"
   },
   "legacyAST": {
-    "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/assets/PlatformsManagerEmitter.sol",
+    "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/assets/PlatformsManagerEmitter.sol",
     "exportedSymbols": {
       "PlatformsManagerEmitter": [
-        2085
+        1785
       ]
     },
-    "id": 2086,
+    "id": 1786,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 1989,
+        "id": 1689,
         "literals": [
           "solidity",
           "^",
           "0.4",
-          ".11"
+          ".21"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:24:9"
+        "src": "92:24:4"
       },
       {
-        "absolutePath": "/Users/alesanro/Documents/Projects/ChronoBank/SmartContracts/contracts/core/event/MultiEventsHistoryAdapter.sol",
+        "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/event/MultiEventsHistoryAdapter.sol",
         "file": "../core/event/MultiEventsHistoryAdapter.sol",
-        "id": 1990,
+        "id": 1690,
         "nodeType": "ImportDirective",
-        "scope": 2086,
-        "sourceUnit": 6543,
-        "src": "26:53:9",
+        "scope": 1786,
+        "sourceUnit": 4477,
+        "src": "119:53:4",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -1436,31 +1436,31 @@
             "arguments": [],
             "baseName": {
               "contractScope": null,
-              "id": 1991,
+              "id": 1691,
               "name": "MultiEventsHistoryAdapter",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 6542,
-              "src": "193:25:9",
+              "referencedDeclaration": 4476,
+              "src": "506:25:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_MultiEventsHistoryAdapter_$6542",
+                "typeIdentifier": "t_contract$_MultiEventsHistoryAdapter_$4476",
                 "typeString": "contract MultiEventsHistoryAdapter"
               }
             },
-            "id": 1992,
+            "id": 1692,
             "nodeType": "InheritanceSpecifier",
-            "src": "193:25:9"
+            "src": "506:25:4"
           }
         ],
         "contractDependencies": [
-          6542
+          4476
         ],
         "contractKind": "contract",
-        "documentation": "@title Emitter with support of events history for PlatformsManager",
+        "documentation": "@title Emitter with support of events history for PlatformsManager\n\n/// Contains all the original event emitting function definitions and events.\n In case of new events needed later, additional emitters can be developed.\n All the functions is meant to be called using delegatecall.",
         "fullyImplemented": true,
-        "id": 2085,
+        "id": 1785,
         "linearizedBaseContracts": [
-          2085,
-          6542
+          1785,
+          4476
         ],
         "name": "PlatformsManagerEmitter",
         "nodeType": "ContractDefinition",
@@ -1468,21 +1468,21 @@
           {
             "anonymous": false,
             "documentation": "@dev Event for attaching a platform to the system",
-            "id": 2000,
+            "id": 1700,
             "name": "PlatformAttached",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 1999,
+              "id": 1699,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 1994,
+                  "id": 1694,
                   "indexed": true,
                   "name": "self",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2000,
-                  "src": "320:20:9",
+                  "scope": 1700,
+                  "src": "620:20:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1490,10 +1490,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1993,
+                    "id": 1693,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "320:7:9",
+                    "src": "620:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1504,12 +1504,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 1996,
+                  "id": 1696,
                   "indexed": false,
                   "name": "platform",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2000,
-                  "src": "342:16:9",
+                  "scope": 1700,
+                  "src": "642:16:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1517,10 +1517,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1995,
+                    "id": 1695,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "342:7:9",
+                    "src": "642:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1531,12 +1531,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 1998,
+                  "id": 1698,
                   "indexed": true,
                   "name": "by",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2000,
-                  "src": "360:18:9",
+                  "scope": 1700,
+                  "src": "660:18:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1544,10 +1544,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 1997,
+                    "id": 1697,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "360:7:9",
+                    "src": "660:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1557,28 +1557,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "319:60:9"
+              "src": "619:60:4"
             },
-            "src": "297:83:9"
+            "src": "597:83:4"
           },
           {
             "anonymous": false,
             "documentation": "@dev Event for detaching a platform from the system",
-            "id": 2008,
+            "id": 1708,
             "name": "PlatformDetached",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 2007,
+              "id": 1707,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2002,
+                  "id": 1702,
                   "indexed": true,
                   "name": "self",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2008,
-                  "src": "482:20:9",
+                  "scope": 1708,
+                  "src": "769:20:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1586,10 +1586,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2001,
+                    "id": 1701,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "482:7:9",
+                    "src": "769:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1600,12 +1600,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2004,
+                  "id": 1704,
                   "indexed": false,
                   "name": "platform",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2008,
-                  "src": "504:16:9",
+                  "scope": 1708,
+                  "src": "791:16:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1613,10 +1613,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2003,
+                    "id": 1703,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "504:7:9",
+                    "src": "791:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1627,12 +1627,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2006,
+                  "id": 1706,
                   "indexed": true,
                   "name": "by",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2008,
-                  "src": "522:18:9",
+                  "scope": 1708,
+                  "src": "809:18:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1640,10 +1640,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2005,
+                    "id": 1705,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "522:7:9",
+                    "src": "809:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1653,28 +1653,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "481:60:9"
+              "src": "768:60:4"
             },
-            "src": "459:83:9"
+            "src": "746:83:4"
           },
           {
             "anonymous": false,
             "documentation": "@dev Event for creating a platform",
-            "id": 2018,
+            "id": 1718,
             "name": "PlatformRequested",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 2017,
+              "id": 1717,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2010,
+                  "id": 1710,
                   "indexed": true,
                   "name": "self",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2018,
-                  "src": "628:20:9",
+                  "scope": 1718,
+                  "src": "902:20:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1682,10 +1682,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2009,
+                    "id": 1709,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "628:7:9",
+                    "src": "902:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1696,12 +1696,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2012,
+                  "id": 1712,
                   "indexed": false,
                   "name": "platform",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2018,
-                  "src": "650:16:9",
+                  "scope": 1718,
+                  "src": "924:16:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1709,10 +1709,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2011,
+                    "id": 1711,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "650:7:9",
+                    "src": "924:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1723,12 +1723,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2014,
+                  "id": 1714,
                   "indexed": false,
                   "name": "tokenExtension",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2018,
-                  "src": "668:22:9",
+                  "scope": 1718,
+                  "src": "942:22:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1736,10 +1736,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2013,
+                    "id": 1713,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "668:7:9",
+                    "src": "942:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1750,12 +1750,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2016,
+                  "id": 1716,
                   "indexed": true,
                   "name": "by",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2018,
-                  "src": "692:18:9",
+                  "scope": 1718,
+                  "src": "966:18:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1763,10 +1763,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2015,
+                    "id": 1715,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "692:7:9",
+                    "src": "966:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1776,28 +1776,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "627:84:9"
+              "src": "901:84:4"
             },
-            "src": "604:108:9"
+            "src": "878:108:4"
           },
           {
             "anonymous": false,
             "documentation": "@dev Event for errors",
-            "id": 2024,
+            "id": 1724,
             "name": "Error",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 2023,
+              "id": 1723,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2020,
+                  "id": 1720,
                   "indexed": true,
                   "name": "self",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2024,
-                  "src": "773:20:9",
+                  "scope": 1724,
+                  "src": "1034:20:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1805,10 +1805,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2019,
+                    "id": 1719,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "773:7:9",
+                    "src": "1034:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1819,12 +1819,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 2022,
+                  "id": 1722,
                   "indexed": false,
                   "name": "errorCode",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2024,
-                  "src": "795:14:9",
+                  "scope": 1724,
+                  "src": "1056:14:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1832,10 +1832,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2021,
+                    "id": 1721,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "795:4:9",
+                    "src": "1056:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1845,18 +1845,18 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "772:38:9"
+              "src": "1033:38:4"
             },
-            "src": "761:50:9"
+            "src": "1022:50:4"
           },
           {
             "body": {
-              "id": 2038,
+              "id": 1738,
               "nodeType": "Block",
-              "src": "925:58:9",
+              "src": "1175:63:4",
               "statements": [
                 {
-                  "expression": {
+                  "eventCall": {
                     "argumentTypes": null,
                     "arguments": [
                       {
@@ -1864,18 +1864,18 @@
                         "arguments": [],
                         "expression": {
                           "argumentTypes": [],
-                          "id": 2032,
+                          "id": 1732,
                           "name": "_self",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 6541,
-                          "src": "952:5:9",
+                          "referencedDeclaration": 4475,
+                          "src": "1207:5:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                             "typeString": "function () view returns (address)"
                           }
                         },
-                        "id": 2033,
+                        "id": 1733,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1883,7 +1883,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "952:7:9",
+                        "src": "1207:7:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -1891,12 +1891,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2034,
+                        "id": 1734,
                         "name": "_platform",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2026,
-                        "src": "961:9:9",
+                        "referencedDeclaration": 1726,
+                        "src": "1216:9:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -1904,12 +1904,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2035,
+                        "id": 1735,
                         "name": "_by",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2028,
-                        "src": "972:3:9",
+                        "referencedDeclaration": 1728,
+                        "src": "1227:3:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -1931,18 +1931,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 2031,
+                      "id": 1731,
                       "name": "PlatformAttached",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2000,
-                      "src": "935:16:9",
+                      "referencedDeclaration": 1700,
+                      "src": "1190:16:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_address_$returns$__$",
                         "typeString": "function (address,address,address)"
                       }
                     },
-                    "id": 2036,
+                    "id": 1736,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -1950,20 +1950,20 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "935:41:9",
+                    "src": "1190:41:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2037,
-                  "nodeType": "ExpressionStatement",
-                  "src": "935:41:9"
+                  "id": 1737,
+                  "nodeType": "EmitStatement",
+                  "src": "1185:46:4"
                 }
               ]
             },
-            "documentation": "Emitting events",
-            "id": 2039,
+            "documentation": null,
+            "id": 1739,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -1971,16 +1971,16 @@
             "name": "emitPlatformAttached",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2029,
+              "id": 1729,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2026,
+                  "id": 1726,
                   "name": "_platform",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2039,
-                  "src": "886:17:9",
+                  "scope": 1739,
+                  "src": "1136:17:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1988,10 +1988,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2025,
+                    "id": 1725,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "886:7:9",
+                    "src": "1136:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -2002,11 +2002,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2028,
+                  "id": 1728,
                   "name": "_by",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2039,
-                  "src": "905:11:9",
+                  "scope": 1739,
+                  "src": "1155:11:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2014,10 +2014,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2027,
+                    "id": 1727,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "905:7:9",
+                    "src": "1155:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -2027,29 +2027,29 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "885:32:9"
+              "src": "1135:32:4"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2030,
+              "id": 1730,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "925:0:9"
+              "src": "1175:0:4"
             },
-            "scope": 2085,
-            "src": "856:127:9",
+            "scope": 1785,
+            "src": "1106:132:4",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 2053,
+              "id": 1753,
               "nodeType": "Block",
-              "src": "1059:58:9",
+              "src": "1314:63:4",
               "statements": [
                 {
-                  "expression": {
+                  "eventCall": {
                     "argumentTypes": null,
                     "arguments": [
                       {
@@ -2057,18 +2057,18 @@
                         "arguments": [],
                         "expression": {
                           "argumentTypes": [],
-                          "id": 2047,
+                          "id": 1747,
                           "name": "_self",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 6541,
-                          "src": "1086:5:9",
+                          "referencedDeclaration": 4475,
+                          "src": "1346:5:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                             "typeString": "function () view returns (address)"
                           }
                         },
-                        "id": 2048,
+                        "id": 1748,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -2076,7 +2076,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "1086:7:9",
+                        "src": "1346:7:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -2084,12 +2084,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2049,
+                        "id": 1749,
                         "name": "_platform",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2041,
-                        "src": "1095:9:9",
+                        "referencedDeclaration": 1741,
+                        "src": "1355:9:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -2097,12 +2097,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2050,
+                        "id": 1750,
                         "name": "_by",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2043,
-                        "src": "1106:3:9",
+                        "referencedDeclaration": 1743,
+                        "src": "1366:3:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -2124,18 +2124,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 2046,
+                      "id": 1746,
                       "name": "PlatformDetached",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2008,
-                      "src": "1069:16:9",
+                      "referencedDeclaration": 1708,
+                      "src": "1329:16:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_address_$returns$__$",
                         "typeString": "function (address,address,address)"
                       }
                     },
-                    "id": 2051,
+                    "id": 1751,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2143,20 +2143,20 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1069:41:9",
+                    "src": "1329:41:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2052,
-                  "nodeType": "ExpressionStatement",
-                  "src": "1069:41:9"
+                  "id": 1752,
+                  "nodeType": "EmitStatement",
+                  "src": "1324:46:4"
                 }
               ]
             },
             "documentation": null,
-            "id": 2054,
+            "id": 1754,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -2164,16 +2164,16 @@
             "name": "emitPlatformDetached",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2044,
+              "id": 1744,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2041,
+                  "id": 1741,
                   "name": "_platform",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2054,
-                  "src": "1020:17:9",
+                  "scope": 1754,
+                  "src": "1275:17:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2181,10 +2181,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2040,
+                    "id": 1740,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1020:7:9",
+                    "src": "1275:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -2195,11 +2195,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2043,
+                  "id": 1743,
                   "name": "_by",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2054,
-                  "src": "1039:11:9",
+                  "scope": 1754,
+                  "src": "1294:11:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2207,10 +2207,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2042,
+                    "id": 1742,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1039:7:9",
+                    "src": "1294:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -2220,29 +2220,29 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1018:33:9"
+              "src": "1273:33:4"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2045,
+              "id": 1745,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1059:0:9"
+              "src": "1314:0:4"
             },
-            "scope": 2085,
-            "src": "989:128:9",
+            "scope": 1785,
+            "src": "1244:133:4",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 2071,
+              "id": 1771,
               "nodeType": "Block",
-              "src": "1219:76:9",
+              "src": "1479:81:4",
               "statements": [
                 {
-                  "expression": {
+                  "eventCall": {
                     "argumentTypes": null,
                     "arguments": [
                       {
@@ -2250,18 +2250,18 @@
                         "arguments": [],
                         "expression": {
                           "argumentTypes": [],
-                          "id": 2064,
+                          "id": 1764,
                           "name": "_self",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 6541,
-                          "src": "1247:5:9",
+                          "referencedDeclaration": 4475,
+                          "src": "1512:5:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                             "typeString": "function () view returns (address)"
                           }
                         },
-                        "id": 2065,
+                        "id": 1765,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -2269,7 +2269,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "1247:7:9",
+                        "src": "1512:7:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -2277,12 +2277,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2066,
+                        "id": 1766,
                         "name": "_platform",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2056,
-                        "src": "1256:9:9",
+                        "referencedDeclaration": 1756,
+                        "src": "1521:9:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -2290,12 +2290,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2067,
+                        "id": 1767,
                         "name": "_tokenExtension",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2058,
-                        "src": "1267:15:9",
+                        "referencedDeclaration": 1758,
+                        "src": "1532:15:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -2303,12 +2303,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2068,
+                        "id": 1768,
                         "name": "_by",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2060,
-                        "src": "1284:3:9",
+                        "referencedDeclaration": 1760,
+                        "src": "1549:3:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -2334,18 +2334,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 2063,
+                      "id": 1763,
                       "name": "PlatformRequested",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2018,
-                      "src": "1229:17:9",
+                      "referencedDeclaration": 1718,
+                      "src": "1494:17:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_address_$_t_address_$returns$__$",
                         "typeString": "function (address,address,address,address)"
                       }
                     },
-                    "id": 2069,
+                    "id": 1769,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2353,20 +2353,20 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1229:59:9",
+                    "src": "1494:59:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2070,
-                  "nodeType": "ExpressionStatement",
-                  "src": "1229:59:9"
+                  "id": 1770,
+                  "nodeType": "EmitStatement",
+                  "src": "1489:64:4"
                 }
               ]
             },
             "documentation": null,
-            "id": 2072,
+            "id": 1772,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -2374,16 +2374,16 @@
             "name": "emitPlatformRequested",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2061,
+              "id": 1761,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2056,
+                  "id": 1756,
                   "name": "_platform",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2072,
-                  "src": "1155:17:9",
+                  "scope": 1772,
+                  "src": "1415:17:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2391,10 +2391,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2055,
+                    "id": 1755,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1155:7:9",
+                    "src": "1415:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -2405,11 +2405,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2058,
+                  "id": 1758,
                   "name": "_tokenExtension",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2072,
-                  "src": "1174:23:9",
+                  "scope": 1772,
+                  "src": "1434:23:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2417,10 +2417,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2057,
+                    "id": 1757,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1174:7:9",
+                    "src": "1434:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -2431,11 +2431,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 2060,
+                  "id": 1760,
                   "name": "_by",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2072,
-                  "src": "1199:11:9",
+                  "scope": 1772,
+                  "src": "1459:11:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2443,10 +2443,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 2059,
+                    "id": 1759,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1199:7:9",
+                    "src": "1459:7:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -2456,29 +2456,29 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1153:58:9"
+              "src": "1413:58:4"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2062,
+              "id": 1762,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1219:0:9"
+              "src": "1479:0:4"
             },
-            "scope": 2085,
-            "src": "1123:172:9",
+            "scope": 1785,
+            "src": "1383:177:4",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 2083,
+              "id": 1783,
               "nodeType": "Block",
-              "src": "1344:43:9",
+              "src": "1609:48:4",
               "statements": [
                 {
-                  "expression": {
+                  "eventCall": {
                     "argumentTypes": null,
                     "arguments": [
                       {
@@ -2486,18 +2486,18 @@
                         "arguments": [],
                         "expression": {
                           "argumentTypes": [],
-                          "id": 2078,
+                          "id": 1778,
                           "name": "_self",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 6541,
-                          "src": "1360:5:9",
+                          "referencedDeclaration": 4475,
+                          "src": "1630:5:4",
                           "typeDescriptions": {
                             "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
                             "typeString": "function () view returns (address)"
                           }
                         },
-                        "id": 2079,
+                        "id": 1779,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -2505,7 +2505,7 @@
                         "lValueRequested": false,
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "1360:7:9",
+                        "src": "1630:7:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
                           "typeString": "address"
@@ -2513,12 +2513,12 @@
                       },
                       {
                         "argumentTypes": null,
-                        "id": 2080,
+                        "id": 1780,
                         "name": "_errorCode",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 2074,
-                        "src": "1369:10:9",
+                        "referencedDeclaration": 1774,
+                        "src": "1639:10:4",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -2536,18 +2536,18 @@
                           "typeString": "uint256"
                         }
                       ],
-                      "id": 2077,
+                      "id": 1777,
                       "name": "Error",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 2024,
-                      "src": "1354:5:9",
+                      "referencedDeclaration": 1724,
+                      "src": "1624:5:4",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_uint256_$returns$__$",
                         "typeString": "function (address,uint256)"
                       }
                     },
-                    "id": 2081,
+                    "id": 1781,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2555,20 +2555,20 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "1354:26:9",
+                    "src": "1624:26:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 2082,
-                  "nodeType": "ExpressionStatement",
-                  "src": "1354:26:9"
+                  "id": 1782,
+                  "nodeType": "EmitStatement",
+                  "src": "1619:31:4"
                 }
               ]
             },
             "documentation": null,
-            "id": 2084,
+            "id": 1784,
             "implemented": true,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -2576,16 +2576,16 @@
             "name": "emitError",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 2075,
+              "id": 1775,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2074,
+                  "id": 1774,
                   "name": "_errorCode",
                   "nodeType": "VariableDeclaration",
-                  "scope": 2084,
-                  "src": "1320:15:9",
+                  "scope": 1784,
+                  "src": "1585:15:4",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2593,10 +2593,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2073,
+                    "id": 1773,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1320:4:9",
+                    "src": "1585:4:4",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2606,27 +2606,27 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1319:17:9"
+              "src": "1584:17:4"
             },
             "payable": false,
             "returnParameters": {
-              "id": 2076,
+              "id": 1776,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "1344:0:9"
+              "src": "1609:0:4"
             },
-            "scope": 2085,
-            "src": "1301:86:9",
+            "scope": 1785,
+            "src": "1566:91:4",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           }
         ],
-        "scope": 2086,
-        "src": "157:1232:9"
+        "scope": 1786,
+        "src": "470:1189:4"
       }
     ],
-    "src": "0:1390:9"
+    "src": "92:1568:4"
   },
   "compiler": {
     "name": "solc",
@@ -2634,5 +2634,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.0",
-  "updatedAt": "2018-04-06T09:20:58.207Z"
+  "updatedAt": "2018-04-11T08:13:18.716Z"
 }
