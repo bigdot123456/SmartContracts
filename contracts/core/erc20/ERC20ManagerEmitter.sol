@@ -1,8 +1,21 @@
-pragma solidity ^0.4.11;
+/**
+ * Copyright 2017–2018, LaborX PTY
+ * Licensed under the AGPL Version 3 license.
+ */
 
-import '../event/MultiEventsHistoryAdapter.sol';
+pragma solidity ^0.4.21;
 
+
+import "../event/MultiEventsHistoryAdapter.sol";
+
+
+/// @title ERC20 Manager emitter contract
+///
+/// Contains all the original event emitting function definitions and events.
+/// In case of new events needed later, additional emitters can be developed.
+/// All the functions is meant to be called using delegatecall.
 contract ERC20ManagerEmitter is MultiEventsHistoryAdapter {
+    
     event LogAddToken (
         address indexed self,
         address token,
@@ -49,7 +62,7 @@ contract ERC20ManagerEmitter is MultiEventsHistoryAdapter {
         bytes32 swarmHash)
     public
     {
-        LogAddToken(_self(), token, name, symbol, url, decimals, ipfsHash, swarmHash);
+        emit LogAddToken(_self(), token, name, symbol, url, decimals, ipfsHash, swarmHash);
     }
 
     function emitLogTokenChange (
@@ -63,7 +76,7 @@ contract ERC20ManagerEmitter is MultiEventsHistoryAdapter {
         bytes32 swarmHash)
     public
     {
-        LogTokenChange(_self(), oldToken, token, name, symbol, url, decimals, ipfsHash, swarmHash);
+        emit LogTokenChange(_self(), oldToken, token, name, symbol, url, decimals, ipfsHash, swarmHash);
     }
 
     function emitLogRemoveToken (
@@ -76,11 +89,11 @@ contract ERC20ManagerEmitter is MultiEventsHistoryAdapter {
         bytes32 swarmHash)
     public
     {
-        LogRemoveToken(_self(), token, name, symbol, url, decimals, ipfsHash, swarmHash);
+        emit LogRemoveToken(_self(), token, name, symbol, url, decimals, ipfsHash, swarmHash);
     }
 
     function emitError(uint error) public
     {
-        Error(_self(), error);
+        emit Error(_self(), error);
     }
 }

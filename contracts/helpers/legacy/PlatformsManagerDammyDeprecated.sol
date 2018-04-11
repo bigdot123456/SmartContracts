@@ -1,3 +1,8 @@
+/**
+ * Copyright 2017–2018, LaborX PTY
+ * Licensed under the AGPL Version 3 license.
+ */
+
 pragma solidity ^0.4.11;
 
 import "../../core/common/BaseManager.sol";
@@ -169,7 +174,7 @@ contract PlatformsManagerDammyDeprecated is BaseManager, PlatformsManagerEmitter
     }
 
     function _emitPlatformAttached(address _platform, address _by) private {
-        //PlatformsManagerEmitter(getEventsHistory()).emitPlatformAttached(_platform, _by);
+        PlatformsManagerEmitter(getEventsHistory()).emitPlatformAttached(_platform, _by);
     }
 
     function _emitPlatformDetached(address _platform, address _by) private {

@@ -1,3 +1,8 @@
+/**
+ * Copyright 2017–2018, LaborX PTY
+ * Licensed under the AGPL Version 3 license.
+ */
+
 contract TimePlatformEmitter {
     event Transfer(address indexed from, address indexed to, bytes32 indexed symbol, uint value, string reference, uint version);
     event Issue(bytes32 indexed symbol, uint value, address by, uint version);

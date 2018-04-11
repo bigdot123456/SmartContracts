@@ -1,13 +1,20 @@
-pragma solidity ^0.4.11;
+/**
+ * Copyright 2017–2018, LaborX PTY
+ * Licensed under the AGPL Version 3 license.
+ */
+
+pragma solidity ^0.4.21;
 
 import "../common/Object.sol";
 import "./ChronoBankPlatformEmitter.sol";
 import "../lib/SafeMath.sol";
 
+
 contract ProxyEventsEmitter {
     function emitTransfer(address _from, address _to, uint _value) public;
     function emitApprove(address _from, address _spender, uint _value) public;
 }
+
 
 ///  @title ChronoBank Platform.
 ///
@@ -43,7 +50,7 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
     uint constant CHRONOBANK_PLATFORM_ASSET_IS_NOT_ISSUED = CHRONOBANK_PLATFORM_SCOPE + 13;
     uint constant CHRONOBANK_PLATFORM_INVALID_INVOCATION = CHRONOBANK_PLATFORM_SCOPE + 17;
 
-    /// Structure of a particular asset.
+    /// @title Structure of a particular asset.
     struct Asset {
         uint owner;                       // Asset's owner id.
         uint totalSupply;                 // Asset's total supply.
@@ -55,41 +62,41 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         mapping(uint => bool) partowners; // Part-owners of an asset; have less access rights than owner
     }
 
-    /// Structure of an asset holder wallet for particular asset.
+    /// @title Structure of an asset holder wallet for particular asset.
     struct Wallet {
         uint balance;
         mapping(uint => uint) allowance;
     }
 
-    /// Structure of an asset holder.
+    /// @title Structure of an asset holder.
     struct Holder {
         address addr;                    // Current address of the holder.
         mapping(address => bool) trust;  // Addresses that are trusted with recovery proocedure.
     }
 
-    /// Iterable mapping pattern is used for holders.
+    /// @dev Iterable mapping pattern is used for holders.
     uint public holdersCount;
     mapping(uint => Holder) public holders;
 
-    /// This is an access address mapping. Many addresses may have access to a single holder.
+    /// @dev This is an access address mapping. Many addresses may have access to a single holder.
     mapping(address => uint) holderIndex;
 
-    /// List of symbols that exist in a platform
+    /// @dev List of symbols that exist in a platform
     bytes32[] public symbols;
 
-    /// Asset symbol to asset mapping.
+    /// @dev Asset symbol to asset mapping.
     mapping(bytes32 => Asset) public assets;
 
-    /// Asset symbol to asset proxy mapping.
+    /// @dev Asset symbol to asset proxy mapping.
     mapping(bytes32 => address) public proxies;
 
-    /// Co-owners of a platform. Has less access rights than a root contract owner
+    /// @dev Co-owners of a platform. Has less access rights than a root contract owner
     mapping(address => bool) public partowners;
 
-    // Should use interface of the emitter, but address of events history.
+    /// @dev Should use interface of the emitter, but address of events history.
     address public eventsHistory;
 
-    /// Emits Error event with specified error message.
+    /// @dev Emits Error event with specified error message.
     /// Should only be used if no state changes happened.
     /// @param _errorCode code of an error
     function _error(uint _errorCode) internal returns (uint) {
@@ -97,7 +104,7 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return _errorCode;
     }
 
-    /// Emits Error if called not by asset owner.
+    /// @dev Emits Error if called not by asset owner.
     modifier onlyOwner(bytes32 _symbol) {
         if (isOwner(msg.sender, _symbol)) {
             _;
@@ -118,21 +125,21 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         }
     }
 
-    /// Emits Error if called not by asset proxy.
+    /// @dev Emits Error if called not by asset proxy.
     modifier onlyProxy(bytes32 _symbol) {
         if (proxies[_symbol] == msg.sender) {
             _;
         }
     }
 
-    /// Emits Error if _from doesn't trust _to.
+    /// @dev Emits Error if _from doesn't trust _to.
     modifier checkTrust(address _from, address _to) {
         if (isTrusted(_from, _to)) {
             _;
         }
     }
 
-    /// Adds a co-owner of a contract. Might be more than one co-owner
+    /// @notice Adds a co-owner of a contract. Might be more than one co-owner
     /// @dev Allowed to only contract onwer
     /// @param _partowner a co-owner of a contract
     /// @return result code of an operation
@@ -141,7 +148,7 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return OK;
     }
 
-    /// Removes a co-owner of a contract
+    /// @notice Removes a co-owner of a contract
     /// @dev Should be performed only by root contract owner
     /// @param _partowner a co-owner of a contract
     /// @return result code of an operation
@@ -150,77 +157,64 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return OK;
     }
 
-    /// Sets EventsHstory contract address.
-    ///
-    /// Can be set only by events history admon or owner.
-    ///
+    /// @notice Sets EventsHistory contract address.
+    /// @dev Can be set only by owner.
     /// @param _eventsHistory MultiEventsHistory contract address.
-    ///
     /// @return success.
     function setupEventsHistory(address _eventsHistory) onlyContractOwner public returns (uint errorCode) {
         eventsHistory = _eventsHistory;
         return OK;
     }
 
-    /// Provides a cheap way to get number of symbols registered in a platform
+    /// @notice Provides a cheap way to get number of symbols registered in a platform
     /// @return number of symbols
     function symbolsCount() public view returns (uint) {
         return symbols.length;
     }
 
-    /// Check asset existance.
-    ///
+    /// @notice Check asset existance.
     /// @param _symbol asset symbol.
-    ///
     /// @return asset existance.
     function isCreated(bytes32 _symbol) public view returns (bool) {
         return assets[_symbol].owner != 0;
     }
 
-    /// Returns asset decimals.
-    ///
+    /// @notice Returns asset decimals.
     /// @param _symbol asset symbol.
-    ///
     /// @return asset decimals.
     function baseUnit(bytes32 _symbol) public view returns (uint8) {
         return assets[_symbol].baseUnit;
     }
 
-    /// Returns asset name.
-    ///
+    /// @notice Returns asset name.
     /// @param _symbol asset symbol.
-    ///
     /// @return asset name.
     function name(bytes32 _symbol) public view returns (string) {
         return assets[_symbol].name;
     }
 
-    /// Returns asset description.
-    ///
+    /// @notice Returns asset description.
     /// @param _symbol asset symbol.
-    ///
     /// @return asset description.
     function description(bytes32 _symbol) public view returns (string) {
         return assets[_symbol].description;
     }
 
-    /// Returns asset reissuability.
-    ///
+    /// @notice Returns asset reissuability.
     /// @param _symbol asset symbol.
-    ///
     /// @return asset reissuability.
     function isReissuable(bytes32 _symbol) public view returns (bool) {
         return assets[_symbol].isReissuable;
     }
 
-    /// Returns asset owner address.
+    /// @notice Returns asset owner address.
     /// @param _symbol asset symbol.
     /// @return asset owner address.
     function owner(bytes32 _symbol) public view returns (address) {
         return holders[assets[_symbol].owner].addr;
     }
 
-    /// Check if specified address has asset owner rights.
+    /// @notice Check if specified address has asset owner rights.
     /// @param _owner address to check.
     /// @param _symbol asset symbol.
     /// @return owner rights availability.
@@ -228,7 +222,7 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return isCreated(_symbol) && (assets[_symbol].owner == getHolderId(_owner));
     }
 
-    /// Checks if a specified address has asset owner or co-owner rights.
+    /// @notice Checks if a specified address has asset owner or co-owner rights.
     /// @param _owner address to check.
     /// @param _symbol asset symbol.
     /// @return owner rights availability.
@@ -237,50 +231,40 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return isCreated(_symbol) && (assets[_symbol].owner == holderId || assets[_symbol].partowners[holderId]);
     }
 
-    /// Returns asset total supply.
-    ///
+    /// @notice Returns asset total supply.
     /// @param _symbol asset symbol.
-    ///
     /// @return asset total supply.
     function totalSupply(bytes32 _symbol) public view returns (uint) {
         return assets[_symbol].totalSupply;
     }
 
-    /// Returns asset balance for a particular holder.
-    ///
+    /// @notice Returns asset balance for a particular holder.
     /// @param _holder holder address.
     /// @param _symbol asset symbol.
-    ///
     /// @return holder balance.
     function balanceOf(address _holder, bytes32 _symbol) public view returns (uint) {
         return _balanceOf(getHolderId(_holder), _symbol);
     }
 
-    /// Returns asset balance for a particular holder id.
-    ///
+    /// @notice Returns asset balance for a particular holder id.
     /// @param _holderId holder id.
     /// @param _symbol asset symbol.
-    ///
     /// @return holder balance.
     function _balanceOf(uint _holderId, bytes32 _symbol) public view returns (uint) {
         return assets[_symbol].wallets[_holderId].balance;
     }
 
-    /// Returns current address for a particular holder id.
-    ///
+    /// @notice Returns current address for a particular holder id.
     /// @param _holderId holder id.
-    ///
     /// @return holder address.
     function _address(uint _holderId) public view returns (address) {
         return holders[_holderId].addr;
     }
 
-    /// Adds a co-owner for an asset with provided symbol.
+    /// @notice Adds a co-owner for an asset with provided symbol.
     /// @dev Should be performed by a contract owner or its co-owners
-    ///
     /// @param _symbol asset's symbol
     /// @param _partowner a co-owner of an asset
-    ///
     /// @return errorCode result code of an operation
     function addAssetPartOwner(bytes32 _symbol, address _partowner) onlyOneOfOwners(_symbol) public returns (uint) {
         uint holderId = _createHolderId(_partowner);
@@ -289,12 +273,10 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return OK;
     }
 
-    /// Removes a co-owner for an asset with provided symbol.
+    /// @notice Removes a co-owner for an asset with provided symbol.
     /// @dev Should be performed by a contract owner or its co-owners
-    ///
     /// @param _symbol asset's symbol
     /// @param _partowner a co-owner of an asset
-    ///
     /// @return errorCode result code of an operation
     function removeAssetPartOwner(bytes32 _symbol, address _partowner) onlyOneOfOwners(_symbol) public returns (uint) {
         uint holderId = getHolderId(_partowner);
@@ -303,13 +285,10 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return OK;
     }
 
-    /// Sets Proxy contract address for a particular asset.
-    ///
-    /// Can be set only once for each asset, and only by contract owner.
-    ///
+    /// @notice Sets Proxy contract address for a particular asset.
+    /// @dev Can be set only once for each asset and only by contract owner.
     /// @param _proxyAddress Proxy contract address.
     /// @param _symbol asset symbol.
-    ///
     /// @return success.
     function setProxy(address _proxyAddress, bytes32 _symbol) public onlyOneOfContractOwners returns (uint) {
         if (proxies[_symbol] != 0x0) {
@@ -320,9 +299,17 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return OK;
     }
     
+    /// @notice Performes asset transfer for multiple destinations
+    /// @param addresses list of addresses to receive some amount
+    /// @param values list of asset amounts for according addresses
+    /// @param _symbol asset symbol
+    /// @return {
+    ///     "errorCode": "resultCode of an operation",
+    ///     "count": "an amount of succeeded transfers"
+    /// }
     function massTransfer(address[] addresses, uint[] values, bytes32 _symbol)
-    external
     onlyOneOfOwners(_symbol)
+    external
     returns (uint errorCode, uint count)
     {
         require(addresses.length == values.length);
@@ -331,7 +318,7 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         uint senderId = _createHolderId(msg.sender);
 
         uint success = 0;
-        for(uint idx = 0; idx < addresses.length && msg.gas > 110000; idx++) {
+        for(uint idx = 0; idx < addresses.length && gasleft() > 110000; idx++) {
             uint value = values[idx];
 
             if (value == 0) {
@@ -360,19 +347,24 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return (OK, success);
     }
 
-    /// Transfers asset balance between holders wallets.
-    ///
+    /// @dev Transfers asset balance between holders wallets.
     /// @param _fromId holder id to take from.
     /// @param _toId holder id to give to.
     /// @param _value amount to transfer.
     /// @param _symbol asset symbol.
-    function _transferDirect(uint _fromId, uint _toId, uint _value, bytes32 _symbol) internal {
+    function _transferDirect(
+        uint _fromId, 
+        uint _toId, 
+        uint _value, 
+        bytes32 _symbol
+    ) 
+    internal 
+    {
         assets[_symbol].wallets[_fromId].balance = assets[_symbol].wallets[_fromId].balance.sub(_value);
         assets[_symbol].wallets[_toId].balance = assets[_symbol].wallets[_toId].balance.add(_value);
     }
 
-    /// Transfers asset balance between holders wallets.
-    ///
+    /// @dev Transfers asset balance between holders wallets.
     /// Performs sanity checks and takes care of allowances adjustment.
     ///
     /// @param _fromId holder id to take from.
@@ -383,7 +375,17 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
     /// @param _senderId transfer initiator holder id.
     ///
     /// @return success.
-    function _transfer(uint _fromId, uint _toId, uint _value, bytes32 _symbol, string _reference, uint _senderId) internal returns (uint) {
+    function _transfer(
+        uint _fromId, 
+        uint _toId, 
+        uint _value, 
+        bytes32 _symbol, 
+        string _reference, 
+        uint _senderId
+    ) 
+    internal 
+    returns (uint) 
+    {
         // Should not allow to send to oneself.
         if (_fromId == _toId) {
             return _error(CHRONOBANK_PLATFORM_CANNOT_APPLY_TO_ONESELF);
@@ -414,8 +416,7 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return OK;
     }
 
-    /// Transfers asset balance between holders wallets.
-    ///
+    /// @dev Transfers asset balance between holders wallets.
     /// Can only be called by asset proxy.
     ///
     /// @param _to holder address to give to.
@@ -425,12 +426,21 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
     /// @param _sender transfer initiator address.
     ///
     /// @return success.
-    function proxyTransferWithReference(address _to, uint _value, bytes32 _symbol, string _reference, address _sender) public onlyProxy(_symbol) returns (uint) {
+    function proxyTransferWithReference(
+        address _to, 
+        uint _value, 
+        bytes32 _symbol, 
+        string _reference, 
+        address _sender
+    ) 
+    onlyProxy(_symbol) 
+    public 
+    returns (uint) 
+    {
         return _transfer(getHolderId(_sender), _createHolderId(_to), _value, _symbol, _reference, getHolderId(_sender));
     }
 
-    /// Ask asset Proxy contract to emit ERC20 compliant Transfer event.
-    ///
+    /// @dev Ask asset Proxy contract to emit ERC20 compliant Transfer event.
     /// @param _fromId holder id to take from.
     /// @param _toId holder id to give to.
     /// @param _value amount to transfer.
@@ -444,19 +454,15 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         }
     }
 
-    /// Returns holder id for the specified address.
-    ///
+    /// @notice Returns holder id for the specified address.
     /// @param _holder holder address.
-    ///
     /// @return holder id.
     function getHolderId(address _holder) public view returns (uint) {
         return holderIndex[_holder];
     }
 
-    /// Returns holder id for the specified address, creates it if needed.
-    ///
+    /// @dev Returns holder id for the specified address, creates it if needed.
     /// @param _holder holder address.
-    ///
     /// @return holder id.
     function _createHolderId(address _holder) internal returns (uint) {
         uint holderId = holderIndex[_holder];
@@ -468,7 +474,7 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return holderId;
     }
 
-    /// Issues new asset token on the platform.
+    /// @notice Issues new asset token on the platform.
     ///
     /// Tokens issued with this call go straight to contract owner.
     /// Each symbol can be issued only once, and only by contract owner.
@@ -481,11 +487,21 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
     /// @param _isReissuable dynamic or fixed supply.
     ///
     /// @return success.
-    function issueAsset(bytes32 _symbol, uint _value, string _name, string _description, uint8 _baseUnit, bool _isReissuable) public returns (uint) {
+    function issueAsset(
+        bytes32 _symbol, 
+        uint _value, 
+        string _name, 
+        string _description, 
+        uint8 _baseUnit, 
+        bool _isReissuable
+    ) 
+    public 
+    returns (uint) 
+    {
         return issueAsset(_symbol, _value, _name, _description, _baseUnit, _isReissuable, msg.sender);
     }
 
-    /// Issues new asset token on the platform.
+    /// @notice Issues new asset token on the platform.
     ///
     /// Tokens issued with this call go straight to contract owner.
     /// Each symbol can be issued only once, and only by contract owner.
@@ -499,7 +515,19 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
     /// @param _account address where issued balance will be held
     ///
     /// @return success.
-    function issueAsset(bytes32 _symbol, uint _value, string _name, string _description, uint8 _baseUnit, bool _isReissuable, address _account) onlyOneOfContractOwners public returns (uint) {
+    function issueAsset(
+        bytes32 _symbol, 
+        uint _value, 
+        string _name, 
+        string _description, 
+        uint8 _baseUnit, 
+        bool _isReissuable, 
+        address _account
+    ) 
+    onlyOneOfContractOwners 
+    public 
+    returns (uint) 
+    {
         // Should have positive value if supply is going to be fixed.
         if (_value == 0 && !_isReissuable) {
             return _error(CHRONOBANK_PLATFORM_CANNOT_ISSUE_FIXED_ASSET_WITH_INVALID_VALUE);
@@ -521,7 +549,7 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return OK;
     }
 
-    /// Issues additional asset tokens if the asset have dynamic supply.
+    /// @notice Issues additional asset tokens if the asset have dynamic supply.
     ///
     /// Tokens issued with this call go straight to asset owner.
     /// Can only be called by asset owner.
@@ -555,7 +583,7 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return OK;
     }
 
-    /// Destroys specified amount of senders asset tokens.
+    /// @notice Destroys specified amount of senders asset tokens.
     ///
     /// @param _symbol asset symbol.
     /// @param _value amount of tokens to destroy.
@@ -582,7 +610,7 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return OK;
     }
 
-    /// Passes asset ownership to specified address.
+    /// @notice Passes asset ownership to specified address.
     ///
     /// Only ownership is changed, balances are not touched.
     /// Can only be called by asset owner.
@@ -591,7 +619,7 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
     /// @param _newOwner address to become a new owner.
     ///
     /// @return success.
-    function changeOwnership(bytes32 _symbol, address _newOwner) public onlyOwner(_symbol) returns (uint) {
+    function changeOwnership(bytes32 _symbol, address _newOwner) onlyOwner(_symbol) public returns (uint) {
         if (_newOwner == 0x0) {
             return _error(CHRONOBANK_PLATFORM_INVALID_NEW_OWNER);
         }
@@ -611,20 +639,16 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return OK;
     }
 
-    /// Check if specified holder trusts an address with recovery procedure.
-    ///
+    /// @notice Check if specified holder trusts an address with recovery procedure.
     /// @param _from truster.
     /// @param _to trustee.
-    ///
     /// @return trust existance.
     function isTrusted(address _from, address _to) public view returns (bool) {
         return holders[getHolderId(_from)].trust[_to];
     }
 
-    /// Trust an address to perform recovery procedure for the caller.
-    ///
+    /// @notice Trust an address to perform recovery procedure for the caller.
     /// @param _to trustee.
-    ///
     /// @return success.
     function trust(address _to) public returns (uint) {
         uint fromId = _createHolderId(msg.sender);
@@ -641,17 +665,15 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return OK;
     }
 
-    /// Revoke trust to perform recovery procedure from an address.
-    ///
+    /// @notice Revoke trust to perform recovery procedure from an address.
     /// @param _to trustee.
-    ///
     /// @return success.
     function distrust(address _to) checkTrust(msg.sender, _to) public returns (uint) {
         holders[getHolderId(msg.sender)].trust[_to] = false;
         return OK;
     }
 
-    /// Perform recovery procedure.
+    /// @notice Perform recovery procedure.
     ///
     /// This function logic is actually more of an addAccess(uint _holderId, address _to).
     /// It grants another address access to recovery subject wallets.
@@ -678,7 +700,7 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return OK;
     }
 
-    /// Sets asset spending allowance for a specified spender.
+    /// @dev Sets asset spending allowance for a specified spender.
     ///
     /// Note: to revoke allowance, one needs to set allowance to 0.
     ///
@@ -688,7 +710,15 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
     /// @param _senderId approve initiator holder id.
     ///
     /// @return success.
-    function _approve(uint _spenderId, uint _value, bytes32 _symbol, uint _senderId) internal returns (uint) {
+    function _approve(
+        uint _spenderId, 
+        uint _value, 
+        bytes32 _symbol, 
+        uint _senderId
+    ) 
+    internal 
+    returns (uint) 
+    {
         // Asset should exist.
         if (!isCreated(_symbol)) {
             return _error(CHRONOBANK_PLATFORM_ASSET_IS_NOT_ISSUED);
@@ -718,7 +748,7 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
         return OK;
     }
 
-    /// Sets asset spending allowance for a specified spender.
+    /// @dev Sets asset spending allowance for a specified spender.
     ///
     /// Can only be called by asset proxy.
     ///
@@ -728,35 +758,22 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
     /// @param _sender approve initiator address.
     ///
     /// @return success.
-    function proxyApprove(address _spender, uint _value, bytes32 _symbol, address _sender) onlyProxy(_symbol) public returns (uint) {
+    function proxyApprove(
+        address _spender, 
+        uint _value, 
+        bytes32 _symbol, 
+        address _sender
+    ) 
+    onlyProxy(_symbol) 
+    public 
+    returns (uint) 
+    {
         return _approve(_createHolderId(_spender), _value, _symbol, _createHolderId(_sender));
     }
 
-    /// Returns asset allowance from one holder to another.
+    /// @notice Performs allowance transfer of asset balance between holders wallets.
     ///
-    /// @param _from holder that allowed spending.
-    /// @param _spender holder that is allowed to spend.
-    /// @param _symbol asset symbol.
-    ///
-    /// @return holder to spender allowance.
-    function allowance(address _from, address _spender, bytes32 _symbol) public view returns (uint) {
-        return _allowance(getHolderId(_from), getHolderId(_spender), _symbol);
-    }
-
-    /// Returns asset allowance from one holder to another.
-    ///
-    /// @param _fromId holder id that allowed spending.
-    /// @param _toId holder id that is allowed to spend.
-    /// @param _symbol asset symbol.
-    ///
-    /// @return holder to spender allowance.
-    function _allowance(uint _fromId, uint _toId, bytes32 _symbol) internal view returns (uint) {
-        return assets[_symbol].wallets[_fromId].allowance[_toId];
-    }
-
-    /// Prforms allowance transfer of asset balance between holders wallets.
-    ///
-    /// Can only be called by asset proxy.
+    /// @dev Can only be called by asset proxy.
     ///
     /// @param _from holder address to take from.
     /// @param _to holder address to give to.
@@ -766,7 +783,36 @@ contract ChronoBankPlatform is Object, ChronoBankPlatformEmitter {
     /// @param _sender allowance transfer initiator address.
     ///
     /// @return success.
-    function proxyTransferFromWithReference(address _from, address _to, uint _value, bytes32 _symbol, string _reference, address _sender) onlyProxy(_symbol) public returns (uint) {
+    function proxyTransferFromWithReference(
+        address _from, 
+        address _to, 
+        uint _value, 
+        bytes32 _symbol, 
+        string _reference, 
+        address _sender
+    ) 
+    onlyProxy(_symbol) 
+    public 
+    returns (uint) 
+    {
         return _transfer(getHolderId(_from), _createHolderId(_to), _value, _symbol, _reference, getHolderId(_sender));
+    }
+
+    /// @dev Returns asset allowance from one holder to another.
+    /// @param _from holder that allowed spending.
+    /// @param _spender holder that is allowed to spend.
+    /// @param _symbol asset symbol.
+    /// @return holder to spender allowance.
+    function allowance(address _from, address _spender, bytes32 _symbol) public view returns (uint) {
+        return _allowance(getHolderId(_from), getHolderId(_spender), _symbol);
+    }
+
+    /// @dev Returns asset allowance from one holder to another.
+    /// @param _fromId holder id that allowed spending.
+    /// @param _toId holder id that is allowed to spend.
+    /// @param _symbol asset symbol.
+    /// @return holder to spender allowance.
+    function _allowance(uint _fromId, uint _toId, bytes32 _symbol) internal view returns (uint) {
+        return assets[_symbol].wallets[_fromId].allowance[_toId];
     }
 }

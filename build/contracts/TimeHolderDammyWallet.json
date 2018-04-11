@@ -1,0 +1,1270 @@
+{
+  "contractName": "TimeHolderDammyWallet",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_asset",
+          "type": "address"
+        },
+        {
+          "name": "_from",
+          "type": "address"
+        },
+        {
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "deposit",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_asset",
+          "type": "address"
+        },
+        {
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "withdraw",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6060604052341561000f57600080fd5b6101ec8061001e6000396000f3006060604052600436106100325763ffffffff60e060020a6000350416638340f5498114610037578063d9caed1214610080575b600080fd5b341561004257600080fd5b61006c73ffffffffffffffffffffffffffffffffffffffff600435811690602435166044356100b5565b604051901515815260200160405180910390f35b341561008b57600080fd5b61006c73ffffffffffffffffffffffffffffffffffffffff60043581169060243516604435610150565b60008373ffffffffffffffffffffffffffffffffffffffff166323b872dd84308560405160e060020a63ffffffff861602815273ffffffffffffffffffffffffffffffffffffffff93841660048201529190921660248201526044810191909152606401602060405180830381600087803b151561013257600080fd5b5af1151561013f57600080fd5b505050604051805195945050505050565b60008373ffffffffffffffffffffffffffffffffffffffff1663a9059cbb848460405160e060020a63ffffffff851602815273ffffffffffffffffffffffffffffffffffffffff90921660048301526024820152604401602060405180830381600087803b151561013257600080fd00a165627a7a7230582007aa5f57b5d6a3ebd8b72c119bfbb04b899dc6419c27af83c627804045238d6f0029",
+  "deployedBytecode": "0x6060604052600436106100325763ffffffff60e060020a6000350416638340f5498114610037578063d9caed1214610080575b600080fd5b341561004257600080fd5b61006c73ffffffffffffffffffffffffffffffffffffffff600435811690602435166044356100b5565b604051901515815260200160405180910390f35b341561008b57600080fd5b61006c73ffffffffffffffffffffffffffffffffffffffff60043581169060243516604435610150565b60008373ffffffffffffffffffffffffffffffffffffffff166323b872dd84308560405160e060020a63ffffffff861602815273ffffffffffffffffffffffffffffffffffffffff93841660048201529190921660248201526044810191909152606401602060405180830381600087803b151561013257600080fd5b5af1151561013f57600080fd5b505050604051805195945050505050565b60008373ffffffffffffffffffffffffffffffffffffffff1663a9059cbb848460405160e060020a63ffffffff851602815273ffffffffffffffffffffffffffffffffffffffff90921660048301526024820152604401602060405180830381600087803b151561013257600080fd00a165627a7a7230582007aa5f57b5d6a3ebd8b72c119bfbb04b899dc6419c27af83c627804045238d6f0029",
+  "sourceMap": "565:1192:84:-;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "565:1192:84:-;;;;;;;;;-1:-1:-1;;;565:1192:84;;;;;;;;;;;;;;;;;;1022:161;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1607:148;;;;;;;;;;;;;;;;;;;;;;;1022:161;1096:4;1134:6;1119:35;;;1155:5;1162:4;1168:7;1119:57;;-1:-1:-1;;;1119:57:84;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1022:161;-1:-1:-1;;;;;1022:161:84:o;1607:148::-;1680:4;1718:6;1703:31;;;1735:3;1740:7;1703:45;;-1:-1:-1;;;1703:45:84;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;",
+  "source": "/**\n * Copyright 2017–2018, LaborX PTY\n * Licensed under the AGPL Version 3 license.\n */\n\npragma solidity ^0.4.11;\n\nimport \"../../core/erc20/ERC20Interface.sol\";\n/**\n* @title TimeHolder's wallet contract defines a basic implementation of DepositWalletInterface\n* to provide a way to store/deposit/withdraw tokens on this contract according to access rights.\n* Here deposit/withdraw are allowed only by TimeHolder contract.\n*\n* @dev Specifies a contract that helps in updating TimeHolder interface by delegating token's ownership\n* to TimeHolderWallet contract\n*/\ncontract TimeHolderDammyWallet {\n    /**\n    * Deposits some amount of tokens on wallet's account using ERC20 tokens\n    *\n    * @dev Allowed only for timeHolder\n    *\n    * @param _asset an address of token\n    * @param _from an address of a sender who is willing to transfer her resources\n    * @param _amount an amount of tokens (resources) a sender wants to transfer\n    *\n    * @return `true` if all successfuly completed, `false` otherwise\n    */\n    function deposit(address _asset, address _from, uint256 _amount) returns (bool) {\n        return ERC20Interface(_asset).transferFrom(_from, this, _amount);\n    }\n\n    /**\n    * Withdraws some amount of tokens from wallet's account using ERC20 tokens\n    *\n    * @dev Allowed only for timeHolder\n    *\n    * @param _asset an address of token\n    * @param _to an address of a receiver who is willing to get stored resources\n    * @param _amount an amount of tokens (resources) a receiver wants to get\n    *\n    * @return `true` if all successfuly completed, `false` otherwise\n    */\n    function withdraw(address _asset, address _to, uint256 _amount) returns (bool) {\n        return ERC20Interface(_asset).transfer(_to, _amount);\n    }\n}\n",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/helpers/legacy/TimeHolderDammyWallet.sol",
+  "ast": {
+    "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/helpers/legacy/TimeHolderDammyWallet.sol",
+    "exportedSymbols": {
+      "TimeHolderDammyWallet": [
+        24450
+      ]
+    },
+    "id": 24451,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 24407,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".11"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "92:24:84"
+      },
+      {
+        "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/erc20/ERC20Interface.sol",
+        "file": "../../core/erc20/ERC20Interface.sol",
+        "id": 24408,
+        "nodeType": "ImportDirective",
+        "scope": 24451,
+        "sourceUnit": 4880,
+        "src": "118:45:84",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": "@title TimeHolder's wallet contract defines a basic implementation of DepositWalletInterface\nto provide a way to store/deposit/withdraw tokens on this contract according to access rights.\nHere deposit/withdraw are allowed only by TimeHolder contract.\n* @dev Specifies a contract that helps in updating TimeHolder interface by delegating token's ownership\nto TimeHolderWallet contract",
+        "fullyImplemented": true,
+        "id": 24450,
+        "linearizedBaseContracts": [
+          24450
+        ],
+        "name": "TimeHolderDammyWallet",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 24428,
+              "nodeType": "Block",
+              "src": "1102:81:84",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 24423,
+                        "name": "_from",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 24412,
+                        "src": "1155:5:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 24424,
+                        "name": "this",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 38422,
+                        "src": "1162:4:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_TimeHolderDammyWallet_$24450",
+                          "typeString": "contract TimeHolderDammyWallet"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 24425,
+                        "name": "_amount",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 24414,
+                        "src": "1168:7:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_contract$_TimeHolderDammyWallet_$24450",
+                          "typeString": "contract TimeHolderDammyWallet"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 24420,
+                            "name": "_asset",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 24410,
+                            "src": "1134:6:84",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "id": 24419,
+                          "name": "ERC20Interface",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4879,
+                          "src": "1119:14:84",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_ERC20Interface_$4879_$",
+                            "typeString": "type(contract ERC20Interface)"
+                          }
+                        },
+                        "id": 24421,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1119:22:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_ERC20Interface_$4879",
+                          "typeString": "contract ERC20Interface"
+                        }
+                      },
+                      "id": 24422,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "transferFrom",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 4860,
+                      "src": "1119:35:84",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_address_$_t_uint256_$returns$_t_bool_$",
+                        "typeString": "function (address,address,uint256) external returns (bool)"
+                      }
+                    },
+                    "id": 24426,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1119:57:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 24418,
+                  "id": 24427,
+                  "nodeType": "Return",
+                  "src": "1112:64:84"
+                }
+              ]
+            },
+            "documentation": "Deposits some amount of tokens on wallet's account using ERC20 tokens\n    * @dev Allowed only for timeHolder\n    * @param _asset an address of token\n@param _from an address of a sender who is willing to transfer her resources\n@param _amount an amount of tokens (resources) a sender wants to transfer\n    * @return `true` if all successfuly completed, `false` otherwise",
+            "id": 24429,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "deposit",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 24415,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 24410,
+                  "name": "_asset",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24429,
+                  "src": "1039:14:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 24409,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1039:7:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 24412,
+                  "name": "_from",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24429,
+                  "src": "1055:13:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 24411,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1055:7:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 24414,
+                  "name": "_amount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24429,
+                  "src": "1070:15:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 24413,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1070:7:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1038:48:84"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 24418,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 24417,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24429,
+                  "src": "1096:4:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 24416,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1096:4:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1095:6:84"
+            },
+            "scope": 24450,
+            "src": "1022:161:84",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 24448,
+              "nodeType": "Block",
+              "src": "1686:69:84",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 24444,
+                        "name": "_to",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 24433,
+                        "src": "1735:3:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 24445,
+                        "name": "_amount",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 24435,
+                        "src": "1740:7:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 24441,
+                            "name": "_asset",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 24431,
+                            "src": "1718:6:84",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "id": 24440,
+                          "name": "ERC20Interface",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4879,
+                          "src": "1703:14:84",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_ERC20Interface_$4879_$",
+                            "typeString": "type(contract ERC20Interface)"
+                          }
+                        },
+                        "id": 24442,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1703:22:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_ERC20Interface_$4879",
+                          "typeString": "contract ERC20Interface"
+                        }
+                      },
+                      "id": 24443,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "transfer",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 4849,
+                      "src": "1703:31:84",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
+                        "typeString": "function (address,uint256) external returns (bool)"
+                      }
+                    },
+                    "id": 24446,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1703:45:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 24439,
+                  "id": 24447,
+                  "nodeType": "Return",
+                  "src": "1696:52:84"
+                }
+              ]
+            },
+            "documentation": "Withdraws some amount of tokens from wallet's account using ERC20 tokens\n    * @dev Allowed only for timeHolder\n    * @param _asset an address of token\n@param _to an address of a receiver who is willing to get stored resources\n@param _amount an amount of tokens (resources) a receiver wants to get\n    * @return `true` if all successfuly completed, `false` otherwise",
+            "id": 24449,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "withdraw",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 24436,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 24431,
+                  "name": "_asset",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24449,
+                  "src": "1625:14:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 24430,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1625:7:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 24433,
+                  "name": "_to",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24449,
+                  "src": "1641:11:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 24432,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1641:7:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 24435,
+                  "name": "_amount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24449,
+                  "src": "1654:15:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 24434,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1654:7:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1624:46:84"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 24439,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 24438,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24449,
+                  "src": "1680:4:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 24437,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1680:4:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1679:6:84"
+            },
+            "scope": 24450,
+            "src": "1607:148:84",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 24451,
+        "src": "565:1192:84"
+      }
+    ],
+    "src": "92:1666:84"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/helpers/legacy/TimeHolderDammyWallet.sol",
+    "exportedSymbols": {
+      "TimeHolderDammyWallet": [
+        24450
+      ]
+    },
+    "id": 24451,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 24407,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".11"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "92:24:84"
+      },
+      {
+        "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/erc20/ERC20Interface.sol",
+        "file": "../../core/erc20/ERC20Interface.sol",
+        "id": 24408,
+        "nodeType": "ImportDirective",
+        "scope": 24451,
+        "sourceUnit": 4880,
+        "src": "118:45:84",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": "@title TimeHolder's wallet contract defines a basic implementation of DepositWalletInterface\nto provide a way to store/deposit/withdraw tokens on this contract according to access rights.\nHere deposit/withdraw are allowed only by TimeHolder contract.\n* @dev Specifies a contract that helps in updating TimeHolder interface by delegating token's ownership\nto TimeHolderWallet contract",
+        "fullyImplemented": true,
+        "id": 24450,
+        "linearizedBaseContracts": [
+          24450
+        ],
+        "name": "TimeHolderDammyWallet",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 24428,
+              "nodeType": "Block",
+              "src": "1102:81:84",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 24423,
+                        "name": "_from",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 24412,
+                        "src": "1155:5:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 24424,
+                        "name": "this",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 38422,
+                        "src": "1162:4:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_TimeHolderDammyWallet_$24450",
+                          "typeString": "contract TimeHolderDammyWallet"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 24425,
+                        "name": "_amount",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 24414,
+                        "src": "1168:7:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_contract$_TimeHolderDammyWallet_$24450",
+                          "typeString": "contract TimeHolderDammyWallet"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 24420,
+                            "name": "_asset",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 24410,
+                            "src": "1134:6:84",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "id": 24419,
+                          "name": "ERC20Interface",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4879,
+                          "src": "1119:14:84",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_ERC20Interface_$4879_$",
+                            "typeString": "type(contract ERC20Interface)"
+                          }
+                        },
+                        "id": 24421,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1119:22:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_ERC20Interface_$4879",
+                          "typeString": "contract ERC20Interface"
+                        }
+                      },
+                      "id": 24422,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "transferFrom",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 4860,
+                      "src": "1119:35:84",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_address_$_t_uint256_$returns$_t_bool_$",
+                        "typeString": "function (address,address,uint256) external returns (bool)"
+                      }
+                    },
+                    "id": 24426,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1119:57:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 24418,
+                  "id": 24427,
+                  "nodeType": "Return",
+                  "src": "1112:64:84"
+                }
+              ]
+            },
+            "documentation": "Deposits some amount of tokens on wallet's account using ERC20 tokens\n    * @dev Allowed only for timeHolder\n    * @param _asset an address of token\n@param _from an address of a sender who is willing to transfer her resources\n@param _amount an amount of tokens (resources) a sender wants to transfer\n    * @return `true` if all successfuly completed, `false` otherwise",
+            "id": 24429,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "deposit",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 24415,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 24410,
+                  "name": "_asset",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24429,
+                  "src": "1039:14:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 24409,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1039:7:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 24412,
+                  "name": "_from",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24429,
+                  "src": "1055:13:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 24411,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1055:7:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 24414,
+                  "name": "_amount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24429,
+                  "src": "1070:15:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 24413,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1070:7:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1038:48:84"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 24418,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 24417,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24429,
+                  "src": "1096:4:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 24416,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1096:4:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1095:6:84"
+            },
+            "scope": 24450,
+            "src": "1022:161:84",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 24448,
+              "nodeType": "Block",
+              "src": "1686:69:84",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "id": 24444,
+                        "name": "_to",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 24433,
+                        "src": "1735:3:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 24445,
+                        "name": "_amount",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 24435,
+                        "src": "1740:7:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": null,
+                        "arguments": [
+                          {
+                            "argumentTypes": null,
+                            "id": 24441,
+                            "name": "_asset",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 24431,
+                            "src": "1718:6:84",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "id": 24440,
+                          "name": "ERC20Interface",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4879,
+                          "src": "1703:14:84",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_ERC20Interface_$4879_$",
+                            "typeString": "type(contract ERC20Interface)"
+                          }
+                        },
+                        "id": 24442,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1703:22:84",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_ERC20Interface_$4879",
+                          "typeString": "contract ERC20Interface"
+                        }
+                      },
+                      "id": 24443,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberName": "transfer",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 4849,
+                      "src": "1703:31:84",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_uint256_$returns$_t_bool_$",
+                        "typeString": "function (address,uint256) external returns (bool)"
+                      }
+                    },
+                    "id": 24446,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1703:45:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 24439,
+                  "id": 24447,
+                  "nodeType": "Return",
+                  "src": "1696:52:84"
+                }
+              ]
+            },
+            "documentation": "Withdraws some amount of tokens from wallet's account using ERC20 tokens\n    * @dev Allowed only for timeHolder\n    * @param _asset an address of token\n@param _to an address of a receiver who is willing to get stored resources\n@param _amount an amount of tokens (resources) a receiver wants to get\n    * @return `true` if all successfuly completed, `false` otherwise",
+            "id": 24449,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "withdraw",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 24436,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 24431,
+                  "name": "_asset",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24449,
+                  "src": "1625:14:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 24430,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1625:7:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 24433,
+                  "name": "_to",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24449,
+                  "src": "1641:11:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 24432,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1641:7:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 24435,
+                  "name": "_amount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24449,
+                  "src": "1654:15:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 24434,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1654:7:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1624:46:84"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 24439,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 24438,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 24449,
+                  "src": "1680:4:84",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 24437,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1680:4:84",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1679:6:84"
+            },
+            "scope": 24450,
+            "src": "1607:148:84",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 24451,
+        "src": "565:1192:84"
+      }
+    ],
+    "src": "92:1666:84"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.21+commit.dfe3193c.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.0",
+  "updatedAt": "2018-04-11T07:40:05.589Z"
+}

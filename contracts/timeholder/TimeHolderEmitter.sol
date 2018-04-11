@@ -1,73 +1,72 @@
-pragma solidity ^0.4.11;
+/**
+ * Copyright 2017–2018, LaborX PTY
+ * Licensed under the AGPL Version 3 license.
+ */
 
-import '../core/event/MultiEventsHistoryAdapter.sol';
+pragma solidity ^0.4.21;
 
+
+import "../core/event/MultiEventsHistoryAdapter.sol";
+
+
+/// @title TimeHolder emitter.
+///
+/// Contains all the original event emitting function definitions and events.
+/// In case of new events needed later, additional emitters can be developed.
+/// All the functions is meant to be called using delegatecall.
 contract TimeHolderEmitter is MultiEventsHistoryAdapter {
-    /**
-    *  User deposited into current period.
-    */
+
+    /// @dev User deposited into current period
     event Deposit(address token, address who, uint amount);
 
-    /**
-    *  Shares withdrawn by a shareholder.
-    */
+    /// @dev Shares withdrawn by a shareholder
     event WithdrawShares(address token, address who, uint amount, address receiver);
 
-    /**
-    *  Shares withdrawn by a shareholder.
-    */
+    /// @dev Shares withdrawn by a shareholder
     event ListenerAdded(address listener, address token);
 
-    /**
-    * Shares listener is removed
-    */
+    /// @dev Shares listener is removed
     event ListenerRemoved(address listener, address token);
 
-    /**
-    * Shares is added to whitelist and start be available to use
-    */
+    /// @dev Shares is added to whitelist and start be available to use
     event SharesWhiteListAdded(address token);
 
-    /**
-    * Shares is removed from whitelist and stop being available to use
-    */
+    /// @dev Shares is removed from whitelist and stop being available to use
     event SharesWhiteListChanged(address token, uint limit, bool indexed isAdded);
 
-    /**
-    * Fee for Feature is taken
-    */
+    /// @dev Fee for Feature is taken
     event FeatureFeeTaken(address self, address indexed from, address indexed to, uint amount);
 
-    /**
-    *  Something went wrong.
-    */
+    /// @dev Something went wrong
     event Error(address indexed self, uint errorCode);
 
+    /* Emitting events */
+
     function emitDeposit(address token, address who, uint amount) public {
-        Deposit(token, who, amount);
+        emit Deposit(token, who, amount);
     }
 
     function emitWithdrawShares(address token, address who, uint amount, address receiver) public {
-        WithdrawShares(token, who, amount, receiver);
+        emit WithdrawShares(token, who, amount, receiver);
     }
 
     function emitListenerAdded(address listener, address token) public {
-        ListenerAdded(listener, token);
+        emit ListenerAdded(listener, token);
     }
 
     function emitListenerRemoved(address listener, address token) public {
-        ListenerRemoved(listener, token);
+        emit ListenerRemoved(listener, token);
     }
 
     function emitSharesWhiteListChanged(address token, uint limit, bool isAdded) public {
-        SharesWhiteListChanged(token, limit, isAdded);
+        emit SharesWhiteListChanged(token, limit, isAdded);
     }
 
     function emitFeatureFeeTaken(address _from, address _to, uint _amount) public {
-        FeatureFeeTaken(_self(), _from, _to, _amount);
+        emit FeatureFeeTaken(_self(), _from, _to, _amount);
     }
 
     function emitError(uint error) public {
-        Error(_self(), error);
+        emit Error(_self(), error);
     }
 }

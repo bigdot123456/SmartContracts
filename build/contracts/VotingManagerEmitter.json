@@ -1,0 +1,2638 @@
+{
+  "contractName": "VotingManagerEmitter",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "self",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "pollAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "optionsCount",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "detailsIpfsHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": false,
+          "name": "votelimit",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "name": "deadline",
+          "type": "uint256"
+        }
+      ],
+      "name": "PollCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "self",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "pollAddress",
+          "type": "address"
+        }
+      ],
+      "name": "PollRemoved",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "self",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "percent",
+          "type": "uint256"
+        }
+      ],
+      "name": "VotingSharesPercentUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "self",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "errorCode",
+          "type": "uint256"
+        }
+      ],
+      "name": "Error",
+      "type": "event"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_pollAddress",
+          "type": "address"
+        },
+        {
+          "name": "_optionsCount",
+          "type": "uint256"
+        },
+        {
+          "name": "_detailsIpfsHash",
+          "type": "bytes32"
+        },
+        {
+          "name": "_votelimit",
+          "type": "uint256"
+        },
+        {
+          "name": "_deadline",
+          "type": "uint256"
+        }
+      ],
+      "name": "emitPollCreated",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "pollAddress",
+          "type": "address"
+        }
+      ],
+      "name": "emitPollRemoved",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_percent",
+          "type": "uint256"
+        }
+      ],
+      "name": "emitVotingSharesPercentUpdated",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "errorCode",
+          "type": "uint256"
+        }
+      ],
+      "name": "emitError",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x6060604052341561000f57600080fd5b6102588061001e6000396000f3006060604052600436106100615763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416635c053ca8811461006657806398d22b01146100875780639f24f2b61461009d578063df26ca08146100c8575b600080fd5b341561007157600080fd5b610085600160a060020a03600435166100de565b005b341561009257600080fd5b610085600435610128565b34156100a857600080fd5b610085600160a060020a036004351660243560443560643560843561016f565b34156100d357600080fd5b6100856004356101e1565b80600160a060020a03166100f0610228565b600160a060020a03167ff8bb25a0adf9f7a1e52d03be7682c4a079e3656657f2aa6a5fdfcd47428316bb60405160405180910390a350565b610130610228565b600160a060020a03167f5598993bcd3a366666d14de88f684a48ea3d9d25b3eed67f0ae0ebd5dc65601f8260405190815260200160405180910390a250565b84600160a060020a0316610181610228565b600160a060020a03167f02c09d2d47a17abb7adebf3db27d52f36f8f8ed7daf846731b4076b5e918edfc86868686604051938452602084019290925260408084019190915260608301919091526080909101905180910390a35050505050565b6101e9610228565b600160a060020a03167f9cf38cf2dbf9139f5c32639950507b10775fbbe0421f3e168bc2d1bb1ae3208c8260405190815260200160405180910390a250565b33905600a165627a7a723058202cc0673422cc6739118a73c7eb4d56d0e9f37e36f6c32c404f4f90e51a7a404f0029",
+  "deployedBytecode": "0x6060604052600436106100615763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416635c053ca8811461006657806398d22b01146100875780639f24f2b61461009d578063df26ca08146100c8575b600080fd5b341561007157600080fd5b610085600160a060020a03600435166100de565b005b341561009257600080fd5b610085600435610128565b34156100a857600080fd5b610085600160a060020a036004351660243560443560643560843561016f565b34156100d357600080fd5b6100856004356101e1565b80600160a060020a03166100f0610228565b600160a060020a03167ff8bb25a0adf9f7a1e52d03be7682c4a079e3656657f2aa6a5fdfcd47428316bb60405160405180910390a350565b610130610228565b600160a060020a03167f5598993bcd3a366666d14de88f684a48ea3d9d25b3eed67f0ae0ebd5dc65601f8260405190815260200160405180910390a250565b84600160a060020a0316610181610228565b600160a060020a03167f02c09d2d47a17abb7adebf3db27d52f36f8f8ed7daf846731b4076b5e918edfc86868686604051938452602084019290925260408084019190915260608301919091526080909101905180910390a35050505050565b6101e9610228565b600160a060020a03167f9cf38cf2dbf9139f5c32639950507b10775fbbe0421f3e168bc2d1bb1ae3208c8260405190815260200160405180910390a250565b33905600a165627a7a723058202cc0673422cc6739118a73c7eb4d56d0e9f37e36f6c32c404f4f90e51a7a404f0029",
+  "sourceMap": "467:1175:50:-;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "467:1175:50:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1302:108;;;;;;;;;;-1:-1:-1;;;;;1302:108:50;;;;;;;1416:129;;;;;;;;;;;;;;991:305;;;;;;;;;;-1:-1:-1;;;;;991:305:50;;;;;;;;;;;;;1551:89;;;;;;;;;;;;;;1302:108;1391:11;-1:-1:-1;;;;;1370:33:50;1382:7;:5;:7::i;:::-;-1:-1:-1;;;;;1370:33:50;;;;;;;;;;;1302:108;:::o;1416:129::-;1520:7;:5;:7::i;:::-;-1:-1:-1;;;;;1493:45:50;;1529:8;1493:45;;;;;;;;;;;;;;1416:129;:::o;991:305::-;1220:12;-1:-1:-1;;;;;1199:90:50;1211:7;:5;:7::i;:::-;-1:-1:-1;;;;;1199:90:50;;1234:13;1249:16;1267:10;1279:9;1199:90;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;991:305;;;;;:::o;1551:89::-;1614:7;:5;:7::i;:::-;-1:-1:-1;;;;;1608:25:50;;1623:9;1608:25;;;;;;;;;;;;;;1551:89;:::o;326:87:22:-;396:10;326:87;:::o",
+  "source": "/**\n * Copyright 2017–2018, LaborX PTY\n * Licensed under the AGPL Version 3 license.\n */\n\npragma solidity ^0.4.21;\n\n\nimport \"../core/event/MultiEventsHistoryAdapter.sol\";\n\n\n/// @title Emitter with support of events history for VotingManager\n///\n/// Contains all the original event emitting function definitions and events.\n/// In case of new events needed later, additional emitters can be developed.\n/// All the functions is meant to be called using delegatecall.\ncontract VotingManagerEmitter is MultiEventsHistoryAdapter {\n\n    /* Events */\n\n    event PollCreated(\n        address indexed self, \n        address indexed pollAddress, \n        uint optionsCount, \n        bytes32 detailsIpfsHash, \n        uint votelimit, \n        uint deadline\n    );\n    event PollRemoved(address indexed self, address indexed pollAddress);\n    event VotingSharesPercentUpdated(address indexed self, uint percent);\n    event Error(address indexed self, uint errorCode);\n\n\n    /* Emitting events */\n\n    function emitPollCreated(\n        address _pollAddress, \n        uint _optionsCount, \n        bytes32 _detailsIpfsHash, \n        uint _votelimit, \n        uint _deadline\n    ) \n    public \n    {\n        emit PollCreated(_self(), _pollAddress, _optionsCount, _detailsIpfsHash, _votelimit, _deadline);\n    }\n\n    function emitPollRemoved(address pollAddress) public {\n        emit PollRemoved(_self(), pollAddress);\n    }\n\n    function emitVotingSharesPercentUpdated(uint _percent) public {\n        emit VotingSharesPercentUpdated(_self(), _percent);\n    }\n\n    function emitError(uint errorCode) public {\n        emit Error(_self(), errorCode);\n    }\n}\n",
+  "sourcePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/vote/VotingManagerEmitter.sol",
+  "ast": {
+    "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/vote/VotingManagerEmitter.sol",
+    "exportedSymbols": {
+      "VotingManagerEmitter": [
+        17925
+      ]
+    },
+    "id": 17926,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 17829,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".21"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "92:24:50"
+      },
+      {
+        "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/event/MultiEventsHistoryAdapter.sol",
+        "file": "../core/event/MultiEventsHistoryAdapter.sol",
+        "id": 17830,
+        "nodeType": "ImportDirective",
+        "scope": 17926,
+        "sourceUnit": 4477,
+        "src": "119:53:50",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": [],
+            "baseName": {
+              "contractScope": null,
+              "id": 17831,
+              "name": "MultiEventsHistoryAdapter",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 4476,
+              "src": "500:25:50",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_MultiEventsHistoryAdapter_$4476",
+                "typeString": "contract MultiEventsHistoryAdapter"
+              }
+            },
+            "id": 17832,
+            "nodeType": "InheritanceSpecifier",
+            "src": "500:25:50"
+          }
+        ],
+        "contractDependencies": [
+          4476
+        ],
+        "contractKind": "contract",
+        "documentation": "@title Emitter with support of events history for VotingManager\n\n/// Contains all the original event emitting function definitions and events.\n In case of new events needed later, additional emitters can be developed.\n All the functions is meant to be called using delegatecall.",
+        "fullyImplemented": true,
+        "id": 17925,
+        "linearizedBaseContracts": [
+          17925,
+          4476
+        ],
+        "name": "VotingManagerEmitter",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 17846,
+            "name": "PollCreated",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 17845,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17834,
+                  "indexed": true,
+                  "name": "self",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17846,
+                  "src": "578:20:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17833,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "578:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17836,
+                  "indexed": true,
+                  "name": "pollAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17846,
+                  "src": "609:27:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17835,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "609:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17838,
+                  "indexed": false,
+                  "name": "optionsCount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17846,
+                  "src": "647:17:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17837,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "647:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17840,
+                  "indexed": false,
+                  "name": "detailsIpfsHash",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17846,
+                  "src": "675:23:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 17839,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "675:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17842,
+                  "indexed": false,
+                  "name": "votelimit",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17846,
+                  "src": "709:14:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17841,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "709:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17844,
+                  "indexed": false,
+                  "name": "deadline",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17846,
+                  "src": "734:13:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17843,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "734:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "568:185:50"
+            },
+            "src": "551:203:50"
+          },
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 17852,
+            "name": "PollRemoved",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 17851,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17848,
+                  "indexed": true,
+                  "name": "self",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17852,
+                  "src": "777:20:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17847,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "777:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17850,
+                  "indexed": true,
+                  "name": "pollAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17852,
+                  "src": "799:27:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17849,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "799:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "776:51:50"
+            },
+            "src": "759:69:50"
+          },
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 17858,
+            "name": "VotingSharesPercentUpdated",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 17857,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17854,
+                  "indexed": true,
+                  "name": "self",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17858,
+                  "src": "866:20:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17853,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "866:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17856,
+                  "indexed": false,
+                  "name": "percent",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17858,
+                  "src": "888:12:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17855,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "888:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "865:36:50"
+            },
+            "src": "833:69:50"
+          },
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 17864,
+            "name": "Error",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 17863,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17860,
+                  "indexed": true,
+                  "name": "self",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17864,
+                  "src": "919:20:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17859,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "919:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17862,
+                  "indexed": false,
+                  "name": "errorCode",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17864,
+                  "src": "941:14:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17861,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "941:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "918:38:50"
+            },
+            "src": "907:50:50"
+          },
+          {
+            "body": {
+              "id": 17887,
+              "nodeType": "Block",
+              "src": "1184:112:50",
+              "statements": [
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 17878,
+                          "name": "_self",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4475,
+                          "src": "1211:5:50",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
+                            "typeString": "function () view returns (address)"
+                          }
+                        },
+                        "id": 17879,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1211:7:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17880,
+                        "name": "_pollAddress",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17866,
+                        "src": "1220:12:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17881,
+                        "name": "_optionsCount",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17868,
+                        "src": "1234:13:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17882,
+                        "name": "_detailsIpfsHash",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17870,
+                        "src": "1249:16:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17883,
+                        "name": "_votelimit",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17872,
+                        "src": "1267:10:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17884,
+                        "name": "_deadline",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17874,
+                        "src": "1279:9:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "id": 17877,
+                      "name": "PollCreated",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 17846,
+                      "src": "1199:11:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_uint256_$_t_bytes32_$_t_uint256_$_t_uint256_$returns$__$",
+                        "typeString": "function (address,address,uint256,bytes32,uint256,uint256)"
+                      }
+                    },
+                    "id": 17885,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1199:90:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 17886,
+                  "nodeType": "EmitStatement",
+                  "src": "1194:95:50"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 17888,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "emitPollCreated",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 17875,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17866,
+                  "name": "_pollAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17888,
+                  "src": "1025:20:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17865,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1025:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17868,
+                  "name": "_optionsCount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17888,
+                  "src": "1056:18:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17867,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1056:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17870,
+                  "name": "_detailsIpfsHash",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17888,
+                  "src": "1085:24:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 17869,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1085:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17872,
+                  "name": "_votelimit",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17888,
+                  "src": "1120:15:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17871,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1120:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17874,
+                  "name": "_deadline",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17888,
+                  "src": "1146:14:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17873,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1146:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1015:151:50"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 17876,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1184:0:50"
+            },
+            "scope": 17925,
+            "src": "991:305:50",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 17899,
+              "nodeType": "Block",
+              "src": "1355:55:50",
+              "statements": [
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 17894,
+                          "name": "_self",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4475,
+                          "src": "1382:5:50",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
+                            "typeString": "function () view returns (address)"
+                          }
+                        },
+                        "id": 17895,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1382:7:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17896,
+                        "name": "pollAddress",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17890,
+                        "src": "1391:11:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 17893,
+                      "name": "PollRemoved",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 17852,
+                      "src": "1370:11:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$returns$__$",
+                        "typeString": "function (address,address)"
+                      }
+                    },
+                    "id": 17897,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1370:33:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 17898,
+                  "nodeType": "EmitStatement",
+                  "src": "1365:38:50"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 17900,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "emitPollRemoved",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 17891,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17890,
+                  "name": "pollAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17900,
+                  "src": "1327:19:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17889,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1327:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1326:21:50"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 17892,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1355:0:50"
+            },
+            "scope": 17925,
+            "src": "1302:108:50",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 17911,
+              "nodeType": "Block",
+              "src": "1478:67:50",
+              "statements": [
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 17906,
+                          "name": "_self",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4475,
+                          "src": "1520:5:50",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
+                            "typeString": "function () view returns (address)"
+                          }
+                        },
+                        "id": 17907,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1520:7:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17908,
+                        "name": "_percent",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17902,
+                        "src": "1529:8:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "id": 17905,
+                      "name": "VotingSharesPercentUpdated",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 17858,
+                      "src": "1493:26:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_uint256_$returns$__$",
+                        "typeString": "function (address,uint256)"
+                      }
+                    },
+                    "id": 17909,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1493:45:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 17910,
+                  "nodeType": "EmitStatement",
+                  "src": "1488:50:50"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 17912,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "emitVotingSharesPercentUpdated",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 17903,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17902,
+                  "name": "_percent",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17912,
+                  "src": "1456:13:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17901,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1456:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1455:15:50"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 17904,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1478:0:50"
+            },
+            "scope": 17925,
+            "src": "1416:129:50",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 17923,
+              "nodeType": "Block",
+              "src": "1593:47:50",
+              "statements": [
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 17918,
+                          "name": "_self",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4475,
+                          "src": "1614:5:50",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
+                            "typeString": "function () view returns (address)"
+                          }
+                        },
+                        "id": 17919,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1614:7:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17920,
+                        "name": "errorCode",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17914,
+                        "src": "1623:9:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "id": 17917,
+                      "name": "Error",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 17864,
+                      "src": "1608:5:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_uint256_$returns$__$",
+                        "typeString": "function (address,uint256)"
+                      }
+                    },
+                    "id": 17921,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1608:25:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 17922,
+                  "nodeType": "EmitStatement",
+                  "src": "1603:30:50"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 17924,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "emitError",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 17915,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17914,
+                  "name": "errorCode",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17924,
+                  "src": "1570:14:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17913,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1570:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1569:16:50"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 17916,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1593:0:50"
+            },
+            "scope": 17925,
+            "src": "1551:89:50",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 17926,
+        "src": "467:1175:50"
+      }
+    ],
+    "src": "92:1551:50"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/vote/VotingManagerEmitter.sol",
+    "exportedSymbols": {
+      "VotingManagerEmitter": [
+        17925
+      ]
+    },
+    "id": 17926,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 17829,
+        "literals": [
+          "solidity",
+          "^",
+          "0.4",
+          ".21"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "92:24:50"
+      },
+      {
+        "absolutePath": "/Users/mikefluff/Documents/Programming/Chronobank/test/SmartContracts/contracts/core/event/MultiEventsHistoryAdapter.sol",
+        "file": "../core/event/MultiEventsHistoryAdapter.sol",
+        "id": 17830,
+        "nodeType": "ImportDirective",
+        "scope": 17926,
+        "sourceUnit": 4477,
+        "src": "119:53:50",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": [],
+            "baseName": {
+              "contractScope": null,
+              "id": 17831,
+              "name": "MultiEventsHistoryAdapter",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 4476,
+              "src": "500:25:50",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_MultiEventsHistoryAdapter_$4476",
+                "typeString": "contract MultiEventsHistoryAdapter"
+              }
+            },
+            "id": 17832,
+            "nodeType": "InheritanceSpecifier",
+            "src": "500:25:50"
+          }
+        ],
+        "contractDependencies": [
+          4476
+        ],
+        "contractKind": "contract",
+        "documentation": "@title Emitter with support of events history for VotingManager\n\n/// Contains all the original event emitting function definitions and events.\n In case of new events needed later, additional emitters can be developed.\n All the functions is meant to be called using delegatecall.",
+        "fullyImplemented": true,
+        "id": 17925,
+        "linearizedBaseContracts": [
+          17925,
+          4476
+        ],
+        "name": "VotingManagerEmitter",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 17846,
+            "name": "PollCreated",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 17845,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17834,
+                  "indexed": true,
+                  "name": "self",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17846,
+                  "src": "578:20:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17833,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "578:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17836,
+                  "indexed": true,
+                  "name": "pollAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17846,
+                  "src": "609:27:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17835,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "609:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17838,
+                  "indexed": false,
+                  "name": "optionsCount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17846,
+                  "src": "647:17:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17837,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "647:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17840,
+                  "indexed": false,
+                  "name": "detailsIpfsHash",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17846,
+                  "src": "675:23:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 17839,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "675:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17842,
+                  "indexed": false,
+                  "name": "votelimit",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17846,
+                  "src": "709:14:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17841,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "709:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17844,
+                  "indexed": false,
+                  "name": "deadline",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17846,
+                  "src": "734:13:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17843,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "734:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "568:185:50"
+            },
+            "src": "551:203:50"
+          },
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 17852,
+            "name": "PollRemoved",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 17851,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17848,
+                  "indexed": true,
+                  "name": "self",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17852,
+                  "src": "777:20:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17847,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "777:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17850,
+                  "indexed": true,
+                  "name": "pollAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17852,
+                  "src": "799:27:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17849,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "799:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "776:51:50"
+            },
+            "src": "759:69:50"
+          },
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 17858,
+            "name": "VotingSharesPercentUpdated",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 17857,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17854,
+                  "indexed": true,
+                  "name": "self",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17858,
+                  "src": "866:20:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17853,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "866:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17856,
+                  "indexed": false,
+                  "name": "percent",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17858,
+                  "src": "888:12:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17855,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "888:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "865:36:50"
+            },
+            "src": "833:69:50"
+          },
+          {
+            "anonymous": false,
+            "documentation": null,
+            "id": 17864,
+            "name": "Error",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 17863,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17860,
+                  "indexed": true,
+                  "name": "self",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17864,
+                  "src": "919:20:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17859,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "919:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17862,
+                  "indexed": false,
+                  "name": "errorCode",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17864,
+                  "src": "941:14:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17861,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "941:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "918:38:50"
+            },
+            "src": "907:50:50"
+          },
+          {
+            "body": {
+              "id": 17887,
+              "nodeType": "Block",
+              "src": "1184:112:50",
+              "statements": [
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 17878,
+                          "name": "_self",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4475,
+                          "src": "1211:5:50",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
+                            "typeString": "function () view returns (address)"
+                          }
+                        },
+                        "id": 17879,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1211:7:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17880,
+                        "name": "_pollAddress",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17866,
+                        "src": "1220:12:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17881,
+                        "name": "_optionsCount",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17868,
+                        "src": "1234:13:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17882,
+                        "name": "_detailsIpfsHash",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17870,
+                        "src": "1249:16:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17883,
+                        "name": "_votelimit",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17872,
+                        "src": "1267:10:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17884,
+                        "name": "_deadline",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17874,
+                        "src": "1279:9:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "id": 17877,
+                      "name": "PollCreated",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 17846,
+                      "src": "1199:11:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_uint256_$_t_bytes32_$_t_uint256_$_t_uint256_$returns$__$",
+                        "typeString": "function (address,address,uint256,bytes32,uint256,uint256)"
+                      }
+                    },
+                    "id": 17885,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1199:90:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 17886,
+                  "nodeType": "EmitStatement",
+                  "src": "1194:95:50"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 17888,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "emitPollCreated",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 17875,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17866,
+                  "name": "_pollAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17888,
+                  "src": "1025:20:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17865,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1025:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17868,
+                  "name": "_optionsCount",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17888,
+                  "src": "1056:18:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17867,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1056:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17870,
+                  "name": "_detailsIpfsHash",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17888,
+                  "src": "1085:24:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 17869,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1085:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17872,
+                  "name": "_votelimit",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17888,
+                  "src": "1120:15:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17871,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1120:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 17874,
+                  "name": "_deadline",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17888,
+                  "src": "1146:14:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17873,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1146:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1015:151:50"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 17876,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1184:0:50"
+            },
+            "scope": 17925,
+            "src": "991:305:50",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 17899,
+              "nodeType": "Block",
+              "src": "1355:55:50",
+              "statements": [
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 17894,
+                          "name": "_self",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4475,
+                          "src": "1382:5:50",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
+                            "typeString": "function () view returns (address)"
+                          }
+                        },
+                        "id": 17895,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1382:7:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17896,
+                        "name": "pollAddress",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17890,
+                        "src": "1391:11:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 17893,
+                      "name": "PollRemoved",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 17852,
+                      "src": "1370:11:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$returns$__$",
+                        "typeString": "function (address,address)"
+                      }
+                    },
+                    "id": 17897,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1370:33:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 17898,
+                  "nodeType": "EmitStatement",
+                  "src": "1365:38:50"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 17900,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "emitPollRemoved",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 17891,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17890,
+                  "name": "pollAddress",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17900,
+                  "src": "1327:19:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 17889,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1327:7:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1326:21:50"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 17892,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1355:0:50"
+            },
+            "scope": 17925,
+            "src": "1302:108:50",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 17911,
+              "nodeType": "Block",
+              "src": "1478:67:50",
+              "statements": [
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 17906,
+                          "name": "_self",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4475,
+                          "src": "1520:5:50",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
+                            "typeString": "function () view returns (address)"
+                          }
+                        },
+                        "id": 17907,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1520:7:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17908,
+                        "name": "_percent",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17902,
+                        "src": "1529:8:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "id": 17905,
+                      "name": "VotingSharesPercentUpdated",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 17858,
+                      "src": "1493:26:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_uint256_$returns$__$",
+                        "typeString": "function (address,uint256)"
+                      }
+                    },
+                    "id": 17909,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1493:45:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 17910,
+                  "nodeType": "EmitStatement",
+                  "src": "1488:50:50"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 17912,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "emitVotingSharesPercentUpdated",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 17903,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17902,
+                  "name": "_percent",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17912,
+                  "src": "1456:13:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17901,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1456:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1455:15:50"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 17904,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1478:0:50"
+            },
+            "scope": 17925,
+            "src": "1416:129:50",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 17923,
+              "nodeType": "Block",
+              "src": "1593:47:50",
+              "statements": [
+                {
+                  "eventCall": {
+                    "argumentTypes": null,
+                    "arguments": [
+                      {
+                        "argumentTypes": null,
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "id": 17918,
+                          "name": "_self",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4475,
+                          "src": "1614:5:50",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
+                            "typeString": "function () view returns (address)"
+                          }
+                        },
+                        "id": 17919,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1614:7:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "argumentTypes": null,
+                        "id": 17920,
+                        "name": "errorCode",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 17914,
+                        "src": "1623:9:50",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      ],
+                      "id": 17917,
+                      "name": "Error",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 17864,
+                      "src": "1608:5:50",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_uint256_$returns$__$",
+                        "typeString": "function (address,uint256)"
+                      }
+                    },
+                    "id": 17921,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1608:25:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 17922,
+                  "nodeType": "EmitStatement",
+                  "src": "1603:30:50"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 17924,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "emitError",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 17915,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 17914,
+                  "name": "errorCode",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 17924,
+                  "src": "1570:14:50",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 17913,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1570:4:50",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1569:16:50"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 17916,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1593:0:50"
+            },
+            "scope": 17925,
+            "src": "1551:89:50",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 17926,
+        "src": "467:1175:50"
+      }
+    ],
+    "src": "92:1551:50"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.21+commit.dfe3193c.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.0",
+  "updatedAt": "2018-04-11T08:13:19.200Z"
+}
