@@ -1,12 +1,14 @@
 {
   "name": "chronobank-smart-contracts",
-  "version": "1.1.45",
+  "version": "1.1.47",
   "description": "Chronobank Smart Contracts",
   "main": "index.js",
   "scripts": {
     "release": "standard-version",
     "install": "cp truffle-config.js truffle.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "testgas": "NODE_ENV=gasreportgen ./node_modules/truffle/build/cli.bundled.js test",
+    "gasreport": "./scripts/gas-report/gasreport.cli.js"
   },
   "babel": {
     "presets": [
@@ -24,7 +26,7 @@
     }
   },
   "author": "Mike Fluff <mf@mikefluff.com> (http://mikefluff.com)",
-  "license": "GPLv3",
+  "license": "AGPL-3.0",
   "dependencies": {
     "bs58": "^4.0.1",
     "buffer": "^5.0.6",
@@ -35,12 +37,15 @@
     "json3": "3.3.2",
     "lodash.create": "3.1.1",
     "has-flag": "^1.0.0",
-    "ethereumjs-testrpc": "6.0.3",
+    "ganache-cli": "6.1.0",
     "truffle-artifactor": "2.1.5",
-    "truffle": "4.0.4",
+    "truffle": "4.1.5",
     "q": "^1.5.0",
     "abi-decoder": "^1.0.9",
-    "truffle-hdwallet-provider": "mikefluff/truffle-hdwallet-provider"
+    "truffle-hdwallet-provider": "mikefluff/truffle-hdwallet-provider#7a2eccca1ba17c235a3ef258914ca74ea5f13014",
+    "node-json2html": "1.1",
+    "jsdom": "11.6",
+    "mkdirp": "^0.5.1"
   },
   "devDependencies": {
     "@digix/contest": "^0.2.6",

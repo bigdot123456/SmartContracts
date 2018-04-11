@@ -1,4 +1,10 @@
-pragma solidity ^0.4.11;
+/**
+ * Copyright 2017–2018, LaborX PTY
+ * Licensed under the AGPL Version 3 license.
+ */
+
+pragma solidity ^0.4.21;
+
 
 import "../core/common/BaseManager.sol";
 import "../core/erc20/ERC20Interface.sol";
@@ -77,7 +83,15 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
     /// @param _contractsManager address of a contracts manager
     /// @param _pollsFactory address of a poll factory
     /// @return _resultCode result code of an operation. REINITIALIZED if it was once initialized.
-    function init(address _contractsManager, address _pollsFactory, address _pollBackend) onlyContractOwner public returns (uint _resultCode) {
+    function init(
+        address _contractsManager, 
+        address _pollsFactory, 
+        address _pollBackend
+    ) 
+    onlyContractOwner 
+    public 
+    returns (uint _resultCode) 
+    {
         require(_pollBackend != 0x0);
 
         _resultCode = BaseManager.init(_contractsManager, "VotingManager");
@@ -86,12 +100,17 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
             return _resultCode;
         }
 
-        if (REINITIALIZED != _resultCode) {
+        if (store.get(sharesPercentStorage) == 0) {
             store.set(sharesPercentStorage, DEFAULT_SHARES_PERCENT);
         }
 
-        store.set(pollsFactoryStorage, _pollsFactory);
-        store.set(pollBackendStorage, _pollBackend);
+        if (store.get(pollsFactoryStorage) != _pollsFactory) {
+            store.set(pollsFactoryStorage, _pollsFactory);
+        }
+
+        if (store.get(pollBackendStorage) != _pollBackend) {
+            store.set(pollBackendStorage, _pollBackend);
+        }
 
         return OK;
     }
@@ -115,8 +134,14 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
 
         store.set(sharesPercentStorage, _percent);
 
-        _emitSharesPercentUpdated();
+        _emitSharesPercentUpdated(_percent);
         return OK;
+    }
+
+    /// @notice Gets shares contract that is set up as default in TimeHolder
+    function voteShares() public view returns (address) {
+        TimeHolderInterface timeHolder = TimeHolderInterface(lookupManager("TimeHolder"));
+        return timeHolder.getDefaultShares();
     }
 
     /// @notice Returns votes percent value
@@ -171,7 +196,15 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
     /// @param _deadline time after which poll isn't active anymore
     ///
     /// @return OK if all went all right, error code otherwise
-    function createPoll(uint _optionsCount, bytes32 _detailsIpfsHash, uint _votelimit, uint _deadline) public returns (uint) {
+    function createPoll(
+        uint _optionsCount, 
+        bytes32 _detailsIpfsHash, 
+        uint _votelimit, 
+        uint _deadline
+    ) 
+    public 
+    returns (uint) 
+    {
         PollFactory _pollsFactory = PollFactory(store.get(pollsFactoryStorage));
         address _poll = _pollsFactory.createPoll(contractsManager, store.get(pollBackendStorage), _optionsCount, _detailsIpfsHash, _votelimit, _deadline);
 
@@ -185,7 +218,7 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
 
         store.add(pollsStorage, _poll);
 
-        _emitPollCreated(_poll);
+        _emitPollCreated(_poll, _optionsCount, _detailsIpfsHash, _votelimit, _deadline);
         return OK;
     }
 
@@ -253,16 +286,29 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
         _creation = new uint[](_polls.length);
 
         for (uint _idx = 0; _idx < _polls.length; ++_idx) {
-            (_owner[_idx], _detailsIpfsHash[_idx], _votelimit[_idx], _deadline[_idx], _status[_idx], _active[_idx], _creation[_idx],) =
-            PollInterface(_polls[_idx]).getDetails();
+            (
+                _owner[_idx], 
+                _detailsIpfsHash[_idx], 
+                _votelimit[_idx], 
+                _deadline[_idx], 
+                _status[_idx], 
+                _active[_idx], 
+                _creation[_idx],
+            ) 
+            = PollInterface(_polls[_idx]).getDetails();
         }
     }
 
     /** ListenerInterface interface */
 
-    function tokenDeposit(address _token, address _who, uint _amount, uint _total)
-    public
+    function tokenDeposit(
+        address _token, 
+        address _who, 
+        uint _amount, 
+        uint _total
+    )
     onlyTimeHolder
+    public
     {
         address _voteShares = voteShares();
         if (_token != _voteShares) {
@@ -272,9 +318,14 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
         _forEachPollMembership(_voteShares, _who, _amount, _total, _deposit);
     }
 
-    function tokenWithdrawn(address _token, address _who, uint _amount, uint _total)
-    public
+    function tokenWithdrawn(
+        address _token, 
+        address _who, 
+        uint _amount, 
+        uint _total
+    )
     onlyTimeHolder
+    public
     {
         address _voteShares = voteShares();
         if (_token != _voteShares) {
@@ -282,11 +333,6 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
         }
 
         _forEachPollMembership(_voteShares, _who, _amount, _total, _withdrawn);
-    }
-
-    function voteShares() public view returns (address) {
-        TimeHolderInterface timeHolder = TimeHolderInterface(lookupManager("TimeHolder"));
-        return timeHolder.getDefaultShares();
     }
 
     /// @dev Don't allow to receive any Ether
@@ -304,7 +350,15 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
         HolderListenerInterface(_entity).tokenWithdrawn(_token, _address, _amount, _total);
     }
 
-    function _forEachPollMembership(address _token, address _address, uint _amount, uint _total, function (address, address, address, uint, uint) _action) private {
+    function _forEachPollMembership(
+        address _token, 
+        address _address, 
+        uint _amount, 
+        uint _total, 
+        function (address, address, address, uint, uint) _action
+    ) 
+    private 
+    {
         uint _count = store.count(pollsStorage);
         address _poll;
         for (uint _idx = 0; _idx < _count; ++_idx) {
@@ -331,12 +385,12 @@ contract VotingManager is BaseManager, VotingManagerEmitter, HolderListenerInter
         return _error;
     }
 
-    function _emitSharesPercentUpdated() internal {
-        VotingManagerEmitter(getEventsHistory()).emitVotingSharesPercentUpdated();
+    function _emitSharesPercentUpdated(uint _percent) internal {
+        VotingManagerEmitter(getEventsHistory()).emitVotingSharesPercentUpdated(_percent);
     }
 
-    function _emitPollCreated(address _pollAddress) internal {
-        VotingManagerEmitter(getEventsHistory()).emitPollCreated(_pollAddress);
+    function _emitPollCreated(address _pollAddress, uint _optionsCount, bytes32 _detailsIpfsHash, uint _votelimit, uint _deadline) internal {
+        VotingManagerEmitter(getEventsHistory()).emitPollCreated(_pollAddress, _optionsCount, _detailsIpfsHash, _votelimit, _deadline);
     }
     function _emitPollRemoved(address _pollAddress) internal {
         VotingManagerEmitter(getEventsHistory()).emitPollRemoved(_pollAddress);

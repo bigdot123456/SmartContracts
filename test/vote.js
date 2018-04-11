@@ -20,20 +20,6 @@ const reverter = new Reverter(web3)
 const timeMachine = new TimeMachine(web3)
 const utils = require('./helpers/utils');
 
-
-Array.prototype.unique = function() {
-    return this.filter(function (value, index, self) {
-        return self.indexOf(value) === index;
-    });
-}
-
-Array.prototype.removeZeros = function() {
-    return this.filter(function (value, index, self) {
-        return value != 0x0 && value != 0 && value.valueOf() != '0'
-    });
-}
-
-
 contract('Vote', function(accounts) {
     const admin = accounts[0];
     const owner = accounts[1]
@@ -42,6 +28,7 @@ contract('Vote', function(accounts) {
     const SYMBOL = 'TIME'
     const totalTimeTokens = 100000000
     const timeTokensBalance = 50
+    const ACTIVE_POLLS_MAX = 20
 
     let timeTokensToWithdraw75Balance = 75
     let timeTokensToWithdraw45Balance = 45
@@ -71,7 +58,13 @@ contract('Vote', function(accounts) {
             try {
                 await poll.activatePoll({ from: admin })
             } catch (e) {
-                console.log(e);
+                const numberOfActivePolls = (await votingManager.getActivePollsCount.call()).toNumber()
+                if (numberOfActivePolls == ACTIVE_POLLS_MAX) {
+                    utils.ensureException(e)
+                }
+                else {
+                    throw e
+                }
             }
 
             polls.push(poll)
@@ -149,7 +142,6 @@ contract('Vote', function(accounts) {
         context("single voter (owner)", function () {
 
             it("should be able to create poll", async () => {
-                console.log(await Setup.timeHolder.depositBalance.call(owner, { from: owner }));
                 voteLimit = await votingManager.getVoteLimit.call()
                 assert.notEqual(voteLimit.toNumber(), 0)
                 let currentTime = await clock.time.call()
@@ -319,6 +311,40 @@ contract('Vote', function(accounts) {
                 assert.lengthOf(pollsDetails[0], 2)
             })
 
+            it('shouldn\'t allow to update details hash for a poll by a non-owner of a poll', async () => {
+                let nonPollOwner = nonOwner
+
+                let updatedDetailsHash = bytes32('updatedhash-333')
+                let originalDetails = (await otherPollEntity.getDetails.call())[1]
+
+                let failedResultCode = await otherPollEntity.updatePollDetailsIpfsHash.call(updatedDetailsHash, { from: nonPollOwner })
+                assert.equal(failedResultCode, ErrorsEnum.UNAUTHORIZED)
+
+                let updateDetailsTx = await otherPollEntity.updatePollDetailsIpfsHash(updatedDetailsHash, { from: nonPollOwner })
+                let emitter = await PollEmitter.at(otherPollEntity.address)
+                let event = (await eventsHelper.findEvent([emitter], updateDetailsTx, "PollDetailsHashUpdated"))[0]
+                assert.isUndefined(event)
+
+                let newDetails = (await otherPollEntity.getDetails.call())[1]
+                assert.equal(newDetails, originalDetails)
+            })
+
+            it('should allow to update details hash for a poll by a owner of a poll', async () => {
+                let updatedDetailsHash = bytes32('updatedhash-333');
+                let originalDetails = (await otherPollEntity.getDetails.call())[1];
+
+                let resultCode = await otherPollEntity.updatePollDetailsIpfsHash.call(updatedDetailsHash, { from: owner });
+                assert.equal(resultCode, ErrorsEnum.OK);
+
+                let updateDetailsTx = await otherPollEntity.updatePollDetailsIpfsHash(updatedDetailsHash, { from: owner });
+                let emitter = await PollEmitter.at(otherPollEntity.address);
+                let event = (await eventsHelper.findEvent([emitter], updateDetailsTx, "PollDetailsHashUpdated"))[0];
+                assert.isDefined(event);
+                assert.equal(event.args.hash, updatedDetailsHash);
+
+                let newDetails = (await otherPollEntity.getDetails.call())[1];
+                assert.equal(newDetails, updatedDetailsHash);
+            })
         })
 
         context('two voters (+ owner1)', function () {

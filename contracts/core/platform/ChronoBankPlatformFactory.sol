@@ -1,39 +1,40 @@
-pragma solidity ^0.4.11;
+/**
+ * Copyright 2017–2018, LaborX PTY
+ * Licensed under the AGPL Version 3 license.
+ */
+
+pragma solidity ^0.4.21;
+
 
 import "./ChronoBankPlatform.sol";
 import "../event/MultiEventsHistory.sol";
 import "../common/Owned.sol";
 import "../contracts/ContractsManagerInterface.sol";
 
-/**
-* @title Implementation of platform factory to create exactly ChronoBankPlatform contract instances.
-*/
+
+/// @title Implementation of platform factory to create exactly ChronoBankPlatform contract instances.
 contract ChronoBankPlatformFactory is Owned {
 
-    /** @dev DEPRECATED. WILL BE REMOVED IN NEXT RELEASES */
-    address ownershipResolver;
+    uint constant OK = 1;
 
-    function ChronoBankPlatformFactory(address _ownershipResolver) public {
-        require(_ownershipResolver != 0x0);
-
-        ownershipResolver = _ownershipResolver;
+    function ChronoBankPlatformFactory() public {
     }
 
-    function setOwnershipResolver(address _ownershipResolver) onlyContractOwner public {
-        require(_ownershipResolver != 0x0);
-        ownershipResolver = _ownershipResolver;
-    }
-
-    /**
-    * @dev Creates a brand new platform and transfers platform ownership to msg.sender
-    */
-    function createPlatform(address, MultiEventsHistory eventsHistory, address eventsHistoryAdmin) public returns(address) {
+    /// @dev Creates a brand new platform and transfers platform ownership to msg.sender
+    function createPlatform(MultiEventsHistory eventsHistory) public returns (address) {
         ChronoBankPlatform platform = new ChronoBankPlatform();
-        eventsHistory.authorize(platform);
-        platform.setupEventsAdmin(eventsHistoryAdmin);
-        platform.setupEventsHistory(eventsHistory);
-        platform.setupAssetOwningListener(ownershipResolver);
-        platform.transferContractOwnership(msg.sender);
+        if (!eventsHistory.authorize(platform)) {
+            revert();
+        }
+
+        if (OK != platform.setupEventsHistory(eventsHistory)) {
+            revert();
+        }
+
+        if (!platform.transferContractOwnership(msg.sender)) {
+            revert();
+        }
+        
         return platform;
     }
 }

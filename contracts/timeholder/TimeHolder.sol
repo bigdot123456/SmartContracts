@@ -1,4 +1,10 @@
-pragma solidity ^0.4.11;
+/**
+ * Copyright 2017–2018, LaborX PTY
+ * Licensed under the AGPL Version 3 license.
+ */
+
+pragma solidity ^0.4.21;
+
 
 import "./TimeHolderEmitter.sol";
 import "../core/common/BaseManager.sol";
@@ -26,12 +32,17 @@ contract TimeHolder is BaseManager, TimeHolderEmitter {
 
     /** Storage keys */
 
+    /// @dev Contains addresses of tokens that are used as shares
     StorageInterface.AddressesSet sharesTokenStorage;
+    /// @dev Mapping of (token address => limit value) for storing deposit limits
     StorageInterface.AddressUIntMapping limitsStorage;
-
+    /// @dev Mapping of (token address => list of listeners) for holding list of listeners for each share token
     StorageInterface.AddressOrderedSetMapping listeners;
+    /// @dev Address of TimeHolder wallet
     StorageInterface.Address walletStorage;
+    /// @dev Address of fee destination
     StorageInterface.Address feeWalletStorage;
+    /// @dev Address of ERC20DepositStorage contract
     StorageInterface.Address erc20DepositStorage;
 
     /// @dev Guards invokations only for FeatureManager
@@ -115,17 +126,6 @@ contract TimeHolder is BaseManager, TimeHolderEmitter {
         return getDepositStorage().depositBalance(_token, _depositor);
     }
 
-    /// @dev Gets pair of depositStorage and default token set up for a deposits
-    ///
-    /// @return {
-    ///     "_depositStorage": "deposit storage contract",
-    ///     "_token": "default shares contract",
-    /// }
-    function getDepositStorage() private view returns (ERC20DepositStorage _depositStorage) {
-        _depositStorage = ERC20DepositStorage(store.get(erc20DepositStorage));
-
-    }
-
     /// @notice Adds ERC20-compatible token symbols and put them in the whitelist to be used then as
     /// shares for other contracts and allow users to deposit for this share.
     ///
@@ -195,11 +195,13 @@ contract TimeHolder is BaseManager, TimeHolderEmitter {
     external
     onlyAuthorized
     {
-        require(store.includes(listeners, bytes32(_token), _listener));
-
         store.remove(listeners, bytes32(_token), _listener);
 
         _emitListenerRemoved(_listener, _token);
+    }
+
+    function isListener(address _token, address _listener) public view returns (bool) {
+        return store.includes(listeners, bytes32(_token), _listener);
     }
 
     /// @notice Sets fee wallet address.
@@ -283,21 +285,16 @@ contract TimeHolder is BaseManager, TimeHolderEmitter {
     /// Only CBE members are permited to call this function.
     /// Multisig concensus is required to withdraw shares from shareholder "_from"
     /// and send it to "_to".
-    function forceWithdrawShares(address _from, address _token, uint _amount, address _to)
+    function forceWithdrawShares(address _from, address _token, uint _amount)
     public
-    onlyAuthorized
+    onlyContractOwner
     returns (uint resultCode) {
-        resultCode = multisig();
-        if (OK != resultCode) {
-            return _emitError(resultCode);
-        }
-
-        resultCode = _withdrawShares(_token, _from, _to, _amount);
+        resultCode = _withdrawShares(_token, _from, contractOwner, _amount);
         if (resultCode != OK) {
             return _emitError(resultCode);
         }
 
-        _emitWithdrawShares(_token, _from, _amount, _to);
+        _emitWithdrawShares(_token, _from, _amount, contractOwner);
     }
 
     /// @notice Provides a way to support getting additional fee for using features of the system.
@@ -427,6 +424,16 @@ contract TimeHolder is BaseManager, TimeHolderEmitter {
 
     function lookupERC20Service() internal view returns (ERC20Service) {
         return ERC20Service(lookupManager("ERC20Manager"));
+    }
+
+    /// @dev Gets pair of depositStorage and default token set up for a deposits
+    ///
+    /// @return {
+    ///     "_depositStorage": "deposit storage contract",
+    ///     "_token": "default shares contract",
+    /// }
+    function getDepositStorage() private view returns (ERC20DepositStorage _depositStorage) {
+        _depositStorage = ERC20DepositStorage(store.get(erc20DepositStorage));
     }
 
     /** Event emitting */

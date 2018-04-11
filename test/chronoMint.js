@@ -46,34 +46,49 @@ contract('LOC Manager', function(accounts) {
     const BALANCE_ETH = 1000;
     const fakeArgs = [0,0,0,0,0,0,0,0];
 
-    before('setup', function(done) {
-        PendingManager.at(MultiEventsHistory.address).then((instance) => {
-            eventor = instance;
-            Setup.setup(done);
-        });
+    let getAllPlatformsForUser = async (user) => {
+        var userPlatforms = []
+        let platformsCount = await Setup.platformsManager.getPlatformsCount.call()
+        let allPlatforms = await Setup.platformsManager.getPlatforms.call(0, platformsCount)
+
+        for (var _platformIdx = 0; _platformIdx < allPlatforms.length; ++_platformIdx) {
+              const _platformAddr = allPlatforms[_platformIdx];
+
+              let _platform = await ChronoBankPlatform.at(_platformAddr);
+              let _owner = await _platform.contractOwner.call();
+              if (_owner === user) {
+                  userPlatforms.push(_platformAddr);
+              }
+        }
+
+        return userPlatforms
+    }
+
+    before('setup', async () => {
+        eventor = await PendingManager.at(MultiEventsHistory.address)
+        await Setup.setupPromise()
     });
 
     context("with one CBE key", function(){
-        it("Platform has correct TIME proxy address.", function() {
-            return Setup.chronoBankPlatform.proxies.call(SYMBOL).then(_proxy => {
-                return Setup.erc20Manager.getTokenAddressBySymbol.call(SYMBOL).then(_token => {
-                    assert.equal(_proxy, _token);
-                })
-            })
-        })
+        // AG: deprecated
+        // it("Platform has correct TIME proxy address.", function() {
+        //     return Setup.chronoBankPlatform.proxies.call(SYMBOL).then(_proxy => {
+        //         return Setup.erc20Manager.getTokenAddressBySymbol.call(SYMBOL).then(_token => {
+        //             assert.equal(_proxy, _token);
+        //         })
+        //     })
+        // })
 
-        it("Platform has correct LHT proxy address.", function() {
-            return Setup.platformsManager.getPlatformForUserAtIndex.call(owner, 0)
-            .then(_platformMeta => {
-                return Promise.resolve()
-                .then(() => ChronoBankPlatform.at(_platformMeta))
-                .then(_platform => _platform.proxies.call(SYMBOL2))
-            })
-            .then(_proxy => {
-                return Setup.erc20Manager.getTokenAddressBySymbol.call(SYMBOL2).then(_token => {
-                    assert.equal(_proxy, _token);
-                })
-            })
+        it("Platform has correct LHT proxy address.", async () => {
+            const platformAddresses = await getAllPlatformsForUser(owner)
+            assert.isAtLeast(platformAddresses.length, 1)
+
+            const platform = await ChronoBankPlatform.at(platformAddresses[0])
+            let gotProxyAddr = await platform.proxies.call(SYMBOL2)
+
+            let registeredProxyAddr = await Setup.erc20Manager.getTokenAddressBySymbol.call(SYMBOL2)
+
+            assert.equal(registeredProxyAddr, gotProxyAddr)
         })
 
         //
@@ -137,10 +152,8 @@ contract('LOC Manager', function(accounts) {
             });
         });
 
-        it("pending operation counter should be 0", function() {
-            return Setup.shareable.pendingsCount.call({from: owner}).then(function(r) {
-                assert.equal(r, 0);
-            });
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
         });
 
         it("doesn't allows non CBE to propose an LOC.", function() {
@@ -166,6 +179,10 @@ contract('LOC Manager', function(accounts) {
                     assert.equal(r,ErrorsEnum.UNAUTHORIZED);
                 });
             });
+        });
+
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
         });
 
         it("allows a CBE to propose an LOC.", function() {
@@ -196,6 +213,10 @@ contract('LOC Manager', function(accounts) {
             });
         });
 
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
+        });
+
         it("doesn't allows a non CBE to change LOC data.", function() {
             return Setup.chronoMint.setLOC.call(
                 bytes32("Bob's Hard Workers"),
@@ -221,6 +242,10 @@ contract('LOC Manager', function(accounts) {
                     });
                 });
             });
+        });
+
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
         });
 
         it("allows a CBE to change LOC data.", function() {
@@ -250,18 +275,27 @@ contract('LOC Manager', function(accounts) {
             });
         });
 
-        it("doesn't allows non CBE to change LOC status.", function() {
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
+        });
+
+        it("doesn't allow non-CBE to change LOC status", function() {
             return Setup.chronoMint.setStatus.call(bytes32("David's Hard Workers"), Status.active, {from:owner1}).then(function(r){
-                return Setup.chronoMint.setStatus(bytes32("David's Hard Workers"), Status.active, {from:owner1}).then(function(){
-                    return Setup.chronoMint.getLOCById.call(0).then(function(r2) {
-                        assert.equal(r, ErrorsEnum.UNAUTHORIZED);
-                        assert.equal(r2[6], Status.maintenance);
+                return Setup.chronoMint.setStatus(bytes32("David's Hard Workers"), Status.active, {from:owner1}).then(async function(tx){
+                    await Setup.chronoMint.getLOCById.call(0).then(function(r2) {
+                        assert.equal(r.toNumber(), ErrorsEnum.MULTISIG_ADDED);
+                        assert.equal(r2[6].toNumber(), Status.maintenance);
                     });
+                    await Setup.shareable.cleanUnconfirmedTx()
                 });
             });
         });
 
-        it("allows a CBE to change LOC status.", function() {
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
+        });
+
+        it("allows a CBE to change LOC status", function() {
             return Setup.chronoMint.setStatus(bytes32("David's Hard Workers"), Status.active, {from:owner}).then(function(){
                 return Setup.chronoMint.getLOCById.call(0).then(function(r2){
                     assert.equal(r2[6], Status.active);
@@ -275,15 +309,20 @@ contract('LOC Manager', function(accounts) {
             });
         });
 
-        it("doesn't allow CBE member to remove LOC is loc is active", function() {
+        it("doesn't allow CBE member to remove LOC if loc is active", function() {
             return Setup.chronoMint.removeLOC(bytes32("David's Hard Workers"),{
                 from: owner,
                 gas: 3000000
-            }).then(function() {
-                return Setup.chronoMint.getLOCCount.call().then(function(r){
+            }).then(async function() {
+                await Setup.chronoMint.getLOCCount.call().then(function(r){
                     assert.equal(r, 1);
                 });
+                await Setup.shareable.cleanUnconfirmedTx()
             });
+        });
+
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
         });
 
         it("allows a CBE to change LOC status.", function() {
@@ -294,7 +333,11 @@ contract('LOC Manager', function(accounts) {
             });
         });
 
-        it("allow CBE member to remove LOC is loc is not active", function() {
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
+        });
+
+        it("allow CBE member to remove LOC if loc is not active", function() {
             return Setup.chronoMint.removeLOC(bytes32("David's Hard Workers"),{
                 from: owner,
                 gas: 3000000
@@ -305,14 +348,12 @@ contract('LOC Manager', function(accounts) {
             });
         });
 
-        it("pending operation counter should be 0", function() {
-            return Setup.shareable.pendingsCount.call({from: owner}).then(function(r) {
-                assert.equal(r, 0);
-            });
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
         });
 
         it("allows one CBE key to add another CBE key.", function() {
-            return Setup.userManager.addCBE(owner1,0x2).then(function() {
+            return Setup.userManager.addCBE(owner1,0x2, { from: owner, }).then(function() {
                 return Setup.userManager.isAuthorized.call(owner1).then(function(r){
                     assert.isOk(r);
                 });
@@ -326,8 +367,8 @@ contract('LOC Manager', function(accounts) {
         });
 
         it("should allow setRequired signatures 2.", function() {
-            return Setup.userManager.setRequired(2).then(function() {
-                return Setup.userManager.required.call({from: owner}).then(function(r) {
+            return Setup.userManager.setRequired(2, {from: owner}).then(function() {
+                return Setup.userManager.required.call().then(function(r) {
                     assert.equal(r, 2);
                 });
             });
@@ -355,10 +396,8 @@ contract('LOC Manager', function(accounts) {
             });
         });
 
-        it("pending operation counter should be 0", function() {
-            return Setup.shareable.pendingsCount.call({from: owner}).then(function(r) {
-                assert.equal(r, 0);
-            });
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
         });
 
         it("allows to propose pending operation", function() {
@@ -369,7 +408,7 @@ contract('LOC Manager', function(accounts) {
             }).then(function(events) {
                 conf_sign = events[0].args.hash;
                 Setup.shareable.pendingsCount.call({from: owner}).then(function(r) {
-                    assert.equal(r,1);
+                    assert.equal(r.toNumber(), 1);
                 });
             });
         });
@@ -377,7 +416,7 @@ contract('LOC Manager', function(accounts) {
         it("allows to revoke last confirmation and remove pending operation", function() {
             return Setup.shareable.revoke(conf_sign, {from:owner}).then(function() {
                 Setup.shareable.pendingsCount.call({from: owner}).then(function(r) {
-                    assert.equal(r,0);
+                    assert.equal(r.toNumber(), 0);
                 });
             });
         });
@@ -395,10 +434,8 @@ contract('LOC Manager', function(accounts) {
             });
         });
 
-        it("pending operation counter should be 0", function() {
-            return Setup.shareable.pendingsCount.call({from: owner}).then(function(r) {
-                assert.equal(r, 0);
-            });
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
         });
 
         it("should allow setRequired signatures 3.", function() {
@@ -433,10 +470,8 @@ contract('LOC Manager', function(accounts) {
             });
         });
 
-        it("pending operation counter should be 0", function() {
-            return Setup.shareable.pendingsCount.call({from: owner}).then(function(r) {
-                assert.equal(r, 0);
-            });
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
         });
 
         it("should allow set required signers to be 4", function() {
@@ -477,10 +512,8 @@ contract('LOC Manager', function(accounts) {
             });
         });
 
-        it("pending operation counter should be 0", function() {
-            return Setup.shareable.pendingsCount.call({from: owner}).then(function(r) {
-                assert.equal(r, 0);
-            });
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
         });
 
         it("should allow set required signers to be 5", function() {
@@ -549,11 +582,8 @@ contract('LOC Manager', function(accounts) {
             });
         });
 
-
-        it("pending operation counter should be 0", function () {
-            return Setup.shareable.pendingsCount.call({from: owner}).then(function (r) {
-                assert.equal(r, 0);
-            });
+        it("pending operation counter should be 0", async () => {
+            assert.equal((await Setup.shareable.pendingsCount.call()).toNumber(), 0)
         });
 
         it("allows a CBE to propose an LOC.", function () {

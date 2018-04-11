@@ -3,7 +3,8 @@ const bytes32 = require('./helpers/bytes32');
 const Reverter = require('./helpers/reverter');
 const ErrorsEnum = require("../common/errors")
 const AssetDonator = artifacts.require('./AssetDonator.sol');
-
+const ERC20Manager = artifacts.require('./ERC20Manager.sol');
+const ERC20Interface = artifacts.require('./ERC20Interface.sol');
 
 contract('AssetDonator', function(accounts) {
     let owner = accounts[0];
@@ -22,28 +23,31 @@ contract('AssetDonator', function(accounts) {
         AssetDonator.deployed()
         .then((_assetDonator) => assetDonator = _assetDonator)
         .then(() => Setup.setup(done))
-});
-
-
-    it("Platform is able to transfer TIMEs for test purposes", function() {
-        return assetDonator.sendTime.call({from: owner5}).then(function(r) {
-            assert.isTrue(r);
-            return assetDonator.sendTime({from: owner5}).then(function(r1) {
-                  return Setup.chronoBankPlatform.balanceOf.call(owner5, bytes32('TIME')).then(function(r2) {
-                      assert.equal(r2, 1000000000);
-                  });
-            });
-      });
     });
 
-    it("Platform is unable to transfer TIMEs twice to the same account", function() {
-        return assetDonator.sendTime.call({from: owner5}).then(function(r) {
-            assert.isFalse(r);
-            return assetDonator.sendTime({from: owner5}).then(function(r1) {
-                  return Setup.chronoBankPlatform.balanceOf.call(owner5, bytes32('TIME')).then(function(r2) {
-                      assert.equal(r2, 1000000000);
-                  });
-            });
-      });
+    it("Platform is able to transfer TIMEs for test purposes", async () => {
+        let result = await assetDonator.sendTime.call({from: owner5});
+        assert.isTrue(result);
+
+        await assetDonator.sendTime({from: owner5});
+
+        let erc20Manager = await ERC20Manager.deployed();
+        let timeAddress = await erc20Manager.getTokenAddressBySymbol("TIME");
+
+        let time = ERC20Interface.at(timeAddress);
+        assert.equal(await time.balanceOf.call(owner5), 1000000000);
+    });
+
+    it("Platform is unable to transfer TIMEs twice to the same account", async () => {
+        let result = await assetDonator.sendTime.call({from: owner5});
+        assert.isFalse(result);
+
+        await assetDonator.sendTime({from: owner5});
+
+        let erc20Manager = await ERC20Manager.deployed();
+        let timeAddress = await erc20Manager.getTokenAddressBySymbol("TIME");
+
+        let time = ERC20Interface.at(timeAddress);
+        assert.equal(await time.balanceOf.call(owner5), 1000000000);
     });
 });

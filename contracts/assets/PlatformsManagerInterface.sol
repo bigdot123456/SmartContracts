@@ -1,10 +1,14 @@
+/**
+ * Copyright 2017–2018, LaborX PTY
+ * Licensed under the AGPL Version 3 license.
+ */
+
 pragma solidity ^0.4.11;
 
+/// @dev DEPRECATED. MIGHT BE REMOVED AFTER CHANGES IN REWARDS
 contract PlatformsManagerInterface {
-    function getPlatformForUserAtIndex(address _user, uint _idx) public constant returns (address _platform);
-    function getPlatformsForUserCount(address _user) public constant returns (uint);
+    function getPlatformsCount() public view returns (uint);
+    function getPlatforms(uint _start, uint _size) public view returns (address[] _platforms);
 
-    function getPlatformsMetadataForUser(address _user) public constant returns (address[] _platforms);
-
-    function isPlatformAttached(address _platform) public constant returns (bool);
+    function isPlatformAttached(address _platform) public view returns (bool);
 }

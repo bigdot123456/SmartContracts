@@ -20,11 +20,10 @@ const RewardsWallet = artifacts.require('./RewardsWallet.sol')
 const Storage = artifacts.require('./Storage.sol')
 const UserManager = artifacts.require("./UserManager.sol")
 const MultiEventsHistory = artifacts.require('./MultiEventsHistory.sol')
-const ProxyFactory = artifacts.require("./ProxyFactory.sol")
+const TokenFactory = artifacts.require("./TokenFactory.sol")
 const StorageManager = artifacts.require('StorageManager.sol')
 const VotingManager = artifacts.require('VotingManager.sol')
 const PlatformTokenExtensionGatewayManager = artifacts.require('./PlatformTokenExtensionGatewayManager.sol')
-const AssetOwnershipDelegateResolver = artifacts.require('./AssetOwnershipDelegateResolver.sol')
 //const CrowdsaleManager = artifacts.require("./CrowdsaleManager.sol");
 
 const contractTypes = {
@@ -75,7 +74,6 @@ let multiEventsHistory
 let storageManager
 let crowdsaleManager
 let tokenExtensionGateway
-let assetOwnershipDelegateResolver
 
 let accounts
 let params
@@ -128,7 +126,6 @@ var setup = function (callback) {
       MultiEventsHistory.deployed(),
       StorageManager.deployed(),
       PlatformTokenExtensionGatewayManager.deployed(),
-      AssetOwnershipDelegateResolver.deployed()
       //CrowdsaleManager.deployed()
     ])
   }).then((instances) => {
@@ -161,6 +158,16 @@ var setup = function (callback) {
       //crowdsaleManager
     ] = instances
   }).then(() => {
+    shareable.cleanUnconfirmedTx = async (from = accounts[0]) => {
+      let [ hashes,, ownersDone, ] = await shareable.getTxs();
+      // console.log(`### from CBE ${from} hashes ${JSON.stringify(hashes)}; ownersDone ${JSON.stringify(ownersDone)}`);
+      for (var _hashIdx = 0; _hashIdx < hashes.length; _hashIdx++) {   
+          if (ownersDone[_hashIdx].toNumber() === 0) {
+            await shareable.revoke(hashes[_hashIdx], { from: from, });
+          }
+      }
+    }
+
     module.exports.storage = storage
     module.exports.accounts = accounts
     module.exports.assetsManager = assetsManager
@@ -186,7 +193,6 @@ var setup = function (callback) {
     module.exports.multiEventsHistory = multiEventsHistory
     module.exports.storageManager = storageManager
     module.exports.tokenExtensionGateway = tokenExtensionGateway
-    module.exports.assetOwnershipResolver = assetOwnershipDelegateResolver
 
     //module.exports.crowdsaleManager = crowdsaleManager
   }).then(() => {

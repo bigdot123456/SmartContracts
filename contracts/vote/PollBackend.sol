@@ -1,4 +1,10 @@
-pragma solidity ^0.4.11;
+/**
+ * Copyright 2017–2018, LaborX PTY
+ * Licensed under the AGPL Version 3 license.
+ */
+
+pragma solidity ^0.4.21;
+
 
 import "../core/common/Owned.sol";
 import "../core/contracts/ContractsManagerInterface.sol";
@@ -51,10 +57,14 @@ contract PollBackend is Owned, MultiSigSupporter {
     uint internal creation;
     State state = State.Prepare;
 
+    /// @dev Amount of options in a poll
     uint internal optionsCount;
 
+    /// @dev Stores how a member of a poll voted 
     mapping(address => uint8) public memberOptions;
+    /// @dev Stores how much balance a member put for his vote
     mapping(address => uint) public memberVotes;
+    /// @dev Stores total amount of tokens that where put for an option
     mapping(uint8 => uint) public optionsBalance;
 
 
@@ -248,7 +258,6 @@ contract PollBackend is Owned, MultiSigSupporter {
 
     /// @notice Activates poll so users could vote and no more changes can be made.
     /// @dev delegatecall only. Multisignature required
-    ///
     /// @return _resultCode result code of an operation.
     function activatePoll() public returns (uint _resultCode) {
         if (state != State.Prepare || creation == 0) {
@@ -285,9 +294,7 @@ contract PollBackend is Owned, MultiSigSupporter {
 
     /// @notice Erases poll from records. Should be called before activation or after poll completion.
     /// Couldn't be invoked in the middle of voting.
-    ///
     /// @dev delegatecall only. Authorized contracts only.
-    ///
     /// @return _resultCode result code of an operation.
     function killPoll() public onlyAuthorized {
         if (active()) {
@@ -297,6 +304,20 @@ contract PollBackend is Owned, MultiSigSupporter {
         getPollListener().onRemovePoll();
 
         selfdestruct(contractOwner);
+    }
+
+    /// @notice Changes details hash with a new version. Should be called before poll will be activated
+    /// Emits PollDetailsHashUpdated event
+    /// @dev delegatecall only. poll owner only
+    /// @param _detailsIpfsHash updated ipfs hash value
+    /// @return result code of an operation.
+    function updatePollDetailsIpfsHash(bytes32 _detailsIpfsHash) onlyContractOwner public returns (uint) {
+        require(_detailsIpfsHash != bytes32(0));
+
+        detailsIpfsHash = _detailsIpfsHash;
+
+        getEventsHistory().emitPollDetailsHashUpdated(_detailsIpfsHash);
+        return OK;
     }
 
     /** ListenerInterface interface */
@@ -361,7 +382,6 @@ contract PollBackend is Owned, MultiSigSupporter {
 
     /// @notice Makes search in contractsManager for registered contract by some identifier
     /// @param _identifier string identifier of a manager
-    ///
     /// @return manager address of a manager, 0x0 if nothing was found
     function lookupManager(bytes32 _identifier) public view returns (address manager) {
         manager = ContractsManagerInterface(contractsManager).getContractAddressByType(_identifier);
@@ -369,7 +389,7 @@ contract PollBackend is Owned, MultiSigSupporter {
     }
 
     /// @dev Don't allow to receive any Ether
-    function () public { // TODO:
+    function () public payable { // TODO:
         revert();
     }
 

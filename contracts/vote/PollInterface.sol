@@ -1,3 +1,8 @@
+/**
+ * Copyright 2017–2018, LaborX PTY
+ * Licensed under the AGPL Version 3 license.
+ */
+
 pragma solidity ^0.4.11;
 
 import "../core/common/OwnedInterface.sol";
@@ -69,6 +74,15 @@ contract PollInterface is OwnedInterface {
 
     /// @notice Get information about current poll situation for existed options: how much tokens are placed for which options.
     function getVotesBalances() public view returns (uint8[], uint[]);
+
+    /// @notice Changes details hash with a new version. Should be called before poll will be activated
+    /// Emits PollDetailsHashUpdated event
+    ///
+    /// @dev delegatecall only. poll owner only
+    ///
+    /// @param _detailsIpfsHash updated ipfs hash value
+    /// @return result code of an operation.
+    function updatePollDetailsIpfsHash(bytes32 _detailsIpfsHash) public returns (uint);
 }
 
 
