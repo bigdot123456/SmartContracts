@@ -35,6 +35,9 @@ contract ERC20DepositStorage is Managed {
     StorageInterface.AddressUIntMapping totalSharesStorage_v2;
     StorageInterface.AddressesSet sharesTokenStorage_v2;
     StorageInterface.AddressUIntMapping limitsStorage_v2;
+    StorageInterface.UIntOrderedSetMapping locks_v2;
+    StorageInterface.Bytes32UIntMapping locksIdCounters_v2;
+    StorageInterface.Bytes32UIntMapping unlocksIdCounters_v2;
 
     /// @dev Restricts access to functions only for TimeHolder sender
     modifier onlyTimeHolder {
@@ -59,6 +62,9 @@ contract ERC20DepositStorage is Managed {
         totalSharesStorage_v2.init("totalSharesStorage_v2");
         sharesTokenStorage_v2.init("sharesContractsStorage_v2");
         limitsStorage_v2.init("limitAmountsStorage_v2");
+        locks_v2.init("locks_v2");
+        locksIdCounters_v2.init("locksIdCounters_v2");
+        unlocksIdCounters_v2.init("unlocksIdCounters_v2");
     }
 
     /// @notice Init DepositStorage contract.
@@ -148,6 +154,23 @@ contract ERC20DepositStorage is Managed {
         }
     }
 
+    /// @notice Deposits for a _target for provided _amount of specified tokens
+    /// @dev Allowed only for TimeHolder call
+    ///
+    /// @param _token token to deposit. Should be in a whitelist
+    /// @param _target deposit destination
+    /// @param _amount amount of deposited tokens
+    function lockFor(address _token, address _target, uint _amount) onlyTimeHolder public {
+        uint id;
+        uint prevAmount;
+
+            bytes32 key = _compileCompositeKey(_token, _target);
+
+            id = store.get(locksIdCounters_v2, key) + 1;
+            store.set(locksIdCounters_v2, key, id);
+            _addLock(key, bytes32(id), _amount);
+    }
+
     /// @notice Withdraws tokens back to provided account
     /// @dev Allowed only for TimeHolder call
     ///
@@ -182,6 +205,70 @@ contract ERC20DepositStorage is Managed {
         }
     }
 
+    /// @notice Withdraws tokens back to provided account
+    /// @dev Allowed only for TimeHolder call
+    ///
+    /// @param _token token address
+    /// @param _account token recepient
+    /// @param _secret to unlock tokens
+    /// @param _totalBalance total balance of shares
+    function unlockShares(address _token, address _account, bytes32 _secret, uint _totalBalance) onlyTimeHolder public {
+        if (_totalBalance == 0) {
+            return;
+        }
+
+        if (_token == store.get(sharesContractStorage)) {
+            uint deposits_count_left_v1 = _unlockShares(bytes32(_account), _secret);
+
+            //if (deposits_count_left_v1 == 0) {
+            //    store.remove(shareholders, _account);
+            //}
+
+            //uint prevAmount_v1 = store.get(totalSharesStorage);
+            //store.set(totalSharesStorage, prevAmount_v1.sub(_amount));
+        } else {
+            bytes32 _key = _compileCompositeKey(_token, _account);
+            uint deposits_count_left_v2 = _unlockShares(_key, _secret);
+
+            //if (deposits_count_left_v2 == 0) {
+            //    store.remove(shareholders_v2, bytes32(_token), _account);
+            //}
+
+            //uint prevAmount_v2 = store.get(totalSharesStorage_v2, _token);
+            //store.set(totalSharesStorage_v2, _token, prevAmount_v2.sub(_amount));
+        }
+    }
+
+    /// @dev Unlock tokens for provided keys
+    ///
+    /// @param _key might be a compositeKey or an account address
+    /// @param _secret secret of registered tokens unlocker
+    ///
+    /// @return _unlock_count_left amount of tokens that is left on deposit locks
+    function _unlockShares(bytes32 _key, bytes32 _secret) private returns (uint _locks_count_left) {
+        uint unlocked_amount = store.get(unlocksIdCounters_v2, keccak256(_secret));
+        StorageInterface.Iterator memory iterator = store.listIterator(locks_v2, _key);
+        _locks_count_left = iterator.count();
+        while (store.canGetNextWithIterator(locks_v2, iterator) && unlocked_amount > 0) {
+            uint _id = store.getNextWithIterator(locks_v2, iterator);
+            (_locks_count_left, unlocked_amount) = _unlockSharesFromDepositV2(_key, _id, unlocked_amount, _locks_count_left);
+            if (unlocked_amount == 0) {
+                break;
+            }
+        }
+    }
+    
+    function _unlockSharesFromDepositV2(bytes32 _key, uint _id, uint _amount, uint _locksLeft) private returns (uint, uint) { 
+        uint _cur_amount = uint(store.get(amounts_v2, _key, bytes32(_id)));
+        if (_amount < _cur_amount) {
+            store.set(amounts_v2, _key, bytes32(_id), bytes32(_cur_amount.sub(_amount)));
+            return (_locksLeft, 0);
+        }
+
+        store.remove(locks_v2, _key, _id);
+        return (_locksLeft.sub(1), _amount.sub(_cur_amount));
+    }
+
     /// @dev Iterates through deposits and calculates a sum
     function _depositBalance(bytes32 _key) private view returns (uint _balance) {
         StorageInterface.Iterator memory iterator = store.listIterator(deposits, _key);
@@ -202,6 +289,30 @@ contract ERC20DepositStorage is Managed {
         store.set(timestamps_v2, _key, _id, bytes32(now));
     }
 
+    /// @dev Saves deposit lock data with provided key
+    ///
+    /// @param _key might be a compositeKey or an account address
+    /// @param _id index of deposit
+    /// @param _amount amount of tokens to deposit
+    function _addLock(bytes32 _key, bytes32 _id, uint _amount) private {
+        store.add(locks_v2, _key, uint(_id));
+        store.set(amounts_v2, _key, _id, bytes32(_amount));
+        store.set(timestamps_v2, _key, _id, bytes32(now));
+    }
+
+    function _registerUnlock(uint _amount, bytes32 _hash) onlyTimeHolder {
+        store.set(unlocksIdCounters_v2, _hash, _amount);
+    }
+
+    function getLocked(bytes32 _key) returns (uint _locked_left) {
+        StorageInterface.Iterator memory iterator = store.listIterator(locks_v2, _key);
+        while (store.canGetNextWithIterator(locks_v2, iterator)) {
+            uint _id = store.getNextWithIterator(locks_v2, iterator);
+            _locked_left = _locked_left.add(uint(store.get(amounts_v2, _key, bytes32(_id))));
+        }
+        return _locked_left;
+    }
+
     /// @dev Withdraws tokens for provided keys
     ///
     /// @param _key might be a compositeKey or an account address
@@ -209,6 +320,7 @@ contract ERC20DepositStorage is Managed {
     ///
     /// @return _deposits_count_left amount of tokens that is left on deposits
     function _withdrawShares(bytes32 _key, uint _amount) private returns (uint _deposits_count_left) {
+        _amount = _amount.sub(getLocked(_key));
         StorageInterface.Iterator memory iterator = store.listIterator(deposits, _key);
         _deposits_count_left = iterator.count();
         while (store.canGetNextWithIterator(deposits, iterator)) {
