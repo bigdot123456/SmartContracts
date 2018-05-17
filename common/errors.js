@@ -9,15 +9,16 @@ const errorScope = {
     vote: 8000, // DEPRECATED
     reward: 9000,
     contract: 10000,
-    assets: 30000,
     timeholder: 12000,
     ercmanager: 13000,
     walletsmanager: 14000,
     chronobankplatform: 15000,
+    roles: 20000,
     platforms: 21000,
     tokenextension: 23000,
     poll_v2: 26000,
     vote_v2: 27000,
+    assets: 30000,
 }
 
 const errorsLibrary = {
@@ -113,14 +114,17 @@ const errorsLibrary = {
     CONTRACT_NOT_EXISTS: errorScope.contract + 1,
 
     TIMEHOLDER_ALREADY_ADDED: errorScope.timeholder + 0,
-    TIMEHOLDER_INVALID_INVOCATION: errorScope.timeholder + 1,
-    TIMEHOLDER_INVALID_STATE: errorScope.timeholder + 2,
     TIMEHOLDER_TRANSFER_FAILED: errorScope.timeholder + 3,
-    TIMEHOLDER_WITHDRAWN_FAILED: errorScope.timeholder + 4,
-    TIMEHOLDER_DEPOSIT_FAILED: errorScope.timeholder + 5,
     TIMEHOLDER_INSUFFICIENT_BALANCE: errorScope.timeholder + 6,
     TIMEHOLDER_LIMIT_EXCEEDED: errorScope.timeholder + 7,
-    TIMEHOLDER_SHARES_IS_NOT_ALLOWED: errorScope.timeholder + 8,
+    TIMEHOLDER_LOCK_LIMIT_EXCEEDED: errorScope.timeholder + 8,
+    TIMEHOLDER_INSUFFICIENT_LOCKED_BALANCE: errorScope.timeholder + 9,
+    TIMEHOLDER_ONLY_REGISTERED_SHARES: errorScope.timeholder + 10,
+    TIMEHOLDER_NO_REGISTERED_UNLOCK_FOUND: errorScope.timeholder + 11,
+    TIMEHOLDER_UNLOCK_LIMIT_EXCEEDED: errorScope.timeholder + 12,
+    TIMEHOLDER_INVALID_INVOCATION: errorScope.timeholder + 13,
+    TIMEHOLDER_REGISTRATION_ID_EXISTS: errorScope.timeholder + 14,
+    TIMEHOLDER_WRONG_SECRET: errorScope.timeholder + 15,
 
     ERCMANAGER_INVALID_INVOCATION: errorScope.ercmanager + 0,
     ERCMANAGER_INVALID_STATE: errorScope.ercmanager + 1,
@@ -166,6 +170,10 @@ const errorsLibrary = {
     CHRONOBANK_PLATFORM_SHOULD_RECOVER_TO_NEW_ADDRESS: errorScope.chronobankplatform + 12,
     CHRONOBANK_PLATFORM_ASSET_IS_NOT_ISSUED: errorScope.chronobankplatform + 13,
     CHRONOBANK_PLATFORM_INVALID_INVOCATION: errorScope.chronobankplatform + 17,
+
+    ROLES_ALREADY_EXISTS: errorScope.roles + 1,
+    ROLES_INVALID_INVOCATION: errorScope.roles + 2,
+    ROLES_NOT_FOUND: errorScope.roles + 3,
 
     PLATFORMS_ATTACHING_PLATFORM_ALREADY_EXISTS: errorScope.platforms + 1,
     PLATFORMS_PLATFORM_DOES_NOT_EXIST: errorScope.platforms + 2,
