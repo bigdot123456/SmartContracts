@@ -17,7 +17,7 @@ While looking into details it could be spotted that _ChronoBank Smart Contracts_
 
 The next foundational block in the ecosystem is a top-level contracts module (a handful of managers) that provides all needed interfaces to organize flexible and powerful tools.
 
-[![Smart_Contracts_small_v6-1.png](./misc/Smart_Contracts_small_v6-1.png)](./misc/Smart_Contracts_small_v6-1.png) [PDF version](./misc/Smart_Contracts_small_v6-1.pdf) for detailed preview.
+[![Smart_Contracts_small_v6-1.png](https://user-images.githubusercontent.com/15607315/41597810-27d290c2-73d7-11e8-8343-f9b0fed654c6.png)](https://user-images.githubusercontent.com/15607315/41597810-27d290c2-73d7-11e8-8343-f9b0fed654c6.png) [PDF version](https://github.com/ChronoBank/SmartContracts/files/2115171/Smart_Contracts_small_v6-1.pdf) for detailed preview.
 
 **ContractsManager** plays a role in the central registry which holds references to all services registered in a system.
 
@@ -73,7 +73,7 @@ A more detailed version of the scheme contains internal entities and connections
 
 As were said _ChronoBank_ ecosystem has its own token called TIME that fuels work of many functions. We gather them in one place to provide a more specific overview of their responsibilities.
 
-[![Smart_Contracts_full_v6-1.png](./misc/Smart_Contracts_full_v6-1.png)](./misc/Smart_Contracts_full_v6-1.png) [PDF version](./misc/Smart_Contracts_full_v6-1.pdf) for detailed preview.
+[![Smart_Contracts_full_v6-1.png](https://user-images.githubusercontent.com/15607315/41597809-279714c0-73d7-11e8-9f1b-10df1c161372.png)](https://user-images.githubusercontent.com/15607315/41597809-279714c0-73d7-11e8-9f1b-10df1c161372.png) [PDF version](https://github.com/ChronoBank/SmartContracts/files/2115170/Smart_Contracts_full_v6-1.pdf) for detailed preview.
 
 #### TimeHolder
 Main contracts:
@@ -195,7 +195,7 @@ export PATH=$PATH:$(pwd)/node_modules/.bin
 
 Then start TestRPC in a separate terminal by doing
 ```bash
-testrpc
+ganache-cli
 ```
 
 Then run tests in a project dir by doing
