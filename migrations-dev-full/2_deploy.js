@@ -372,6 +372,9 @@ module.exports = (deployer, network, accounts) => {
 		console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] LOC Manager setup: #done`)
 	})
 	.then(async () => {
+
+		await deployer.deploy(RewardsWallet, Storage.address, 'RewardsWallet')
+		
 		const TIME_SYMBOL = 'TIME'
 		const TIME_NAME = 'Time Token'
 		const TIME_DESCRIPTION = 'ChronoBank Time Shares'
@@ -650,7 +653,7 @@ module.exports = (deployer, network, accounts) => {
 		const assetOwnershipManagerAddr = await tokenExtension.getAssetOwnershipManager.call()
 		const assetOwnershipManager = ChronoBankAssetOwnershipManager.at(assetOwnershipManagerAddr)
 		await assetOwnershipManager.addAssetPartOwner(LHT_SYMBOL, LOCWallet.address)
-		
+
 		console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] PlatformsManager reinit with LHT: #done`)
 	})
 	.then(async () => {
@@ -764,5 +767,9 @@ module.exports = (deployer, network, accounts) => {
             }
 
 			console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] Role Capabilities setup: #done`)
+		})
+		.then(async () => {
+			let contractsManager = await ContractsManager.deployed()
+			await contractsManager.addContract(accounts[0], "Rewards")
 		})
 }
