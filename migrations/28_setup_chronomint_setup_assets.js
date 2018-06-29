@@ -5,7 +5,6 @@ const ChronoBankAssetWithFeeProxy = artifacts.require("./ChronoBankAssetWithFeeP
 const AssetsManager = artifacts.require("./AssetsManager.sol");
 const PlatformsManager = artifacts.require('./PlatformsManager.sol')
 const OwnedInterface = artifacts.require('./OwnedInterface')
-const Rewards = artifacts.require("./Rewards.sol");
 const RewardsWallet = artifacts.require("./RewardsWallet.sol");
 const ERC20Manager = artifacts.require("./ERC20Manager.sol");
 const LOCManager = artifacts.require('./LOCManager.sol');

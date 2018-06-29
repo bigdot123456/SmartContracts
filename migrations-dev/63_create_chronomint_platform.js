@@ -5,7 +5,6 @@ const ChronoBankAssetOwnershipManager = artifacts.require('ChronoBankAssetOwners
 const TokenManagementInterface = artifacts.require('./TokenManagementInterface.sol')
 const LOCWallet = artifacts.require('LOCWallet')
 const RewardsWallet = artifacts.require('RewardsWallet')
-const Rewards = artifacts.require('Rewards')
 const path = require("path")
 
 const bytes32fromBase58 = require('../test/helpers/bytes32fromBase58')
@@ -69,7 +68,7 @@ module.exports = function(deployer, network, accounts) {
                 FEE_VALUE,
                 bytes32fromBase58(lhtIconIpfsHash)
             )
-        } 
+        }
         else {
             throw `Cannot create token LHT. Result code: + ${createLhtResultCode}`
         }
@@ -77,11 +76,6 @@ module.exports = function(deployer, network, accounts) {
         const assetOwnershipManagerAddr = await tokenExtension.getAssetOwnershipManager.call()
         const assetOwnershipManager = ChronoBankAssetOwnershipManager.at(assetOwnershipManagerAddr)
         await assetOwnershipManager.addAssetPartOwner(LHT_SYMBOL, LOCWallet.address)
-
-        const contractsManager = await ContractsManager.deployed()
-        await contractsManager.removeContract(Rewards.address)
-        const rewards = await Rewards.deployed()
-        await rewards.init(ContractsManager.address, RewardsWallet.address, platformAddr, 0)
 
         console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] PlatformsManager reinit with LHT: #done`)
     })

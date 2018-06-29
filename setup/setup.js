@@ -15,7 +15,6 @@ const WalletsManager = artifacts.require("./WalletsManager.sol")
 const PendingManager = artifacts.require("./PendingManager.sol")
 const TimeHolder = artifacts.require('./TimeHolder.sol')
 const TimeHolderWallet = artifacts.require('./TimeHolderWallet.sol')
-const Rewards = artifacts.require('./Rewards.sol')
 const RewardsWallet = artifacts.require('./RewardsWallet.sol')
 const Storage = artifacts.require('./Storage.sol')
 const UserManager = artifacts.require("./UserManager.sol")
@@ -37,7 +36,6 @@ const contractTypes = {
   // DEPRECATED
   Voting: "PollManager", // Voting
   VotingManager: "VotingManager", // Voting v.2
-  Rewards: "Rewards", // Rewards
   AssetsManager: "AssetsManager", // AssetsManager
   TimeHolder: "TimeHolder", //TimeHolder
   CrowdsaleManager: "CrowdsaleManager",
@@ -63,7 +61,6 @@ let timeHolder
 let timeHolderWallet
 let shareable
 let erc20Manager
-let rewards
 let rewardsWallet
 let votingManager
 let userManager
@@ -122,7 +119,6 @@ var setup = function (callback) {
       WalletsManager.deployed(),
       ERC20Manager.deployed(),
       ExchangeManager.deployed(),
-      Rewards.deployed(),
       RewardsWallet.deployed(),
       VotingManager.deployed(),
       TimeHolder.deployed(),
@@ -151,7 +147,6 @@ var setup = function (callback) {
       walletsManager,
       erc20Manager,
       exchangeManager,
-      rewards,
       rewardsWallet,
       votingManager,
       timeHolder,
@@ -166,7 +161,7 @@ var setup = function (callback) {
     shareable.cleanUnconfirmedTx = async (from = accounts[0]) => {
       let [ hashes,, ownersDone, ] = await shareable.getTxs();
       // console.log(`### from CBE ${from} hashes ${JSON.stringify(hashes)}; ownersDone ${JSON.stringify(ownersDone)}`);
-      for (var _hashIdx = 0; _hashIdx < hashes.length; _hashIdx++) {   
+      for (var _hashIdx = 0; _hashIdx < hashes.length; _hashIdx++) {
           if (ownersDone[_hashIdx].toNumber() === 0) {
             await shareable.revoke(hashes[_hashIdx], { from: from, });
           }
@@ -186,7 +181,6 @@ var setup = function (callback) {
     module.exports.timeHolderWallet = timeHolderWallet
     module.exports.shareable = shareable
     module.exports.erc20Manager = erc20Manager
-    module.exports.rewards = rewards
     module.exports.rewardsWallet = rewardsWallet
     module.exports.userManager = userManager
     module.exports.rolesLibrary = rolesLibrary

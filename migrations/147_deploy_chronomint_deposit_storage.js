@@ -1,7 +1,5 @@
-var Rewards = artifacts.require("./Rewards.sol");
+const ERC20DepositStorage = artifacts.require("./ERC20DepositStorage.sol")
 const Storage = artifacts.require('./Storage.sol');
-
-var ERC20DepositStorage = artifacts.require("./ERC20DepositStorage.sol")
 
 module.exports = function (deployer, network) {
     deployer

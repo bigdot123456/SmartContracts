@@ -1,5 +1,3 @@
-const Rewards = artifacts.require("./Rewards.sol");
-const RewardsWallet = artifacts.require("./RewardsWallet.sol")
 const StorageManager = artifacts.require("./StorageManager.sol");
 const ContractsManager = artifacts.require("./ContractsManager.sol");
 const MultiEventsHistory = artifacts.require("./MultiEventsHistory.sol");

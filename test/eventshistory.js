@@ -1,4 +1,3 @@
-const Rewards = artifacts.require("Rewards")
 const AssetsManager = artifacts.require("AssetsManager")
 const PlatformsManager = artifacts.require("PlatformsManager")
 const ExchangeManager = artifacts.require("ExchangeManager")
@@ -25,7 +24,6 @@ contract('MultiEventsHistory', (accounts) => {
         ExchangeManager,
         LOCManager,
         PendingManager,
-        Rewards,
         FeatureFeeManager,
         TimeHolder,
         VotingManager,

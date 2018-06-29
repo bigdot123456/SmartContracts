@@ -918,40 +918,6 @@ contract('LOC Manager', function(accounts) {
             assert.equal(balance, 100);
         })
 
-        it("should show 100 TIME for currnet rewards period", function () {
-            return Setup.rewards.totalDepositInPeriod.call(0).then((r) => {
-                assert.equal(r, 100);
-            })
-        })
-
-        it("should return periods length = 1", function () {
-            return Setup.rewards.periodsLength.call().then((r) => {
-                assert.equal(r, 0);
-            })
-        })
-
-        it("should be able to close rewards period and destribute rewards", function() {
-            let currentOwner = owner1
-            return Setup.rewards.closePeriod({from: owner}).then(() => {
-                return Setup.rewards.depositBalanceInPeriod.call(currentOwner, 0, {from: currentOwner}).then((r1) => {
-                    return Setup.rewards.totalDepositInPeriod.call(0, {from: currentOwner}).then((r2) => {
-                        return tokenContractBySymbol(SYMBOL2, ChronoBankAssetWithFeeProxy).then(_assetWithFeeProxy => {
-                            return Setup.rewards.rewardsFor.call(_assetWithFeeProxy.address, currentOwner).then((r3) => {
-                                return Setup.rewards.withdrawReward(_assetWithFeeProxy.address, r3, { from: currentOwner }).then(() => {
-                                    return _assetWithFeeProxy.balanceOf.call(currentOwner).then((r4) => {
-                                        assert.equal(r1, 100);
-                                        assert.equal(r2, 100);
-                                        assert.equal(r3, 4951); //issue reward + exchage sell + exchange buy
-                                        assert.equal(r4, 4951);
-                                    })
-                                })
-                            })
-                        })
-                    })
-                })
-            })
-        })
-
         /*   it("should be able to TIME exchange rate from Bittrex", function() {
         return rateTracker.rate.call().then((r) => {
         assert.notEqual(r,null)

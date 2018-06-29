@@ -23,7 +23,6 @@ const AssetsManager = artifacts.require("AssetsManager")
 const ChronoBankPlatformFactory = artifacts.require('ChronoBankPlatformFactory')
 const PlatformsManager = artifacts.require("PlatformsManager")
 const RewardsWallet = artifacts.require("RewardsWallet")
-const Rewards = artifacts.require("Rewards")
 var AssetDonator = artifacts.require("AssetDonator")
 var LOCWallet = artifacts.require("LOCWallet")
 var LOCManager = artifacts.require("LOCManager")
@@ -86,11 +85,11 @@ module.exports = (deployer, network, accounts) => {
 			const TIME_SYMBOL = 'TIME'
 			const TIME_NAME = 'Time Token'
 			const TIME_DESCRIPTION = 'ChronoBank Time Shares'
-	
+
 			const BASE_UNIT = 8
 			// const IS_REISSUABLE = true
 			const IS_NOT_REISSUABLE = false
-	
+
 			const platform = await ChronoBankPlatform.deployed()
 
 			await platform.issueAsset(TIME_SYMBOL, 2000000000000, TIME_NAME, TIME_DESCRIPTION, BASE_UNIT, IS_NOT_REISSUABLE)
@@ -115,11 +114,11 @@ module.exports = (deployer, network, accounts) => {
 		const LHT_SYMBOL = 'LHT'
 		const LHT_NAME = 'Labour-hour Token'
 		const LHT_DESCRIPTION = 'ChronoBank Lht Assets'
-	
+
 		const BASE_UNIT = 8
 		const IS_REISSUABLE = true
 		// const IS_NOT_REISSUABLE = false
-	
+
 		const platform = await ChronoBankPlatform.deployed()
 
 		await platform.issueAsset(LHT_SYMBOL, 0, LHT_NAME, LHT_DESCRIPTION, BASE_UNIT, IS_REISSUABLE)
@@ -144,7 +143,7 @@ module.exports = (deployer, network, accounts) => {
 		await deployer.deploy(SetStorageInterface_v_1_1)
 
 		await deployer.link(SetStorageInterface_v_1_1, [ERC20Manager,])
-        
+
         console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] Libraries deploy: #done`)
 	})
 	.then(async () => {
@@ -173,7 +172,7 @@ module.exports = (deployer, network, accounts) => {
 	})
 	.then(async () => {
 		await deployer.deploy(UserManager, Storage.address, 'UserManager')
-		
+
 		const storageManager = await StorageManager.deployed()
 		await storageManager.giveAccess(UserManager.address, 'UserManager')
 
@@ -212,7 +211,7 @@ module.exports = (deployer, network, accounts) => {
 	.then(async () => {
 		const storageManager = await StorageManager.deployed()
         await storageManager.giveAccess(FeatureFeeManager.address, 'FeatureFeeManager')
-        
+
         const featureFeeRegistry = await FeatureFeeManager.deployed()
         await featureFeeRegistry.init(ContractsManager.address
         )
@@ -229,7 +228,7 @@ module.exports = (deployer, network, accounts) => {
 	})
 	.then(async () => {
 		await deployer.deploy(TokenFactory)
-		
+
 		console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] Token Factory deploy: #done`)
 	})
 	.then(async () => {
@@ -289,37 +288,6 @@ module.exports = (deployer, network, accounts) => {
 		await history.authorize(platformsManager.address)
 
 		console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] Platforms Manager setup: #done`)
-	})
-	.then(async () => {
-		await deployer.deploy(RewardsWallet, Storage.address, 'RewardsWallet')
-
-		console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] Rewards Wallet deploy: #done`)
-	})
-	.then(async () => {
-		const storageManager = await StorageManager.deployed()
-		await storageManager.giveAccess(RewardsWallet.address, 'RewardsWallet')
-
-		const wallet = await RewardsWallet.deployed()
-		await wallet.init(ContractsManager.address)
-
-		console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] Rewards Wallet setup: #done`)
-	})
-	.then(async () => {
-		await deployer.deploy(Rewards, Storage.address, "Deposits")
-
-		console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] Rewards deploy: #done`)
-	})
-	.then(async () => {
-		const storageManager = await StorageManager.deployed()
-		await storageManager.giveAccess(Rewards.address, "Deposits")
-
-		const rewards = await Rewards.deployed()
-		await rewards.init(ContractsManager.address, RewardsWallet.address, ChronoBankPlatform.address, 0)
-
-		const history = await MultiEventsHistory.deployed()
-		await history.authorize(Rewards.address)
-
-		console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] Rewards setup: #done`)
 	})
 	.then(async () => {
 		const TIME_SYMBOL = 'TIME'
@@ -408,13 +376,13 @@ module.exports = (deployer, network, accounts) => {
 		const TIME_NAME = 'Time Token'
 		const TIME_DESCRIPTION = 'ChronoBank Time Shares'
 		const TIME_BASE_UNIT = 8
-	
+
 		//----------
 		const LHT_SYMBOL = 'LHT'
 		const LHT_NAME = 'Labour-hour Token'
 		const LHT_DESCRIPTION = 'ChronoBank Lht Assets'
 		const LHT_BASE_UNIT = 8
-	
+
 		const systemOwner = accounts[0]
 
 		const erc20Manager = await ERC20Manager.deployed()
@@ -554,10 +522,10 @@ module.exports = (deployer, network, accounts) => {
 	.then(async () => {
 		const storageManager = await StorageManager.deployed()
         await storageManager.giveAccess(PlatformTokenExtensionGatewayManager.address, "TokenExtensionGateway")
-        
+
         const tokenExtensionManager = await PlatformTokenExtensionGatewayManager.deployed()
         await tokenExtensionManager.init(ContractsManager.address)
-        
+
         const history = await MultiEventsHistory.deployed()
         await history.authorize(PlatformTokenExtensionGatewayManager.address)
 
@@ -625,11 +593,11 @@ module.exports = (deployer, network, accounts) => {
 		const LHT_BASE_UNIT = 8
 		const IS_REISSUABLE = true
 		const WITH_FEE = true
-	
+
 		const FEE_VALUE = 100 // 1%
-	
+
 		const systemOwner = accounts[0]
-	
+
 		var lhtIconIpfsHash = ""
 		if (network !== "test") {
 			//https://ipfs.infura.io:5001
@@ -674,7 +642,7 @@ module.exports = (deployer, network, accounts) => {
 				FEE_VALUE,
 				bytes32fromBase58(lhtIconIpfsHash)
 			)
-		} 
+		}
 		else {
 			throw `Cannot create token LHT. Result code: + ${createLhtResultCode}`
 		}
@@ -682,12 +650,7 @@ module.exports = (deployer, network, accounts) => {
 		const assetOwnershipManagerAddr = await tokenExtension.getAssetOwnershipManager.call()
 		const assetOwnershipManager = ChronoBankAssetOwnershipManager.at(assetOwnershipManagerAddr)
 		await assetOwnershipManager.addAssetPartOwner(LHT_SYMBOL, LOCWallet.address)
-
-		const contractsManager = await ContractsManager.deployed()
-		await contractsManager.removeContract(Rewards.address)
-		const rewards = await Rewards.deployed()
-		await rewards.init(ContractsManager.address, RewardsWallet.address, platformAddr, 0)
-
+		
 		console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] PlatformsManager reinit with LHT: #done`)
 	})
 	.then(async () => {
@@ -735,7 +698,7 @@ module.exports = (deployer, network, accounts) => {
 			const timeHolder = await TimeHolder.deployed()
 
 			const oldTimeAddress = await erc20Manager.getTokenAddressBySymbol("TIME")
-			
+
 			const totalTimeShares = (await timeHolder.totalShares(oldTimeAddress)).toNumber()
 			await timeHolder.removeListener(oldTimeAddress, VotingManager.address)
 
@@ -758,7 +721,7 @@ module.exports = (deployer, network, accounts) => {
 	})
 	.then(async () => {
 		const userManager = await UserManager.deployed()
-		
+
 		const required = (await userManager.required()).toNumber()
 		if (required < 2) {
 			const result = (await userManager.setRequired.call(2)).toNumber()
@@ -783,13 +746,13 @@ module.exports = (deployer, network, accounts) => {
 
 		const rolesLibrary = await Roles2Library.deployed()
 			await rolesLibrary.setRootUser(rootUser, true, { from: systemUser, })
-			
+
 			for (var middlewareAddress of middlewareAddresses) {
 				await rolesLibrary.addUserRole(middlewareAddress, roles.middlewareAuthority, { from: rootUser, })
 			}
-		
+
 			// Setup role capabilities
-		
+
 			const timeHolder = await TimeHolder.deployed()
 			{
 				const signature = timeHolder.contract.registerUnlockShares.getData("", 0x0, 0, 0x0, "").slice(0, 10)

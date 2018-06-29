@@ -1,5 +1,3 @@
-const Rewards = artifacts.require("Rewards")
-const RewardsWallet = artifacts.require("RewardsWallet")
 const ContractsManager = artifacts.require("ContractsManager")
 const PendingManager = artifacts.require("PendingManager")
 const TimeHolder = artifacts.require("TimeHolder")
@@ -39,10 +37,10 @@ function bindConfirmMultisig(pendingMananger) {
             if (doneEvent !== undefined) {
                 return [ true, tx, ]
             }
-        
+
             const addTxEvent = (await eventsHelper.findEvent([pendingMananger,], tx, "AddMultisigTx"))[0]
             const confirmEvent = (await eventsHelper.findEvent([pendingMananger,], tx, "Confirmation"))[0]
-        
+
             if (addTxEvent !== undefined) {
                 confirmationHash = addTxEvent.args.hash
             }
@@ -59,7 +57,7 @@ function bindConfirmMultisig(pendingMananger) {
             lastTx = await pendingMananger.confirm(confirmationHash, { from: cbe, })
             // console.log(`### cbe (${cbe}) confirms: ${JSON.stringify(lastTx, null, 4)}`)
             const doneEvent = (await eventsHelper.findEvent([pendingMananger,], lastTx, "Done"))[0]
-            
+
             // console.log(`### cbe (${cbe}) doneEvent: ${JSON.stringify(doneEvent, null, 4)}`)
             if (doneEvent !== undefined) {
                 return [ true, lastTx, ]
@@ -67,8 +65,8 @@ function bindConfirmMultisig(pendingMananger) {
         }
 
         console.log(`### "Done" not found`)
-        
-        return [ false, lastTx || tx, ]  
+
+        return [ false, lastTx || tx, ]
     }
 }
 
@@ -87,8 +85,6 @@ contract('New version of TimeHolder', (accounts) => {
 
     let contractsManager
     let pendingManager
-    let reward
-    let rewardsWallet
     let timeHolder
     let erc20DepositStorage
     let timeHolderDeprecated
@@ -120,8 +116,6 @@ contract('New version of TimeHolder', (accounts) => {
 
     before('Setup', async() => {
         storage = await Storage.new()
-        rewardsWallet = await RewardsWallet.new(storage.address, "RewardsWallet")
-        reward = await Rewards.new(storage.address, "Deposits")
         assetsManager = await AssetsManagerMock.deployed()
         chronoMintWallet = await LOCWallet.new(storage.address, "LOCWallet")
         chronoMint = await  LOCManager.new(storage.address, "LOCManager")
@@ -160,8 +154,6 @@ contract('New version of TimeHolder', (accounts) => {
             await erc20Manager.addToken(asset2.address, "", await asset2.symbol.call(), await asset2.decimals.call(), "", 0x0, 0x0)
         }
         await assetsManager.init(contractsManager.address)
-        await rewardsWallet.init(contractsManager.address)
-        await reward.init(contractsManager.address, rewardsWallet.address, STUB_PLATFORM_ADDRESS, ZERO_INTERVAL)
         await chronoMintWallet.init(contractsManager.address)
         await chronoMint.init(contractsManager.address, chronoMintWallet.address)
         await userManager.init(contractsManager.address)
@@ -184,7 +176,6 @@ contract('New version of TimeHolder', (accounts) => {
         await timeHolder.init(contractsManager.address, shares.address, timeHolderDammyWallet.address, accounts[0], erc20DepositStorage.address)
         await pendingManager.init(contractsManager.address)
         await assetsManager.addAsset(asset1.address, 'LHT', chronoMintWallet.address)
-        await multiEventsHistory.authorize(reward.address)
         await multiEventsHistory.authorize(rolesLibrary.address)
         await multiEventsHistory.authorize(timeHolder.address)
         await multiEventsHistory.authorize(pendingManager.address)
@@ -386,7 +377,7 @@ contract('New version of TimeHolder', (accounts) => {
         let userDeposit
 
         let revertedSnapshotId
-        
+
         before("prepare", async () => {
             await timeHolder.deposit(shares.address, DEPOSIT_AMOUNT, { from: user1, })
             await timeHolder.deposit(shares.address, DEPOSIT_AMOUNT, { from: user2, })
@@ -466,22 +457,22 @@ contract('New version of TimeHolder', (accounts) => {
                 const event = (await eventsHelper.findEvent([timeHolder,], tx, "Lock"))[0]
                 assert.isUndefined(event)
             })
-            
+
             it("shouldn't be allowed to withdraw shares more than available (after 'deposited - locked') with TIMEHOLDER_INSUFFICIENT_BALANCE code", async () => {
                 const availableToWithdrawAmount = userDeposit - LOCK_AMOUNT
                 assert.equal((await timeHolder.withdrawShares.call(shares.address, availableToWithdrawAmount + 1, { from: user1, })).toNumber(), ErrorsEnum.TIMEHOLDER_INSUFFICIENT_BALANCE)
             })
-            
+
             it("should be allowed to withdraw an amount less than deposited with OK code", async () => {
                 const availableToWithdrawAmount = userDeposit - LOCK_AMOUNT
-                assert.equal((await timeHolder.withdrawShares.call(shares.address, availableToWithdrawAmount - 1, { from: user1, })).toNumber(), ErrorsEnum.OK)  
+                assert.equal((await timeHolder.withdrawShares.call(shares.address, availableToWithdrawAmount - 1, { from: user1, })).toNumber(), ErrorsEnum.OK)
             })
 
             it("should be able to lock the rest of deposited amount with OK code", async () => {
                 const availableToLockAmount = userDeposit - LOCK_AMOUNT
                 assert.equal((await timeHolder.lock.call(shares.address, availableToLockAmount, { from: user1, })).toNumber(), ErrorsEnum.OK)
             })
-            
+
             it("should be able to lock the rest of deposited amount", async () => {
                 const availableToLockAmount = userDeposit - LOCK_AMOUNT
                 const tx = await timeHolder.lock(shares.address, availableToLockAmount, { from: user1, })
@@ -524,11 +515,11 @@ contract('New version of TimeHolder', (accounts) => {
                 assert.equal(unlockAmount, 0)
                 assert.equal(unlockHolder, 0x0)
             })
-            
+
             it("shouldn't be able to unlock without certain registrationID with TIMEHOLDER_NO_REGISTERED_UNLOCK_FOUND code", async () => {
                 assert.equal((await timeHolder.unlockShares.call(registrationId, secret)).toNumber(), ErrorsEnum.TIMEHOLDER_NO_REGISTERED_UNLOCK_FOUND)
             })
-            
+
             it("shouldn't be able to unlock without certain registrationID", async () => {
                 const tx = await timeHolder.unlockShares(registrationId, secret)
                 const event = (await eventsHelper.findEvent([timeHolder,], tx, "UnlockShares"))[0]
@@ -537,22 +528,22 @@ contract('New version of TimeHolder', (accounts) => {
 
             it("shouldn't allow to register unlock by non-middleware role address with UNAUTHORIZED code", async () => {
                 assert.equal((await timeHolder.registerUnlockShares.call(
-                    registrationId, 
-                    shares.address, 
-                    lockedAmount, 
-                    user1, 
-                    secretLock, 
+                    registrationId,
+                    shares.address,
+                    lockedAmount,
+                    user1,
+                    secretLock,
                     { from: user1, }
                 )).toNumber(), ErrorsEnum.UNAUTHORIZED)
             })
 
             it("shouldn't allow to register unlock to non-middleware role address", async () => {
                 const tx = await timeHolder.registerUnlockShares(
-                    registrationId, 
-                    shares.address, 
-                    lockedAmount, 
-                    user1, 
-                    secretLock, 
+                    registrationId,
+                    shares.address,
+                    lockedAmount,
+                    user1,
+                    secretLock,
                     { from: user1, }
                 )
                 {
@@ -567,16 +558,16 @@ contract('New version of TimeHolder', (accounts) => {
 
             it("shouldn't allow to register unlock for more tokens then were locked with TIMEHOLDER_UNLOCK_LIMIT_EXCEEDED code", async () => {
                 const multisigTx = await timeHolder.registerUnlockShares(
-                    registrationId, 
-                    shares.address, 
-                    lockedAmount + 1, 
-                    user1, 
-                    secretLock, 
+                    registrationId,
+                    shares.address,
+                    lockedAmount + 1,
+                    user1,
+                    secretLock,
                     { from: middlewareAuthorityAddress, }
                 )
                 const [ success, tx, ] = await confirmMultisig(multisigTx, [systemUser,])
                 assert.isTrue(success, "have no multisig in tx")
-                
+
                 {
                     const event = (await eventsHelper.findEvent([timeHolder,pendingManager,], tx, "RegisterUnlockShares"))[0]
                     assert.isUndefined(event)
@@ -591,11 +582,11 @@ contract('New version of TimeHolder', (accounts) => {
             it("should THROW and doesn't allow to register unlock for 0 amount of tokens", async () => {
                 try {
                     await timeHolder.registerUnlockShares.call(
-                        registrationId, 
-                        shares.address, 
-                        0, 
-                        user1, 
-                        secretLock, 
+                        registrationId,
+                        shares.address,
+                        0,
+                        user1,
+                        secretLock,
                         { from: middlewareAuthorityAddress, }
                     )
                     assert(false)
@@ -610,11 +601,11 @@ contract('New version of TimeHolder', (accounts) => {
             it("should be able to register unlock for some amount of locked tokens with MULTISIG_ADDED code", async () => {
                 partedLockAmount = Math.floor(lockedAmount / 3)
                 assert.equal((await timeHolder.registerUnlockShares.call(
-                    registrationId, 
-                    shares.address, 
-                    partedLockAmount, 
-                    user1, 
-                    secretLock, 
+                    registrationId,
+                    shares.address,
+                    partedLockAmount,
+                    user1,
+                    secretLock,
                     { from: middlewareAuthorityAddress, }
                 )).toNumber(), ErrorsEnum.MULTISIG_ADDED)
             })
@@ -622,11 +613,11 @@ contract('New version of TimeHolder', (accounts) => {
             it("should be able to register unlock for some amount of locked tokens", async () => {
                 partedLockAmount = Math.floor(lockedAmount / 3)
                 const multisigTx = await timeHolder.registerUnlockShares(
-                    registrationId, 
-                    shares.address, 
-                    partedLockAmount, 
-                    user1, 
-                    secretLock, 
+                    registrationId,
+                    shares.address,
+                    partedLockAmount,
+                    user1,
+                    secretLock,
                     { from: middlewareAuthorityAddress, }
                 )
                 const [ success, tx, ] = await confirmMultisig(multisigTx, [systemUser,])
@@ -659,11 +650,11 @@ contract('New version of TimeHolder', (accounts) => {
             it("shouldn't be able to register unlock for an existed registrationID with TIMEHOLDER_REGISTRATION_ID_EXISTS code", async () => {
                 const availableLockAmount = lockedAmount - partedLockAmount
                 assert.equal((await timeHolder.registerUnlockShares.call(
-                    registrationId, 
-                    shares.address, 
-                    availableLockAmount, 
-                    user1, 
-                    secretLock, 
+                    registrationId,
+                    shares.address,
+                    availableLockAmount,
+                    user1,
+                    secretLock,
                     { from: middlewareAuthorityAddress, }
                 )).toNumber(), ErrorsEnum.TIMEHOLDER_REGISTRATION_ID_EXISTS)
             })
@@ -671,11 +662,11 @@ contract('New version of TimeHolder', (accounts) => {
             it("shouldn't be able to register unlock for an existed registrationID", async () => {
                 const availableLockAmount = lockedAmount - partedLockAmount
                 const multisigTx = await timeHolder.registerUnlockShares(
-                    registrationId, 
-                    shares.address, 
-                    availableLockAmount, 
-                    user1, 
-                    secretLock, 
+                    registrationId,
+                    shares.address,
+                    availableLockAmount,
+                    user1,
+                    secretLock,
                     { from: middlewareAuthorityAddress, }
                 )
                 const [ success, tx, ] = await confirmMultisig(multisigTx, [systemUser,])
@@ -684,7 +675,7 @@ contract('New version of TimeHolder', (accounts) => {
                 const event = (await eventsHelper.findEvent([timeHolder,], tx, "RegisterUnlockShares"))[0]
                 assert.isUndefined(event)
             })
-            
+
             it("should keep original info for registrationID", async () => {
                 const [ unlockToken, unlockAmount, unlockHolder, ] = await timeHolder.checkUnlockedShares.call(registrationId, { from: user1, })
                 assert.equal(unlockToken, shares.address)
@@ -755,11 +746,11 @@ contract('New version of TimeHolder', (accounts) => {
 
             it(`middleware should be able to register unlock with "${registrationId}" registrationId`, async () => {
                 const multisigTx = await timeHolder.registerUnlockShares(
-                    registrationId, 
-                    shares.address, 
-                    needToUnlockAmount, 
-                    user1, 
-                    secretLock, 
+                    registrationId,
+                    shares.address,
+                    needToUnlockAmount,
+                    user1,
+                    secretLock,
                     { from: middlewareAuthorityAddress, }
                 )
                 const [ success, tx, ] = await confirmMultisig(multisigTx, [systemUser,])
@@ -771,18 +762,18 @@ contract('New version of TimeHolder', (accounts) => {
 
             it(`shouldn't allow to unregister a lock with not existed "${notExistedRegistrationId}" registrationID with TIMEHOLDER_NO_REGISTERED_UNLOCK_FOUND code`, async () => {
                 assert.equal((await timeHolder.unregisterUnlockShares.call(
-                    notExistedRegistrationId, 
+                    notExistedRegistrationId,
                     { from: middlewareAuthorityAddress, }
                 )).toNumber(), ErrorsEnum.TIMEHOLDER_NO_REGISTERED_UNLOCK_FOUND)
             })
-            
+
             it("shouldn't allow to unregister a lock by non-middleware role with UNAUTHORIZED code", async () => {
                 assert.equal((await timeHolder.unregisterUnlockShares.call(
-                    registrationId, 
+                    registrationId,
                     { from: user1, }
                 )).toNumber(), ErrorsEnum.UNAUTHORIZED)
             })
-            
+
             it("shouldn't allow to unregister a lock by non-middleware role", async () => {
                 const tx = await timeHolder.unregisterUnlockShares(registrationId, { from: user1, })
                 {
@@ -804,7 +795,7 @@ contract('New version of TimeHolder', (accounts) => {
 
             it("should allow to unregister a lock by middleware role with OK code", async () => {
                 assert.equal((await timeHolder.unregisterUnlockShares.call(
-                    registrationId, 
+                    registrationId,
                     { from: middlewareAuthorityAddress, }
                 )).toNumber(), ErrorsEnum.OK)
             })
@@ -824,7 +815,7 @@ contract('New version of TimeHolder', (accounts) => {
 
             it("user shouldn't be able to unlock shares with unregistered ID with TIMEHOLDER_NO_REGISTERED_UNLOCK_FOUND code", async () => {
                 assert.equal((await timeHolder.unregisterUnlockShares.call(
-                    notExistedRegistrationId, 
+                    notExistedRegistrationId,
                     { from: middlewareAuthorityAddress, }
                 )).toNumber(), ErrorsEnum.TIMEHOLDER_NO_REGISTERED_UNLOCK_FOUND)
             })
@@ -877,7 +868,7 @@ contract('New version of TimeHolder', (accounts) => {
             it(`middleware should be able to register unlock for first user's amount ${LOCK_AMOUNT_1}`, async () => {
                 const multisigTx = await timeHolder.registerUnlockShares(
                     registrationId1,
-                    shares.address, 
+                    shares.address,
                     LOCK_AMOUNT_1,
                     user1,
                     secretLock,
@@ -907,7 +898,7 @@ contract('New version of TimeHolder', (accounts) => {
             it(`middleware should be able to register unlock for the second user's amount ${LOCK_AMOUNT_2}`, async () => {
                 const multisigTx = await timeHolder.registerUnlockShares(
                     registrationId2,
-                    shares.address, 
+                    shares.address,
                     LOCK_AMOUNT_2,
                     user1,
                     secretLock,
@@ -923,7 +914,7 @@ contract('New version of TimeHolder', (accounts) => {
             it(`middleware shoulb be able to register unlock for the third amount ${TOTAL_LOCK_AMOUNT}`, async () => {
                 const multisigTx = await timeHolder.registerUnlockShares(
                     registrationId3,
-                    shares.address, 
+                    shares.address,
                     TOTAL_LOCK_AMOUNT,
                     user1,
                     secretLock,
@@ -1020,11 +1011,11 @@ contract('New version of TimeHolder', (accounts) => {
 
             it("should be allowed to register unlock to user2", async () => {
                 const multisigTx = await timeHolder.registerUnlockShares(
-                    registrationId, 
-                    shares.address, 
-                    LOCK_AMOUNT, 
-                    user2, 
-                    secretLock, 
+                    registrationId,
+                    shares.address,
+                    LOCK_AMOUNT,
+                    user2,
+                    secretLock,
                     { from: middlewareAuthorityAddress, }
                 )
                 const [ success, tx, ] = await confirmMultisig(multisigTx, [systemUser,])
@@ -1094,11 +1085,11 @@ contract('New version of TimeHolder', (accounts) => {
 
             it(`middleware agent should be able to register unlock request to user3 for ${UNLOCK_AMOUNT}`, async () => {
                 const multisigTx = await timeHolder.registerUnlockShares(
-                    registrationId, 
-                    shares.address, 
-                    UNLOCK_AMOUNT, 
-                    user3, 
-                    secretLock, 
+                    registrationId,
+                    shares.address,
+                    UNLOCK_AMOUNT,
+                    user3,
+                    secretLock,
                     { from: middlewareAuthorityAddress, }
                 )
                 const [ success, tx, ] = await confirmMultisig(multisigTx, [systemUser,])
@@ -1160,11 +1151,11 @@ contract('New version of TimeHolder', (accounts) => {
 
             it("middleware should be able to register unlock request with recepient user3", async () => {
                 const multisigTx = await timeHolder.registerUnlockShares(
-                    registrationId, 
-                    shares.address, 
-                    UNLOCK_AMOUNT, 
-                    user3, 
-                    secretLock, 
+                    registrationId,
+                    shares.address,
+                    UNLOCK_AMOUNT,
+                    user3,
+                    secretLock,
                     { from: middlewareAuthorityAddress, }
                 )
                 const [ success, tx, ] = await confirmMultisig(multisigTx, [systemUser,])
@@ -1201,7 +1192,7 @@ contract('New version of TimeHolder', (accounts) => {
                     assert.isUndefined(event)
                 }
             })
-            
+
             it("locked balance should be equal to 0", async () => {
                 assert.equal((await timeHolder.getLockedBalance.call(shares.address)).toNumber(), 0)
             })

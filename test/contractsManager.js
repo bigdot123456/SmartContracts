@@ -18,10 +18,6 @@ contract('Contracts Manager', function(accounts) {
       assert.equal(await Setup.contractsManager.getContractAddressByType.call(Setup.contractTypes.ExchangeManager), Setup.exchangeManager.address)
     })
 
-    it("can provide Rewards contract address.", async () => {
-      assert.equal(await Setup.contractsManager.getContractAddressByType.call(Setup.contractTypes.Rewards), Setup.rewards.address)
-    })
-
     it("can provide LOCManager address.", async () => {
       assert.equal(await Setup.contractsManager.getContractAddressByType.call(Setup.contractTypes.LOCManager), Setup.chronoMint.address)
     })
@@ -52,14 +48,14 @@ contract('Contracts Manager', function(accounts) {
 
     it("can provide Voting Manager address.", async () => {
       assert.equal(await Setup.contractsManager.getContractAddressByType.call(Setup.contractTypes.VotingManager), Setup.votingManager.address)
-    })    
+    })
 
     it("can provide Token Extension Gateway Manager address.", async () => {
       assert.equal(await Setup.contractsManager.getContractAddressByType.call(Setup.contractTypes.TokenExtensionGateway), Setup.tokenExtensionGateway.address)
     })
 
     it("doesn't allow a non CBE key to change the contract address", async () => {
-      await Setup.contractsManager.addContract(Setup.rewards.address, Setup.contractTypes.VotingManager, { from: owner1, })
+      await Setup.contractsManager.addContract("0x2", Setup.contractTypes.VotingManager, { from: owner1, })
       assert.equal(await Setup.contractsManager.getContractAddressByType.call(Setup.contractTypes.VotingManager), Setup.votingManager.address)
     })
 

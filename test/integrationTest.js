@@ -38,12 +38,5 @@ contract("Integration test", function(accounts) {
             assert.isTrue(await Setup.assetsManager.isAssetOwner.call(LHT_SYMBOL, systemOwner))
             assert.isTrue(await Setup.assetsManager.isAssetOwner.call(LHT_SYMBOL, LOCWallet.address))
         })
-
-        it("should have a list of tokens in Rewards contract", async () => {
-            let tokens = await Setup.rewards.getAssets.call()
-            let lhtTokenAddr = await Setup.erc20Manager.getTokenAddressBySymbol.call(LHT_SYMBOL)
-            assert.isAtLeast(tokens.length, 1)
-            assert.include(tokens, lhtTokenAddr)
-        })
     })
 })
