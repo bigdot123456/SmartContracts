@@ -51,6 +51,9 @@ contract PollInterface is OwnedInterface {
     /// @notice Votes for a picked option. Usually numbers from `1` to max value are used.
     function vote(uint8 _choice) public returns (uint);
 
+    /// @notice Cancel vote to allow revote. 
+    function cancelVote() public returns (uint);
+
     /// @notice Activates poll, so users can start voting.
     function activatePoll() public returns (uint);
 

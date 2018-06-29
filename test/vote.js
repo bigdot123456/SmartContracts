@@ -230,12 +230,54 @@ contract('Vote', function(accounts) {
             })
 
             it("user shouldn\'t be able to vote twice", async () => {
-                try {
-                    await pollEntity.vote.call(2, { from: owner })
-                    assert.isTrue(false)
-                } catch (e) {
-                    assert.isTrue(true)
-                }
+                assert.equal((await pollEntity.vote.call(2, { from: owner })).toNumber(), ErrorsEnum.POLL_BACKEND_ALREADY_VOTED)
+            })
+
+            it('should be able to get balances of votes for poll', async () => {
+                const timeHolderBalance = await Setup.timeHolder.depositBalance.call(owner)
+
+                let optionsAndBalances = await pollEntity.getVotesBalances.call()
+                assert.lengthOf(optionsAndBalances, 2)
+
+                let [ , balances, ] = optionsAndBalances
+                assert.equal(balances[0].toString(16), timeHolderBalance.toString(16))
+            })
+
+            it("owner should be able to cancel vote, option 1 ", async () => {
+                let successVotingResultCode = await pollEntity.cancelVote.call({ from: owner })
+                assert.equal(successVotingResultCode, ErrorsEnum.OK)
+
+                let voteTx = await pollEntity.cancelVote({ from: owner })
+                console.log('unvote in poll', voteTx.tx);
+
+                let emitter = await PollEmitter.at(pollEntity.address)
+                let event = (await eventsHelper.findEvent([emitter], voteTx, "PollUnvoted"))[0]
+                assert.isDefined(event)
+            })
+
+            it("voter (owner) should have no option voted", async () => {
+                let choice = await pollEntity.memberOptions.call(owner)
+                assert.equal(choice, 0)
+            })
+
+            it('should be able to get balances of votes for poll after cancelling a vote', async () => {
+                let optionsAndBalances = await pollEntity.getVotesBalances.call()
+                assert.lengthOf(optionsAndBalances, 2)
+
+                let [ , balances, ] = optionsAndBalances
+                assert.equal(balances[0].toString(16), '0')
+            })
+	
+            it("owner should be able to vote again, option 1 ", async () => {
+                let successVotingResultCode = await pollEntity.vote.call(1, { from: owner })
+                assert.equal(successVotingResultCode, ErrorsEnum.OK)
+
+                let voteTx = await pollEntity.vote(1, { from: owner })
+                console.log('vote in poll', voteTx.tx);
+
+                let emitter = await PollEmitter.at(pollEntity.address)
+                let event = (await eventsHelper.findEvent([emitter], voteTx, "PollVoted"))[0]
+                assert.isDefined(event)
             })
 
             it("should be able to fetch details for a poll", async () => {

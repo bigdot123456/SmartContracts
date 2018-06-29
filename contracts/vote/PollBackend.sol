@@ -36,6 +36,7 @@ contract PollBackend is Owned, MultiSigSupporter {
     uint constant ERROR_POLL_BACKEND_NO_SHARES = 26002;
     uint constant ERROR_POLL_BACKEND_INVALID_STATE = 26003;
     uint constant ERROR_POLL_BACKEND_ALREADY_VOTED = 26004;
+    uint constant ERROR_POLL_BACKEND_NOT_VOTED = 26005;
 
     /// @title Defines finite number of poll's state:
     /// - Prepare - poll is probably initialized and ready to be activated
@@ -255,6 +256,34 @@ contract PollBackend is Owned, MultiSigSupporter {
 
         return OK;
     }
+
+    /// @notice Performs a cancel of caller vote if exist. 
+    ///
+    /// @dev delegatecall only. Should be called by only those contracts that have balance in TimeHolder.
+    ///
+    /// @return _resultCode result code of an operation. Returns ERROR_POLL_BACKEND_NO_SHARES if
+    /// a balance in TimeHolder for the user is equal to zero.
+
+    function cancelVote() public returns (uint _resultCode) {
+        uint8 choice = memberOptions[msg.sender];
+        if (choice == 0) {
+            return _emitError(ERROR_POLL_BACKEND_NOT_VOTED);
+        }
+        
+        if (!active()) {
+            return _emitError(ERROR_POLL_BACKEND_INVALID_STATE);
+        }
+        
+        address timeHolder = lookupManager("TimeHolder");
+        uint balance = TimeHolderInterface(timeHolder).depositBalance(msg.sender);
+        optionsBalance[choice] = optionsBalance[choice].sub(balance);
+        memberOptions[msg.sender] = 0;
+
+        getEventsHistory().emitPollUnvoted(choice);
+        
+        return OK;
+    }
+
 
     /// @notice Activates poll so users could vote and no more changes can be made.
     /// @dev delegatecall only. Multisignature required

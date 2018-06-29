@@ -19,6 +19,7 @@ contract PollEmitter is MultiEventsHistoryAdapter {
     /** Events */
 
     event PollVoted(address indexed self, uint8 choice);
+    event PollUnvoted(address indexed self, uint8 choice);
     event PollActivated(address indexed self);
     event PollEnded(address indexed self);
     event PollDetailsHashUpdated(address indexed self, bytes32 hash);
@@ -33,6 +34,10 @@ contract PollEmitter is MultiEventsHistoryAdapter {
 
     function emitPollVoted(uint8 choice) public {
         emit PollVoted(_self(), choice);
+    }
+
+    function emitPollUnvoted(uint8 choice) public {
+        emit PollUnvoted(_self(), choice);
     }
 
     function emitPollActivated() public {
