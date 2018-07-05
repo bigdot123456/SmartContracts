@@ -6,7 +6,10 @@
   "scripts": {
     "release": "standard-version",
     "install": "cp truffle-config.js truffle.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx truffle test",
+    "compile": "npx truffle compile",
+    "compile:all": "npx truffle compile --all",
+    "testrpc": "npx ganache-cli -g 1 --gasLimit 4700000 --trace_request true | grep -Ev \"FilterSubprovider|eth_getFilterChanges\"",
     "testgas": "NODE_ENV=gasreportgen ./node_modules/truffle/build/cli.bundled.js test",
     "gasreport": "./scripts/gas-report/gasreport.cli.js"
   },

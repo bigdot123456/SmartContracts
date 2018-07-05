@@ -46,7 +46,16 @@ contract PollInterface is OwnedInterface {
         bytes32 _detailsIpfsHash,
         uint _votelimit,
         uint _deadline
-    ) public returns (uint);
+        ) public returns (uint);
+
+    /// @notice Updates polls' details after the initialization. 
+    /// Should be called before activation
+    function updatePollDetails(
+        uint _optionsCount,
+        bytes32 _detailsIpfsHash,
+        uint _votelimit,
+        uint _deadline
+        ) public returns (uint);
 
     /// @notice Votes for a picked option. Usually numbers from `1` to max value are used.
     function vote(uint8 _choice) public returns (uint);
@@ -73,19 +82,10 @@ contract PollInterface is OwnedInterface {
         bool _active,
         uint _creation,
         uint _optionsCount
-    );
+        );
 
     /// @notice Get information about current poll situation for existed options: how much tokens are placed for which options.
     function getVotesBalances() public view returns (uint8[], uint[]);
-
-    /// @notice Changes details hash with a new version. Should be called before poll will be activated
-    /// Emits PollDetailsHashUpdated event
-    ///
-    /// @dev delegatecall only. poll owner only
-    ///
-    /// @param _detailsIpfsHash updated ipfs hash value
-    /// @return result code of an operation.
-    function updatePollDetailsIpfsHash(bytes32 _detailsIpfsHash) public returns (uint);
 }
 
 
