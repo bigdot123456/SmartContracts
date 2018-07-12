@@ -49,7 +49,7 @@ contract PollBackend is Owned, MultiSigSupporter {
     * DO NOT CHANGE VARIABLES' LAYOUT UNDER ANY CIRCUMSTANCES!
     */
 
-    address internal backendAddress;
+    address internal backendProviderAddress;
     address internal contractsManager;
 
     bytes32 internal detailsIpfsHash;
@@ -68,6 +68,8 @@ contract PollBackend is Owned, MultiSigSupporter {
     /// @dev Stores total amount of tokens that where put for an option
     mapping(uint8 => uint) public optionsBalance;
 
+    /// @dev Presents version of a backend contract. MUST BE UPDATED AFTER ANY CHANGES
+    bytes32 public version = "1.0.2";
 
     /** Modifiers */
 

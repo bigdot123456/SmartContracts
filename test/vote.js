@@ -4,12 +4,10 @@ const bytes32fromBase58 = require('./helpers/bytes32fromBase58')
 const eventsHelper = require('./helpers/eventsHelper')
 const Setup = require('../setup/setup')
 const ErrorsEnum = require("../common/errors");
-const TimeMachine = require('./helpers/timemachine')
 
 const Clock = artifacts.require('./Clock.sol')
 const Stub = artifacts.require('./Stub.sol')
 const MultiEventsHistory = artifacts.require('./MultiEventsHistory.sol')
-const PendingManager = artifacts.require("./PendingManager.sol")
 const ChronoBankAssetProxy = artifacts.require("./ChronoBankAssetProxy.sol")
 const VotingManager = artifacts.require("./VotingManager.sol")
 const PollInterface = artifacts.require("./PollInterface.sol")
@@ -17,10 +15,8 @@ const PollBackend = artifacts.require("./PollBackend.sol")
 const VotingManagerEmitter = artifacts.require("./VotingManagerEmitter.sol")
 const PollEmitter = artifacts.require("./PollEmitter.sol")
 const ERC20Manager = artifacts.require("./ERC20Manager.sol")
-const Roles2Library = artifacts.require("./Roles2Library.sol")
 
 const reverter = new Reverter(web3)
-const timeMachine = new TimeMachine(web3)
 const utils = require('./helpers/utils');
 
 contract('Vote', function(accounts) {
@@ -664,10 +660,6 @@ contract('Vote', function(accounts) {
 
         before(async () => {
             [poll,] = await createPolls(1, user, activate = false)
-
-            console.info(`poll history ${await PollBackend.at(poll.address).getEventsHistory()}`)
-            console.info(`voting history ${await votingManager.getEventsHistory()}`)
-            console.info(`events history ${MultiEventsHistory.address}`)
         })
 
         after(async () => {
@@ -714,7 +706,6 @@ contract('Vote', function(accounts) {
             )
 
             let updateDetailsTx = await poll.updatePollDetails(updatedOptionsCount, updatedDetailsHash, originalVoteLimit, originalDeadline, { from: owner })
-            console.log(`tx receipt ${JSON.stringify(updateDetailsTx, null, 4)}`);
             {
                 let emitter = await PollEmitter.at(poll.address)
                 let event = (await eventsHelper.findEvent([emitter], updateDetailsTx, "PollDetailsUpdated"))[0]
