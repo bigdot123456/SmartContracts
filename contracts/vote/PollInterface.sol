@@ -6,10 +6,11 @@
 pragma solidity ^0.4.11;
 
 import "../core/common/OwnedInterface.sol";
+import "./PollEmitter.sol";
 
 
 /// @title Defines public interface for polls: how to interact and what could be asked.
-contract PollInterface is OwnedInterface {
+contract PollInterface is OwnedInterface, PollEmitter {
 
     /** Getters */
 
