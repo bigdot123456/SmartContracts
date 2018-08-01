@@ -22,7 +22,7 @@ contract PollEmitter is MultiEventsHistoryAdapter {
     event PollUnvoted(address indexed self, uint8 choice);
     event PollActivated(address indexed self);
     event PollEnded(address indexed self);
-    event PollDetailsHashUpdated(address indexed self, bytes32 hash);
+    event PollDetailsUpdated(address indexed self);
     event Error(address indexed self, uint errorCode);
 
 
@@ -48,7 +48,7 @@ contract PollEmitter is MultiEventsHistoryAdapter {
         emit PollEnded(_self());
     }
 
-    function emitPollDetailsHashUpdated(bytes32 hash) public {
-        emit PollDetailsHashUpdated(_self(), hash);
+    function emitPollDetailsUpdated() public {
+        emit PollDetailsUpdated(_self());
     }
 }

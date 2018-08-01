@@ -22,6 +22,7 @@ const Roles2Library = artifacts.require("Roles2Library")
 const MultiEventsHistory = artifacts.require('./MultiEventsHistory.sol')
 const TokenFactory = artifacts.require("./TokenFactory.sol")
 const StorageManager = artifacts.require('StorageManager.sol')
+const PollBackendProvider = artifacts.require('PollBackendProvider.sol')
 const VotingManager = artifacts.require('VotingManager.sol')
 const PlatformTokenExtensionGatewayManager = artifacts.require('./PlatformTokenExtensionGatewayManager.sol')
 //const CrowdsaleManager = artifacts.require("./CrowdsaleManager.sol");
@@ -62,6 +63,7 @@ let timeHolderWallet
 let shareable
 let erc20Manager
 let rewardsWallet
+let pollBackendProvider
 let votingManager
 let userManager
 let rolesLibrary
@@ -120,6 +122,7 @@ var setup = function (callback) {
       ERC20Manager.deployed(),
       ExchangeManager.deployed(),
       RewardsWallet.deployed(),
+      PollBackendProvider.deployed(),
       VotingManager.deployed(),
       TimeHolder.deployed(),
       TimeHolderWallet.deployed(),
@@ -148,6 +151,7 @@ var setup = function (callback) {
       erc20Manager,
       exchangeManager,
       rewardsWallet,
+      pollBackendProvider,
       votingManager,
       timeHolder,
       timeHolderWallet,
@@ -189,6 +193,7 @@ var setup = function (callback) {
     module.exports.chronoBankAssetProxy = chronoBankAssetProxy
     module.exports.chronoBankAssetWithFee = chronoBankAssetWithFee
     module.exports.chronoBankAssetWithFeeProxy = chronoBankAssetWithFeeProxy
+    module.exports.pollBackendProvider = pollBackendProvider // voting v.2
     module.exports.votingManager = votingManager // voting v.2
     module.exports.multiEventsHistory = multiEventsHistory
     module.exports.storageManager = storageManager

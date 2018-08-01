@@ -49,7 +49,7 @@ contract PollBackend is Owned, MultiSigSupporter {
     * DO NOT CHANGE VARIABLES' LAYOUT UNDER ANY CIRCUMSTANCES!
     */
 
-    address internal backendAddress;
+    address internal backendProviderAddress;
     address internal contractsManager;
 
     bytes32 internal detailsIpfsHash;
@@ -68,6 +68,8 @@ contract PollBackend is Owned, MultiSigSupporter {
     /// @dev Stores total amount of tokens that where put for an option
     mapping(uint8 => uint) public optionsBalance;
 
+    /// @dev Presents version of a backend contract. MUST BE UPDATED AFTER ANY CHANGES
+    bytes32 public version = "1.0.2";
 
     /** Modifiers */
 
@@ -197,22 +199,55 @@ contract PollBackend is Owned, MultiSigSupporter {
     /// @param _deadline time to end voting
     ///
     /// @return result code of an operation
-    function init(uint _optionsCount, bytes32 _detailsIpfsHash, uint _votelimit, uint _deadline) onlyContractOwner public returns (uint) {
-        require(_optionsCount >= 2 && _optionsCount <= OPTIONS_POLLS_MAX);
-        require(_detailsIpfsHash != bytes32(0));
-        require(_votelimit <= getVoteLimit());
-        require(_deadline > now);
-
+    function init(
+        uint _optionsCount, 
+        bytes32 _detailsIpfsHash, 
+        uint _votelimit, 
+        uint _deadline
+    ) 
+    onlyContractOwner 
+    public 
+    returns (uint) 
+    {
         if (creation != 0) {
             return _emitError(ERROR_POLL_BACKEND_INVALID_INVOCATION);
         }
 
-        optionsCount = _optionsCount;
-        detailsIpfsHash = _detailsIpfsHash;
-        votelimit = _votelimit;
-        deadline = _deadline;
         creation = now;
+        _setPollDetails(_optionsCount, _detailsIpfsHash, _votelimit, _deadline);
+        return OK;
+    }
 
+    /// @notice Updates poll details. Should be done after first poll initialization.
+    /// Could be invoked multiple times but only before poll activation.
+    /// Emits PollDetailsUpdated event 
+    /// @param _optionsCount number of options in a poll
+    /// @param _detailsIpfsHash ipfs hash for poll's details info
+    /// @param _votelimit votelimit. Should be less than votelimit that is defined on a backend
+    /// @param _deadline time to end voting
+    /// @return result of an operation
+    function updatePollDetails(
+        uint _optionsCount,
+        bytes32 _detailsIpfsHash,
+        uint _votelimit,
+        uint _deadline
+    ) 
+    onlyContractOwner
+    public 
+    returns (uint)
+    {
+        if (creation == 0) {
+            return _emitError(ERROR_POLL_BACKEND_INVALID_INVOCATION);
+        }
+
+        if (active()) {
+            return _emitError(ERROR_POLL_BACKEND_INVALID_STATE);
+        }
+
+        bool _updated = _setPollDetails(_optionsCount, _detailsIpfsHash, _votelimit, _deadline);
+        if (_updated) {
+            getEventsHistory().emitPollDetailsUpdated();
+        }
         return OK;
     }
 
@@ -335,20 +370,6 @@ contract PollBackend is Owned, MultiSigSupporter {
         selfdestruct(contractOwner);
     }
 
-    /// @notice Changes details hash with a new version. Should be called before poll will be activated
-    /// Emits PollDetailsHashUpdated event
-    /// @dev delegatecall only. poll owner only
-    /// @param _detailsIpfsHash updated ipfs hash value
-    /// @return result code of an operation.
-    function updatePollDetailsIpfsHash(bytes32 _detailsIpfsHash) onlyContractOwner public returns (uint) {
-        require(_detailsIpfsHash != bytes32(0));
-
-        detailsIpfsHash = _detailsIpfsHash;
-
-        getEventsHistory().emitPollDetailsHashUpdated(_detailsIpfsHash);
-        return OK;
-    }
-
     /** ListenerInterface interface */
 
     /// @notice Implements deposit method and receives calls from TimeHolder. Updates poll according to changes
@@ -423,6 +444,41 @@ contract PollBackend is Owned, MultiSigSupporter {
     }
 
     /** PRIVATE section */
+
+    function _setPollDetails(
+        uint _optionsCount,
+        bytes32 _detailsIpfsHash,
+        uint _votelimit,
+        uint _deadline
+    )
+    private
+    returns (bool _changed)
+    {
+        require(_optionsCount >= 2 && _optionsCount <= OPTIONS_POLLS_MAX);
+        require(_detailsIpfsHash != bytes32(0));
+        require(_votelimit <= getVoteLimit());
+        require(_deadline > now);
+
+        if (optionsCount != _optionsCount) {
+            optionsCount = _optionsCount;
+            _changed = true;
+        }
+        
+        if (detailsIpfsHash != _detailsIpfsHash) {
+            detailsIpfsHash = _detailsIpfsHash;
+            _changed = true;
+        }
+
+        if (votelimit != _votelimit) {
+            votelimit = _votelimit;
+            _changed = true;
+        }
+
+        if (deadline != _deadline) {
+            deadline = _deadline;
+            _changed = true;
+        }
+    }
 
     function _isReadyToEndPoll(uint _value) private view returns (bool) {
         uint _voteLimitNumber = votelimit;

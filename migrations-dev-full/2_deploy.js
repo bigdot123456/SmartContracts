@@ -23,21 +23,22 @@ const AssetsManager = artifacts.require("AssetsManager")
 const ChronoBankPlatformFactory = artifacts.require('ChronoBankPlatformFactory')
 const PlatformsManager = artifacts.require("PlatformsManager")
 const RewardsWallet = artifacts.require("RewardsWallet")
-var AssetDonator = artifacts.require("AssetDonator")
-var LOCWallet = artifacts.require("LOCWallet")
-var LOCManager = artifacts.require("LOCManager")
-var ERC20DepositStorage = artifacts.require("ERC20DepositStorage")
+const AssetDonator = artifacts.require("AssetDonator")
+const LOCWallet = artifacts.require("LOCWallet")
+const LOCManager = artifacts.require("LOCManager")
+const ERC20DepositStorage = artifacts.require("ERC20DepositStorage")
 const TimeHolderWallet = artifacts.require('TimeHolderWallet')
 const TimeHolder = artifacts.require("TimeHolder")
 const PendingManager = artifacts.require("PendingManager")
-var ExchangeFactory = artifacts.require("ExchangeFactory")
-var ExchangeManager = artifacts.require("ExchangeManager")
+const ExchangeFactory = artifacts.require("ExchangeFactory")
+const ExchangeManager = artifacts.require("ExchangeManager")
 const WalletsFactory = artifacts.require("WalletsFactory")
 const WalletsManager = artifacts.require("WalletsManager")
-var PlatformTokenExtensionGatewayManager = artifacts.require("PlatformTokenExtensionGatewayManager")
-var PollFactory = artifacts.require('PollFactory')
-var PollBackend = artifacts.require('PollBackend')
-var VotingManager = artifacts.require('VotingManager')
+const PlatformTokenExtensionGatewayManager = artifacts.require("PlatformTokenExtensionGatewayManager")
+const PollFactory = artifacts.require('PollFactory')
+const PollBackend = artifacts.require('PollBackend')
+const PollBackendProvider = artifacts.require('PollBackendProvider')
+const VotingManager = artifacts.require('VotingManager')
 const TokenManagementInterface = artifacts.require('TokenManagementInterface')
 const ChronoBankAssetOwnershipManager = artifacts.require('ChronoBankAssetOwnershipManager')
 const ERC20Interface = artifacts.require("ERC20Interface")
@@ -46,16 +47,16 @@ const TimeAsset = artifacts.require("TimeAsset")
 const TimeAssetProxy = artifacts.require("TimeAssetProxy")
 
 
-var FakeCoin = artifacts.require("FakeCoin")
-var FakeCoin2 = artifacts.require("FakeCoin2")
-var FakeCoin3 = artifacts.require("FakeCoin3")
-var ManagerMock = artifacts.require("ManagerMock")
-var AssetsManagerMock = artifacts.require("AssetsManagerMock")
-var Stub = artifacts.require("Stub")
-var ChronoBankPlatformTestable = artifacts.require("ChronoBankPlatformTestable")
-var KrakenPriceTicker = artifacts.require("KrakenPriceTicker")
-var FakePriceTicker = artifacts.require("FakePriceTicker")
-var Clock = artifacts.require("Clock")
+const FakeCoin = artifacts.require("FakeCoin")
+const FakeCoin2 = artifacts.require("FakeCoin2")
+const FakeCoin3 = artifacts.require("FakeCoin3")
+const ManagerMock = artifacts.require("ManagerMock")
+const AssetsManagerMock = artifacts.require("AssetsManagerMock")
+const Stub = artifacts.require("Stub")
+const ChronoBankPlatformTestable = artifacts.require("ChronoBankPlatformTestable")
+const KrakenPriceTicker = artifacts.require("KrakenPriceTicker")
+const FakePriceTicker = artifacts.require("FakePriceTicker")
+const Clock = artifacts.require("Clock")
 
 const path = require("path")
 
@@ -541,8 +542,22 @@ module.exports = (deployer, network, accounts) => {
 	})
 	.then(async () => {
 		await deployer.deploy(PollBackend)
+		
+		const pollBackend = await PollBackend.deployed()
+        await pollBackend.init(ContractsManager.address)
 
 		console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] Poll Backend deploy: #done`)
+	})
+	.then(async () => {
+		await deployer.deploy(PollBackendProvider)
+
+		console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] Poll Backend Provider deploy: #done`)
+	})
+	.then(async () => {
+		const backendProvider = await PollBackendProvider.deployed()
+		await backendProvider.setPollBackend(PollBackend.address)
+
+		console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] Poll Backend Provider setup: #done`)
 	})
 	.then(async () => {
 		await deployer.deploy(VotingManager, Storage.address, "VotingManager_v1")
@@ -554,7 +569,7 @@ module.exports = (deployer, network, accounts) => {
 		await storageManager.giveAccess(VotingManager.address, "VotingManager_v1")
 
 		const votingManager = await VotingManager.deployed()
-		await votingManager.init(ContractsManager.address, PollFactory.address, PollBackend.address)
+		await votingManager.init(ContractsManager.address, PollFactory.address, PollBackendProvider.address)
 
 		const history = await MultiEventsHistory.deployed()
 		await votingManager.setEventsHistory(history.address)
@@ -748,28 +763,28 @@ module.exports = (deployer, network, accounts) => {
 		}
 
 		const rolesLibrary = await Roles2Library.deployed()
-			await rolesLibrary.setRootUser(rootUser, true, { from: systemUser, })
+		await rolesLibrary.setRootUser(rootUser, true, { from: systemUser, })
 
-			for (var middlewareAddress of middlewareAddresses) {
-				await rolesLibrary.addUserRole(middlewareAddress, roles.middlewareAuthority, { from: rootUser, })
-			}
+		for (var middlewareAddress of middlewareAddresses) {
+			await rolesLibrary.addUserRole(middlewareAddress, roles.middlewareAuthority, { from: rootUser, })
+		}
 
-			// Setup role capabilities
+		// Setup role capabilities
 
-			const timeHolder = await TimeHolder.deployed()
-			{
-				const signature = timeHolder.contract.registerUnlockShares.getData("", 0x0, 0, 0x0, "").slice(0, 10)
-				await rolesLibrary.addRoleCapability(roles.middlewareAuthority, timeHolder.address, signature, { from: rootUser, })
-			}
-            {
-                const signature = timeHolder.contract.unregisterUnlockShares.getData("").slice(0, 10)
-                await rolesLibrary.addRoleCapability(roles.middlewareAuthority, timeHolder.address, signature, { from: rootUser, })
-            }
+		const timeHolder = await TimeHolder.deployed()
+		{
+			const signature = timeHolder.contract.registerUnlockShares.getData("", 0x0, 0, 0x0, "").slice(0, 10)
+			await rolesLibrary.addRoleCapability(roles.middlewareAuthority, timeHolder.address, signature, { from: rootUser, })
+		}
+		{
+			const signature = timeHolder.contract.unregisterUnlockShares.getData("").slice(0, 10)
+			await rolesLibrary.addRoleCapability(roles.middlewareAuthority, timeHolder.address, signature, { from: rootUser, })
+		}
 
-			console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] Role Capabilities setup: #done`)
-		})
-		.then(async () => {
-			let contractsManager = await ContractsManager.deployed()
-			await contractsManager.addContract(accounts[0], "Rewards")
-		})
+		console.log(`[MIGRATION] [${parseInt(path.basename(__filename))}] Role Capabilities setup: #done`)
+	})
+	.then(async () => {
+		let contractsManager = await ContractsManager.deployed()
+		await contractsManager.addContract(accounts[0], "Rewards")
+	})
 }

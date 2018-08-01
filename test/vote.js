@@ -4,22 +4,19 @@ const bytes32fromBase58 = require('./helpers/bytes32fromBase58')
 const eventsHelper = require('./helpers/eventsHelper')
 const Setup = require('../setup/setup')
 const ErrorsEnum = require("../common/errors");
-const TimeMachine = require('./helpers/timemachine')
 
 const Clock = artifacts.require('./Clock.sol')
 const Stub = artifacts.require('./Stub.sol')
 const MultiEventsHistory = artifacts.require('./MultiEventsHistory.sol')
-const PendingManager = artifacts.require("./PendingManager.sol")
 const ChronoBankAssetProxy = artifacts.require("./ChronoBankAssetProxy.sol")
 const VotingManager = artifacts.require("./VotingManager.sol")
 const PollInterface = artifacts.require("./PollInterface.sol")
+const PollBackend = artifacts.require("./PollBackend.sol")
 const VotingManagerEmitter = artifacts.require("./VotingManagerEmitter.sol")
 const PollEmitter = artifacts.require("./PollEmitter.sol")
 const ERC20Manager = artifacts.require("./ERC20Manager.sol")
-const Roles2Library = artifacts.require("./Roles2Library.sol")
 
 const reverter = new Reverter(web3)
-const timeMachine = new TimeMachine(web3)
 const utils = require('./helpers/utils');
 
 contract('Vote', function(accounts) {
@@ -45,13 +42,15 @@ contract('Vote', function(accounts) {
     let timeAddress
     let helperContract
 
+    let snapshotId
+
     let proxyForSymbol = async (symbol) => {
         let tokenAddress = await Setup.erc20Manager.getTokenAddressBySymbol.call(symbol)
         let proxy = await ChronoBankAssetProxy.at(tokenAddress)
         return proxy
     }
 
-    let createPolls = async (count, user) => {
+    let createPolls = async (count, user, activate = true) => {
         var polls = []
         for (var idx = 0; idx < count; ++idx) {
             var time = await clock.time.call()
@@ -59,16 +58,19 @@ contract('Vote', function(accounts) {
             let emitter = await VotingManagerEmitter.at(votingManager.address)
             let event = (await eventsHelper.findEvent([emitter], tx, 'PollCreated'))[0]
             assert.isDefined(event)
+            
             let poll = await PollInterface.at(event.args.pollAddress)
-            try {
-                await poll.activatePoll({ from: admin })
-            } catch (e) {
-                const numberOfActivePolls = (await votingManager.getActivePollsCount.call()).toNumber()
-                if (numberOfActivePolls == ACTIVE_POLLS_MAX) {
-                    utils.ensureException(e)
-                }
-                else {
-                    throw e
+            if (activate) {
+                try {
+                    await poll.activatePoll({ from: admin })
+                } catch (e) {
+                    const numberOfActivePolls = (await votingManager.getActivePollsCount.call()).toNumber()
+                    if (numberOfActivePolls == ACTIVE_POLLS_MAX) {
+                        utils.ensureException(e)
+                    }
+                    else {
+                        throw e
+                    }
                 }
             }
 
@@ -79,7 +81,6 @@ contract('Vote', function(accounts) {
     }
 
     before('setup', async () => {
-        eventor = await PendingManager.at(MultiEventsHistory.address)
         votingManager = await VotingManager.deployed()
         clock = await Clock.deployed()
         let erc20Manager = await ERC20Manager.deployed();
@@ -89,6 +90,11 @@ contract('Vote', function(accounts) {
     });
 
     context("owner shares deposit", function () {
+
+        after(async () => {
+            await reverter.promisifySnapshot()
+            snapshotId = reverter.snapshotId
+        })
 
         it("should be able to send 100 TIME to owner", async () => {
             let token = await proxyForSymbol(SYMBOL)
@@ -132,8 +138,6 @@ contract('Vote', function(accounts) {
             let depositBalance = await Setup.timeHolder.depositBalance.call(owner, { from: owner })
             assert.equal(depositBalance, timeTokensToWithdraw25Balance);
         })
-
-        it("snapshot", reverter.snapshot)
     })
 
     context("voting", function () {
@@ -338,14 +342,8 @@ contract('Vote', function(accounts) {
             })
 
             it('should be able to have to 2 active polls for owner and vote, option 2', async () => {
-                try {
-                    await otherPollEntity.activatePoll()
-
-                    let isPollActive = await otherPollEntity.active.call()
-                    assert.isOk(isPollActive)
-                } catch (e) {
-                    assert.isTrue(false);
-                }
+                await otherPollEntity.activatePoll()
+                assert.isOk(await otherPollEntity.active.call())
 
                 let successVotingResultCode = await otherPollEntity.vote.call(2, { from: owner })
                 assert.equal(successVotingResultCode, ErrorsEnum.OK)
@@ -359,40 +357,6 @@ contract('Vote', function(accounts) {
                 assert.lengthOf(pollsDetails[0], 2)
             })
 
-            it('shouldn\'t allow to update details hash for a poll by a non-owner of a poll', async () => {
-                let nonPollOwner = nonOwner
-
-                let updatedDetailsHash = bytes32('updatedhash-333')
-                let originalDetails = (await otherPollEntity.getDetails.call())[1]
-
-                let failedResultCode = await otherPollEntity.updatePollDetailsIpfsHash.call(updatedDetailsHash, { from: nonPollOwner })
-                assert.equal(failedResultCode, ErrorsEnum.UNAUTHORIZED)
-
-                let updateDetailsTx = await otherPollEntity.updatePollDetailsIpfsHash(updatedDetailsHash, { from: nonPollOwner })
-                let emitter = await PollEmitter.at(otherPollEntity.address)
-                let event = (await eventsHelper.findEvent([emitter], updateDetailsTx, "PollDetailsHashUpdated"))[0]
-                assert.isUndefined(event)
-
-                let newDetails = (await otherPollEntity.getDetails.call())[1]
-                assert.equal(newDetails, originalDetails)
-            })
-
-            it('should allow to update details hash for a poll by a owner of a poll', async () => {
-                let updatedDetailsHash = bytes32('updatedhash-333');
-                let originalDetails = (await otherPollEntity.getDetails.call())[1];
-
-                let resultCode = await otherPollEntity.updatePollDetailsIpfsHash.call(updatedDetailsHash, { from: owner });
-                assert.equal(resultCode, ErrorsEnum.OK);
-
-                let updateDetailsTx = await otherPollEntity.updatePollDetailsIpfsHash(updatedDetailsHash, { from: owner });
-                let emitter = await PollEmitter.at(otherPollEntity.address);
-                let event = (await eventsHelper.findEvent([emitter], updateDetailsTx, "PollDetailsHashUpdated"))[0];
-                assert.isDefined(event);
-                assert.equal(event.args.hash, updatedDetailsHash);
-
-                let newDetails = (await otherPollEntity.getDetails.call())[1];
-                assert.equal(newDetails, updatedDetailsHash);
-            })
         })
 
         context('two voters (+ owner1)', function () {
@@ -687,5 +651,118 @@ contract('Vote', function(accounts) {
         })
 
         it('revert', reverter.revert)
+    })
+
+    context("work with poll details", () => {
+        const user = owner
+        let nonPollOwner = nonOwner
+        let poll
+
+        before(async () => {
+            [poll,] = await createPolls(1, user, activate = false)
+        })
+
+        after(async () => {
+            await reverter.promisifyRevert(snapshotId)
+        })
+
+        it("where newly created poll is not activated", async () => {
+            assert.isFalse(await poll.active.call())
+        })
+
+        it.skip("should NOT allow to update poll details before proper initialization with POLL_BACKEND_INVALID_INVOCATION code", async () => {
+            // TODO: alesanro
+        })
+
+        it('should NOT allow to update poll details by a non-owner of a poll with UNAUTHORIZED code', async () => {
+            let updatedDetailsHash = bytes32('updatedhash-333')
+            let [ , originalDetails, originalVoteLimit, originalDeadline,,,, originalOptionsCount, ] = await poll.getDetails.call()
+            assert.equal(
+                (await poll.updatePollDetails.call(originalOptionsCount, updatedDetailsHash, originalVoteLimit, originalDeadline, { from: nonPollOwner })).toNumber(),
+                ErrorsEnum.UNAUTHORIZED
+            )
+
+            let updateDetailsTx = await poll.updatePollDetails(originalOptionsCount, updatedDetailsHash, originalVoteLimit, originalDeadline, { from: nonPollOwner })
+            {
+                let emitter = await PollEmitter.at(poll.address)
+                let event = (await eventsHelper.findEvent([emitter], updateDetailsTx, "PollDetailsUpdated"))[0]
+                assert.isUndefined(event)
+            }
+
+            let [ , newDetails, newVoteLimit, newDeadline,,,, newOptionsCount, ] = await poll.getDetails.call()
+            assert.equal(newOptionsCount.toString(16), originalOptionsCount.toString(16))
+            assert.equal(newDetails.toString(16), originalDetails.toString(16))
+            assert.equal(newVoteLimit.toString(16), originalVoteLimit.toString(16))
+            assert.equal(newDeadline.toString(16), originalDeadline.toString(16))
+        })
+
+        it("should allow to update poll details when poll is not activated with OK code", async () => {
+            let [ ,, originalVoteLimit, originalDeadline,,,, originalOptionsCount, ] = await poll.getDetails.call()
+            let updatedDetailsHash = bytes32('updatedhash-333');
+            const updatedOptionsCount = originalOptionsCount.add(2)
+            assert.equal(
+                (await poll.updatePollDetails.call(updatedOptionsCount, updatedDetailsHash, originalVoteLimit, originalDeadline, { from: owner })).toNumber(), 
+                ErrorsEnum.OK
+            )
+
+            let updateDetailsTx = await poll.updatePollDetails(updatedOptionsCount, updatedDetailsHash, originalVoteLimit, originalDeadline, { from: owner })
+            {
+                let emitter = await PollEmitter.at(poll.address)
+                let event = (await eventsHelper.findEvent([emitter], updateDetailsTx, "PollDetailsUpdated"))[0]
+                assert.isDefined(event)
+            }
+            let [ , newDetails, newVoteLimit, newDeadline,,,, newOptionsCount, ] = await poll.getDetails.call()
+            assert.equal(newOptionsCount.toString(16), updatedOptionsCount.toString(16))
+            assert.equal(newDetails.toString(16), updatedDetailsHash.toString(16))
+            assert.equal(newVoteLimit.toString(16), originalVoteLimit.toString(16))
+            assert.equal(newDeadline.toString(16), originalDeadline.toString(16))
+        })
+
+        it("should allow to update poll details when poll is not activated but not produce an event when nothing has changed", async () => {
+            let [ , originalDetails, originalVoteLimit, originalDeadline,,,, originalOptionsCount, ] = await poll.getDetails.call()
+            assert.equal(
+                (await poll.updatePollDetails.call(originalOptionsCount, originalDetails, originalVoteLimit, originalDeadline, { from: owner })).toNumber(), 
+                ErrorsEnum.OK
+            )
+
+            let updateDetailsTx = await poll.updatePollDetails(originalOptionsCount, originalDetails, originalVoteLimit, originalDeadline, { from: owner })
+            {
+                let emitter = await PollEmitter.at(poll.address)
+                let event = (await eventsHelper.findEvent([emitter], updateDetailsTx, "PollDetailsUpdated"))[0]
+                assert.isUndefined(event)
+            }
+            let [ , notChangedDetails, notChangedVoteLimit, notChangedDeadline,,,, notChangedOptionsCount, ] = await poll.getDetails.call()
+            assert.equal(notChangedOptionsCount.toString(16), originalOptionsCount.toString(16))
+            assert.equal(notChangedDetails.toString(16), originalDetails.toString(16))
+            assert.equal(notChangedVoteLimit.toString(16), originalVoteLimit.toString(16))
+            assert.equal(notChangedDeadline.toString(16), originalDeadline.toString(16))
+        })
+
+        it("should allow to activate poll", async () => {
+            await poll.activatePoll({ from: admin, })
+            assert.isTrue(await poll.active.call())  
+        })
+
+        it("should NOT allow to update poll details when poll is activated with POLL_BACKEND_INVALID_STATE code", async () => {
+            let [ , originalDetails, originalVoteLimit, originalDeadline,,,, originalOptionsCount, ] = await poll.getDetails.call()
+            let updatedDetailsHash = bytes32('updatedhash-555');
+            const updatedOptionsCount = originalOptionsCount.add(2)
+            assert.equal(
+                (await poll.updatePollDetails.call(updatedOptionsCount, updatedDetailsHash, originalVoteLimit, originalDeadline, { from: owner })).toNumber(), 
+                ErrorsEnum.POLL_BACKEND_INVALID_STATE
+            )
+
+            let updateDetailsTx = await poll.updatePollDetails(originalOptionsCount, updatedDetailsHash, originalVoteLimit, originalDeadline, { from: owner })
+            {
+                let emitter = await PollEmitter.at(poll.address)
+                let event = (await eventsHelper.findEvent([emitter], updateDetailsTx, "PollDetailsUpdated"))[0]
+                assert.isUndefined(event)
+            }
+            let [ , notChangedDetails, notChangedVoteLimit, notChangedDeadline,,,, notChangedOptionsCount, ] = await poll.getDetails.call()
+            assert.equal(notChangedOptionsCount.toString(16), originalOptionsCount.toString(16))
+            assert.equal(notChangedDetails.toString(16), originalDetails.toString(16))
+            assert.equal(notChangedVoteLimit.toString(16), originalVoteLimit.toString(16))
+            assert.equal(notChangedDeadline.toString(16), originalDeadline.toString(16))
+        })
     })
 })

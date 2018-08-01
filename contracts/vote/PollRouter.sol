@@ -9,6 +9,7 @@ import "../core/common/BaseByzantiumRouter.sol";
 import "../core/contracts/ContractsManagerInterface.sol";
 import "../core/common/Owned.sol";
 import "./PollEmitter.sol";
+import "./PollBackendProvider.sol";
 
 
 /// @title Defines a shell that will redirects almost all actions to a backend address.
@@ -23,24 +24,24 @@ contract PollRouter is BaseByzantiumRouter, PollEmitter {
     address internal contractOwner;
     address internal pendingContractOwner;
 
-    address internal backendAddress;
+    address internal backendProviderAddress;
     address internal contractsManager;
 
 
     /** PUBLIC section */
 
-    function PollRouter(address _contractsManager, address _backend) public {
-        require(_backend != 0x0);
+    function PollRouter(address _contractsManager, address _backendProviderAddress) public {
+        require(_backendProviderAddress != 0x0);
         require(_contractsManager != 0x0);
 
         contractOwner = msg.sender;
         contractsManager = _contractsManager;
-        backendAddress = _backend;
+        backendProviderAddress = _backendProviderAddress;
     }
 
     /// @notice Gets address of a backend contract
     /// @return _backend address of a backend contract
     function backend() internal view returns (address) {
-        return backendAddress;
+        return PollBackendProvider(backendProviderAddress).getPollBackend();
     }
 }
